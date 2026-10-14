@@ -46,8 +46,8 @@ export const makePendingMuseProvider = Effect.fn("makePendingMuseProvider")(func
       status: "warning",
       auth: { status: "unknown" },
       message: settings.enabled
-        ? "Checking Muse Code CLI availability..."
-        : "Muse Code is disabled in T3 Code settings.",
+        ? "正在检查 Muse Code CLI 是否可用…"
+        : "T3 Code 设置中已禁用 Muse Code。",
     },
   });
 });
@@ -93,8 +93,8 @@ export const checkMuseProviderStatus = Effect.fn("checkMuseProviderStatus")(func
       status: "error",
       auth: { status: "unknown" },
       message: missing
-        ? "Muse Code CLI (`muse`) was not found. Install Muse Code and run `muse login` on this T3 server host."
-        : "Failed to execute Muse Code CLI. Check its binary path on this T3 server host.",
+        ? "未找到 Muse Code CLI（`muse`）。请在此 T3 服务器主机上安装 Muse Code 并运行 `muse login`。"
+        : "无法执行 Muse Code CLI。请检查此 T3 服务器主机上的可执行文件路径。",
     });
   }
   if (Option.isNone(versionResult.success)) {
@@ -103,7 +103,7 @@ export const checkMuseProviderStatus = Effect.fn("checkMuseProviderStatus")(func
       version: null,
       status: "error",
       auth: { status: "unknown" },
-      message: "Muse Code CLI version check timed out.",
+      message: "Muse Code CLI 版本检查超时。",
     });
   }
   const versionOutput = versionResult.success.value;
@@ -114,7 +114,7 @@ export const checkMuseProviderStatus = Effect.fn("checkMuseProviderStatus")(func
       version,
       status: "error",
       auth: { status: "unknown" },
-      message: "Muse Code CLI is installed but failed to run.",
+      message: "已安装 Muse Code CLI，但运行失败。",
     });
   }
 
@@ -130,7 +130,7 @@ export const checkMuseProviderStatus = Effect.fn("checkMuseProviderStatus")(func
       status: "error",
       auth: { status: "unknown" },
       message:
-        "Muse Code SDK could not read the model catalog. Check your Muse installation and run `muse login` on this T3 server host.",
+        "Muse Code SDK 无法读取模型目录。请检查 Muse 安装，并在此 T3 服务器主机上运行 `muse login`。",
     });
   }
   const models = catalog.success.value;
@@ -145,8 +145,7 @@ export const checkMuseProviderStatus = Effect.fn("checkMuseProviderStatus")(func
         ? { status: "ready" }
         : {
             status: "warning",
-            message:
-              "Muse Code returned no models. Run `muse login` on this T3 server host and refresh its status.",
+            message: "Muse Code 未返回模型。请在此 T3 服务器主机上运行 `muse login` 并刷新状态。",
           }),
     },
     models,

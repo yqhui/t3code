@@ -37,20 +37,20 @@ export function PreviewFileNotShown({
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-8 py-12 sm:py-16">
         <ErrorIcon className="mb-6 size-12 text-muted-foreground/70" />
         <h1 className="mb-3 text-2xl font-semibold leading-tight text-foreground">
-          This file can&rsquo;t be shown here
+          无法在此显示此文件
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">{fileName}</span> from {host} was
-          downloaded instead.
+          <span className="font-semibold text-foreground">{fileName}</span>（来自 {host}
+          ）已改为下载。
         </p>
         <div className="mt-auto flex items-center gap-2 pt-8">
           <div className="flex-1" />
           <Button type="button" variant="outline" size="sm" onClick={onOpen}>
-            Open in browser
+            在浏览器中打开
           </Button>
           {downloadUrl ? (
             <Button type="button" size="sm" render={<a href={downloadUrl} download={fileName} />}>
-              Download
+              下载
             </Button>
           ) : null}
         </div>
@@ -71,22 +71,20 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col px-8 py-12 sm:py-16">
         <ErrorIcon className="mb-6 size-12 text-muted-foreground/70" />
         <h1 className="mb-3 text-2xl font-semibold leading-tight text-foreground">
-          This site can&rsquo;t be reached
+          无法访问此网站
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          <span className="font-semibold text-foreground">{host}</span>: {friendly}.
+          <span className="font-semibold text-foreground">{host}</span>：{friendly}。
         </p>
 
         {showDetails ? (
           <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4 text-sm">
-            <p className="mb-2 font-medium text-foreground">Try:</p>
+            <p className="mb-2 font-medium text-foreground">请尝试：</p>
             <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-              <li>Checking your connection</li>
-              <li>Confirming the dev server is running</li>
-              {move ? (
-                <li>Opening it in the environment&rsquo;s browser, which reaches its network</li>
-              ) : null}
-              <li>Checking the proxy and the firewall</li>
+              <li>检查你的网络连接</li>
+              <li>确认开发服务器正在运行</li>
+              {move ? <li>在环境的浏览器中打开（它能够访问该网络）</li> : null}
+              <li>检查代理和防火墙</li>
             </ul>
           </div>
         ) : null}
@@ -102,7 +100,7 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
             size="sm"
             onClick={() => setShowDetails((value) => !value)}
           >
-            {showDetails ? "Hide details" : "Details"}
+            {showDetails ? "隐藏详情" : "详情"}
           </Button>
           <div className="flex-1" />
           {move ? (
@@ -111,7 +109,7 @@ export function PreviewUnreachable({ url, code, description, onReload, move }: P
             </Button>
           ) : null}
           <Button type="button" size="sm" onClick={onReload}>
-            Reload
+            重新加载
           </Button>
         </div>
       </div>

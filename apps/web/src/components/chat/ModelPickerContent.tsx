@@ -856,7 +856,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
               ? {
                   disabledInstanceIds: lockedDisabledInstanceIds,
                   getDisabledInstanceTooltip: (entry: ProviderInstanceEntry) =>
-                    `${entry.displayName} is unavailable in this thread. Start a new thread to switch providers.`,
+                    `${entry.displayName} 在此会话中不可用。请新建会话以切换提供商。`,
                 }
               : {})}
           />
@@ -913,7 +913,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
           >
             <ComboboxSearchInput
               ref={searchInputRef}
-              placeholder="Search models..."
+              placeholder="搜索模型…"
               value={searchQuery}
               onChange={(e) => {
                 if (!isSearching) setSearchHeight(pickerContentRef.current?.offsetHeight ?? 0);
@@ -993,9 +993,9 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
                           className="group w-full cursor-pointer"
                         >
                           <div className="min-w-0 flex-1 text-left">
-                            <div className="text-xs font-medium leading-snug">Legacy models</div>
+                            <div className="text-xs font-medium leading-snug">旧版模型</div>
                             <div className="mt-1 text-xs font-normal leading-snug text-muted-foreground/70">
-                              {legacySection.legacyModels.length} models
+                              {legacySection.legacyModels.length} 个模型
                             </div>
                           </div>
                           <ChevronRightIcon
@@ -1076,14 +1076,14 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
                       }}
                     >
                       {providerSetupEntries.length > 1
-                        ? `Set up ${entry.displayName}`
-                        : "Open provider setup"}
+                        ? `配置 ${entry.displayName}`
+                        : "打开提供商配置"}
                     </InlineButton>
                   </div>
                 ))}
               </div>
             ) : (
-              <ComboboxEmpty className="empty:h-0">No models found</ComboboxEmpty>
+              <ComboboxEmpty className="empty:h-0">未找到模型</ComboboxEmpty>
             )}
             {updateRequiredNotices.map(({ instanceId, notice }) => (
               <p
@@ -1097,7 +1097,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
                     void navigate({ to: "/settings/providers" });
                   }}
                 >
-                  Provider settings
+                  提供商设置
                 </InlineButton>
               </p>
             ))}

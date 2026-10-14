@@ -22,8 +22,8 @@ export const GrokSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("grok").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Path to the Grok CLI binary.",
+        title: "可执行文件路径",
+        description: "Grok CLI 可执行文件的路径。",
         providerSettingsForm: { placeholder: "grok", clearWhenEmpty: "omit" },
       }),
     ),

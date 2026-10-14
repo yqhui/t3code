@@ -26,7 +26,7 @@ export function webhookAddress(
     return {
       address: endpoint.path,
       copyable: false,
-      note: "Link this environment to T3 Connect for a public URL.",
+      note: "将此环境关联到 T3 Connect 以获取公共 URL。",
     };
   }
   const url = new URL(endpoint.path, httpBaseUrl);
@@ -34,7 +34,7 @@ export function webhookAddress(
     address: url.href,
     copyable: true,
     note: isLocalLoopbackHost(url.hostname)
-      ? "Only this computer can call this address. Link T3 Connect for a public URL."
-      : "Works wherever this environment's address is reachable, for example over Tailscale or your own proxy. Link T3 Connect for a public URL.",
+      ? "只有此电脑可以调用该地址。关联 T3 Connect 以获取公共 URL。"
+      : "在能够访问此环境地址的任何位置都可使用，例如通过 Tailscale 或自建代理。关联 T3 Connect 以获取公共 URL。",
   };
 }

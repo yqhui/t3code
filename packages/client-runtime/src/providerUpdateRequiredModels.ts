@@ -4,12 +4,11 @@ import { compareSemverVersions } from "@t3tools/shared/semver";
 // Name the thing the user updates; "Claude" alone reads like the app or model.
 const RUNTIME_NAMES: Partial<Record<string, string>> = {
   claudeAgent: "Claude Code",
-  codex: "the Codex CLI",
+  codex: "Codex CLI",
 };
 
 function formatModelList(names: ReadonlyArray<string>): string {
-  if (names.length <= 2) return names.join(" and ");
-  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+  return names.join("、");
 }
 
 /**
@@ -41,5 +40,5 @@ export function formatProviderUpdateRequiredNotice(
     RUNTIME_NAMES[provider.driver] ?? PROVIDER_DISPLAY_NAMES[provider.driver] ?? provider.driver;
   const version = minVersion.startsWith("v") ? minVersion : `v${minVersion}`;
   const names = formatModelList(models.map((model) => model.name));
-  return `Update ${providerName} to ${version} or newer to use ${names}.`;
+  return `请将 ${providerName} 更新至 ${version} 或更新版本以使用 ${names}。`;
 }

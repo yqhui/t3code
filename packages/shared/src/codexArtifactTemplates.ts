@@ -27,16 +27,16 @@ export interface CodexArtifactTemplate {
 }
 
 const CODEX_ARTIFACT_TEMPLATE_LABEL_BY_KIND = {
-  document: "Document template",
-  presentation: "Presentation template",
-  spreadsheet: "Spreadsheet template",
-  site: "Site template",
-  "google-docs": "Google Doc template",
-  "google-slides": "Google Slides template",
-  "google-sheets": "Google Sheet template",
-  image: "Image template",
-  email: "Email template",
-  slack: "Slack template",
+  document: "文档模板",
+  presentation: "演示文稿模板",
+  spreadsheet: "电子表格模板",
+  site: "网站模板",
+  "google-docs": "Google Doc 模板",
+  "google-slides": "Google Slides 模板",
+  "google-sheets": "Google Sheet 模板",
+  image: "图片模板",
+  email: "邮件模板",
+  slack: "Slack 模板",
 } satisfies Record<CodexArtifactTemplateKind, string>;
 
 export type CodexArtifactTemplateAttributes = Readonly<Record<string, string | null | undefined>>;

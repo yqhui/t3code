@@ -146,14 +146,14 @@ export function describeMcpElicitation(
   return {
     appName,
     options: [
-      { decision: "cancel", label: "Cancel" },
-      { decision: "decline", label: "Decline" },
+      { decision: "cancel", label: "取消" },
+      { decision: "decline", label: "拒绝" },
       ...(persistenceOptions.has("acceptForSession") &&
       toMcpElicitationResponse(payload, "acceptForSession").action === "accept"
         ? [
             {
               decision: "acceptForSession" as const,
-              label: persistenceOptions.get("acceptForSession") || "Always allow this session",
+              label: persistenceOptions.get("acceptForSession") || "本会话内始终允许",
             },
           ]
         : []),
@@ -162,11 +162,11 @@ export function describeMcpElicitation(
         ? [
             {
               decision: "acceptAlways" as const,
-              label: persistenceOptions.get("acceptAlways") || "Always allow",
+              label: persistenceOptions.get("acceptAlways") || "始终允许",
             },
           ]
         : []),
-      { decision: "accept", label: "Approve" },
+      { decision: "accept", label: "批准" },
     ],
   };
 }

@@ -106,11 +106,11 @@ export function formatContextWindowCompactionMessage(
   autoCompactThreshold?: number | null,
 ): string {
   if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
-    return `Compacts automatically at ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
+    return `达到 ${autoCompactThreshold.toLocaleString("en-US")} Token 时自动压缩上下文。`;
   }
   return modelDisplayName
-    ? `Context for ${modelDisplayName} compacts automatically when needed.`
-    : "Context compacts automatically when needed.";
+    ? `${modelDisplayName} 的上下文会在需要时自动压缩。`
+    : "上下文会在需要时自动压缩。";
 }
 
 /**

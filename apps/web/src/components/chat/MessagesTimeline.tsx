@@ -1469,10 +1469,10 @@ const ConversationTimeline = memo(function ConversationTimeline({
         <div className="messages-timeline-row-frame">
           <div className="chat-content-lane pt-1 sm:pt-2">
             <TimelineSystemDivider
-              label="Subagent of"
+              label="父 Agent"
               detail={parentThreadLink.title}
               icon={BotIcon}
-              actionLabel="Open parent thread"
+              actionLabel="打开父会话"
               onAction={() => onOpenThread(parentThreadLink.threadId)}
             />
           </div>
@@ -1616,9 +1616,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
         className="flex h-full items-center justify-center ps-(--chat-lane-inset-start) pe-(--chat-lane-inset-end)"
         style={{ paddingBottom: contentInsetEndAdjustment }}
       >
-        <p className="text-sm text-muted-foreground/30">
-          Send a message to start the conversation.
-        </p>
+        <p className="text-sm text-muted-foreground/30">发送消息以开始对话。</p>
       </div>
     );
   }
@@ -1719,11 +1717,11 @@ function TimelineHistoryControl(props: MessagesTimelineHistoryControls) {
           <button
             type="button"
             disabled={props.loading}
-            aria-label="Load earlier turns"
+            aria-label="加载更早轮次"
             onClick={() => props.onLoadEarlier()}
             className="w-full py-1.5 text-xs text-muted-foreground/60 hover:text-foreground disabled:cursor-default"
           >
-            {props.loading ? "Loading earlier turns…" : "Load earlier turns"}
+            {props.loading ? "正在加载更早轮次…" : "加载更早轮次"}
           </button>
         ) : null}
         {props.error !== null ? (
@@ -1890,7 +1888,7 @@ function TimelineMinimap({
             }}
           />
           <button
-            aria-label={`Jump to message: ${activeItem?.userText ?? "User message"}`}
+            aria-label={`跳转到消息：${activeItem?.userText ?? "用户消息"}`}
             className="absolute inset-y-0 left-0 w-full cursor-pointer bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/70"
             onBlur={() => setActiveIndex(null)}
             onClick={(event) => {
@@ -1989,7 +1987,7 @@ function TimelineMinimap({
               >
                 <span className="dropdown-glass block rounded-xl p-3 text-left text-popover-foreground shadow-xl shadow-black/25">
                   <span className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
-                    {activeItem.userText ?? "User message"}
+                    {activeItem.userText ?? "用户消息"}
                   </span>
                   {activeItem.assistantText ? (
                     <span
@@ -2033,7 +2031,7 @@ function TimelineMinimapNavigationButton({
   onClick: () => void;
 }) {
   const previous = direction === "previous";
-  const label = previous ? "Previous turn" : "Next turn";
+  const label = previous ? "上一轮" : "下一轮";
   const Icon = previous ? ChevronUpIcon : ChevronDownIcon;
 
   return (
@@ -2451,10 +2449,10 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
               }}
               className="rounded-sm hover:text-muted-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring"
             >
-              Sent by automation
+              由自动化任务发送
             </Link>
           ) : (
-            "Sent by automation"
+            "由自动化任务发送"
           )}
         </p>
       ) : userMessage.attribution === "t3code" ? (
@@ -2462,7 +2460,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
           className="me-1 text-2xs text-muted-foreground/70"
           data-user-message-attribution="t3code"
         >
-          Sent by T3 Code
+          由 T3 Code 发送
         </p>
       ) : userMessage.attribution === "agent" ? (
         <p className="me-1 text-2xs text-muted-foreground/70" data-user-message-attribution="agent">
@@ -2470,12 +2468,12 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
             <InlineButton
               onClick={() => ctx.onOpenThread(senderThreadId)}
               tone="muted"
-              aria-label="Open sending thread"
+              aria-label="打开发送方会话"
             >
-              Sent by another agent
+              由其他 Agent 发送
             </InlineButton>
           ) : (
-            "Sent by another agent"
+            "由其他 Agent 发送"
           )}
         </p>
       ) : null}
@@ -2483,7 +2481,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
         <UserMessageIntentMarker intent={row.message.inputIntent} />
       ) : null}
       <div className="relative max-w-[80%] rounded-2xl bg-message p-3 text-message-foreground">
-        <MessageAuthorHeading>You</MessageAuthorHeading>
+        <MessageAuthorHeading>你</MessageAuthorHeading>
         {(regularImages.length > 0 || userVideos.length > 0) && (
           <div className="mb-2 grid max-w-[210px] grid-cols-2 gap-2">
             {regularImages.map((image) => (
@@ -2500,7 +2498,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
                   <button
                     type="button"
                     className="block h-full w-full cursor-zoom-in"
-                    aria-label={`Preview ${image.name}`}
+                    aria-label={`预览 ${image.name}`}
                     onClick={() => {
                       const preview = buildExpandedImagePreview(regularImages, image.id);
                       if (!preview) return;
@@ -2542,7 +2540,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
                   <div key={file.id} className="flex min-w-0 items-center gap-1">
                     <button
                       type="button"
-                      aria-label={`Preview ${file.name}`}
+                      aria-label={`预览 ${file.name}`}
                       onClick={() => ctx.onFileOpen(file)}
                       className="focus-visible:ring-ring/70 flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-md py-1 text-left text-sm hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:outline-none"
                     >
@@ -2555,14 +2553,14 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
                           <Button
                             size="icon-xs"
                             variant="ghost-muted"
-                            aria-label={`Download ${file.name}`}
+                            aria-label={`下载 ${file.name}`}
                             onClick={() => ctx.onFileDownload(file)}
                           />
                         }
                       >
                         <DownloadIcon />
                       </TooltipTrigger>
-                      <TooltipPopup side="top">Download {file.name}</TooltipPopup>
+                      <TooltipPopup side="top">下载 {file.name}</TooltipPopup>
                     </Tooltip>
                   </div>
                 );
@@ -2601,7 +2599,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
       row.projectedItem.item.status !== "waiting" ? (
         <div className="me-1 flex items-center gap-1.5">
           <span className="rounded-full border border-destructive/25 bg-destructive/8 px-1.5 py-0.5 text-3xs font-medium text-destructive">
-            {row.projectedItem.item.status}
+            {timelineStatusLabel(row.projectedItem.item.status)}
           </span>
         </div>
       ) : null}
@@ -2634,7 +2632,7 @@ function UserTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "message" 
             {promptLink !== null && (
               <MessageCopyButton
                 text={promptLink}
-                label="Copy prompt link"
+                label="复制 Prompt 链接"
                 icon={LinkIconNode}
                 variant="ghost"
               />
@@ -2654,16 +2652,16 @@ function UserMessageIntentMarker({
   const presentation =
     intent === "queued_turn"
       ? {
-          label: "Queued",
+          label: "排队中",
           icon: null,
         }
       : intent === "promoted_queued_to_steer"
         ? {
-            label: "Steer",
+            label: "插话",
             icon: Redo2Icon,
           }
         : {
-            label: "Steer",
+            label: "插话",
             icon: Redo2Icon,
           };
   const IntentIcon = presentation.icon;
@@ -2682,10 +2680,10 @@ function UserMessageIntentMarker({
       </TooltipTrigger>
       <TooltipPopup side="top">
         {intent === "queued_turn"
-          ? "Queued behind the active turn"
+          ? "已排队，将在当前轮次结束后发送"
           : intent === "promoted_queued_to_steer"
-            ? "Originally queued, then promoted to steer the active turn"
-            : "Steered the active turn"}
+            ? "原为排队消息，随后作为插话发送到当前轮次"
+            : "已插话至当前轮次"}
       </TooltipPopup>
     </Tooltip>
   );
@@ -2733,13 +2731,13 @@ function RevertUserMessageButton({
             variant="ghost"
             disabled={activity.isRevertingCheckpoint || activity.isWorking}
             onClick={() => ctx.onRevertToTurnCount(turnCount, messageId)}
-            aria-label="Edit from here"
+            aria-label="从此处编辑"
           />
         }
       >
         <Undo2Icon className="size-3" />
       </TooltipTrigger>
-      <TooltipPopup side="top">Edit from here</TooltipPopup>
+      <TooltipPopup side="top">从此处编辑</TooltipPopup>
     </Tooltip>
   );
 }
@@ -2825,7 +2823,7 @@ function AttemptFoldTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "at
         icon={row.expanded ? ChevronDown : ChevronRight}
       />
       <span className="text-xs font-medium text-foreground/80">{row.label}</span>
-      <span className="text-2xs text-muted-foreground">Cut off by a steer</span>
+      <span className="text-2xs text-muted-foreground">被插话中断</span>
     </button>
   );
 }
@@ -2915,13 +2913,13 @@ function AssistantForkButton({
                 .onForkFromRun({ sourceThreadId: projectedItem.sourceThreadId, runId })
                 .finally(() => setBusy(false));
             }}
-            aria-label="Fork from this response"
+            aria-label="从此回复分叉"
           />
         }
       >
         <GitForkIcon className={cn("size-3", busy && "animate-pulse")} />
       </TooltipTrigger>
-      <TooltipPopup side="top">Fork from this response</TooltipPopup>
+      <TooltipPopup side="top">从此回复分叉</TooltipPopup>
     </Tooltip>
   );
 }
@@ -2974,7 +2972,7 @@ function AssistantMessageMeta({
     >
       {projectedItem && projectedItem.item.status !== "completed" ? (
         <span className="rounded-full border border-border/70 px-1.5 py-0.5 font-mono text-3xs text-muted-foreground">
-          {projectedItem.item.status}
+          {timelineStatusLabel(projectedItem.item.status)}
         </span>
       ) : null}
       <AssistantCopyButton
@@ -3087,6 +3085,21 @@ function McpAppTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "mcp-app
   );
 }
 
+const timelineStatusLabels = {
+  idle: "空闲",
+  pending: "等待中",
+  running: "运行中",
+  waiting: "等待中",
+  completed: "已完成",
+  failed: "已失败",
+  cancelled: "已取消",
+  interrupted: "已中断",
+};
+
+function timelineStatusLabel(status: keyof typeof timelineStatusLabels) {
+  return timelineStatusLabels[status];
+}
+
 type V2EventTone = "muted" | "warning" | "danger" | "success";
 
 function v2EventPresentation(item: OrchestrationV2TurnItem): {
@@ -3111,21 +3124,21 @@ function v2EventPresentation(item: OrchestrationV2TurnItem): {
     }
     case "run_interrupt_request":
       return {
-        label: "Interrupt requested",
+        label: "已请求中断",
         detail: item.message,
         tone: "warning",
         icon: CircleAlertIcon,
       };
     case "run_interrupt_result":
       return {
-        label: "Run interrupted",
+        label: "运行已中断",
         detail: item.message,
         tone: "danger",
         icon: XIcon,
       };
     case "handoff":
       return {
-        label: "Context handoff",
+        label: "上下文交接",
         detail:
           item.summary ??
           `${item.fromProviderInstanceIds.join(", ")} → ${item.toProviderInstanceId}`,
@@ -3134,8 +3147,8 @@ function v2EventPresentation(item: OrchestrationV2TurnItem): {
       };
     case "fork":
       return {
-        label: "Conversation fork",
-        detail: `Continues in ${item.targetThreadId}`,
+        label: "对话分叉",
+        detail: `在 ${item.targetThreadId} 中继续`,
         tone: "muted",
         icon: GitForkIcon,
       };
@@ -3143,18 +3156,20 @@ function v2EventPresentation(item: OrchestrationV2TurnItem): {
       const tokenSummary =
         item.beforeTokenCount === undefined && item.afterTokenCount === undefined
           ? null
-          : `${item.beforeTokenCount ?? "?"} → ${item.afterTokenCount ?? "?"} tokens`;
+          : `${item.beforeTokenCount ?? "?"} → ${item.afterTokenCount ?? "?"} Token`;
       return {
-        label: "Context compacted",
+        label: "上下文已压缩",
         detail: item.summary ?? tokenSummary,
         tone: item.status === "failed" ? "danger" : "muted",
         icon: MinusIcon,
       };
     }
     case "todo_list": {
-      const steps = item.steps.map((step) => `${step.status}: ${step.text}`).join("\n");
+      const steps = item.steps
+        .map((step) => `${timelineStatusLabel(step.status)}：${step.text}`)
+        .join("\n");
       return {
-        label: "Plan updated",
+        label: "计划已更新",
         detail: [item.explanation, steps].filter(Boolean).join("\n\n") || null,
         tone: item.status === "failed" ? "danger" : "success",
         icon: CheckIcon,
@@ -3233,7 +3248,7 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
                   : "border-border/70 text-muted-foreground",
               )}
             >
-              {item.status}
+              {timelineStatusLabel(item.status)}
             </span>
           ) : null}
           {presentation.detail ? (
@@ -3243,7 +3258,7 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
           ) : null}
           {visibility !== "local" ? (
             <span className="shrink-0 rounded-full bg-muted px-1.5 py-0.5 text-3xs text-muted-foreground">
-              {visibility === "inherited" ? "Inherited" : "Synthetic"}
+              {visibility === "inherited" ? "继承" : "合成"}
             </span>
           ) : null}
           <ChevronDownIcon className="size-3 shrink-0 text-muted-foreground/60 transition-transform group-open:rotate-180" />
@@ -3262,7 +3277,7 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
           ) : null}
           {visibility === "inherited" ? (
             <p className="mt-1 font-mono text-3xs text-muted-foreground/65">
-              From {sourceThreadId}
+              来自 {sourceThreadId}
             </p>
           ) : null}
           <div className={presentation.detail ? "mt-2" : undefined}>
@@ -3315,12 +3330,12 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
                     : "border-border/70 text-muted-foreground",
                 )}
               >
-                {item.status}
+                {timelineStatusLabel(item.status)}
               </span>
             ) : null}
             {visibility !== "local" ? (
               <span className="rounded-full bg-muted px-1.5 py-0.5 text-3xs text-muted-foreground">
-                {visibility === "inherited" ? "Inherited" : "Synthetic"}
+                {visibility === "inherited" ? "继承" : "合成"}
               </span>
             ) : null}
           </div>
@@ -3337,7 +3352,7 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
           ) : null}
           {visibility === "inherited" ? (
             <p className="mt-1 font-mono text-3xs text-muted-foreground/65">
-              From {sourceThreadId}
+              来自 {sourceThreadId}
             </p>
           ) : null}
           <div className="mt-2">
@@ -3424,7 +3439,7 @@ const V2SubagentGroup = memo(function V2SubagentGroup({
     };
   });
   const summary = subagentGroupSummary(agents);
-  const label = `${members.length} ${members.length === 1 ? "subagent" : "subagents"}`;
+  const label = `${members.length} 个子 Agent`;
   const statusSummary = summarizeSubagentStatuses(agents.map(({ status }) => status));
   const toggleExpanded = (open: boolean) => {
     ctx.onToggleWorkEntry(row.id, expanded);
@@ -3554,7 +3569,7 @@ const WorkGroupSection = memo(function WorkGroupSection({
   }
 
   return (
-    <section aria-label="Activity">
+    <section aria-label="活动">
       {nonEmptyEntries.map((workEntry) => (
         <SimpleWorkEntryRow
           key={workEntry.id}
@@ -3755,7 +3770,7 @@ function ExpandedWorkGroupEntries({
           onItemSizeChanged={updateExpandedContentHeight}
           tabIndex={0}
           role="region"
-          aria-label="Tool calls"
+          aria-label="工具调用"
           data-tool-group-scroll
           style={{ maxHeight: `calc(min(18rem, 50dvh) + ${expandedContentHeight}px)` }}
           className={cn(
@@ -3797,15 +3812,15 @@ function WorkingTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "workin
   // place instead of remounting the row.
   const shimmer = isPreparingWorktree || isCompacting;
   const label = isPreparingWorktree ? (
-    "Setting up worktree…"
+    "正在设置 Worktree…"
   ) : isCompacting ? (
     <CompactingLabel />
   ) : row.createdAt ? (
     <>
-      Working for <WorkingTimer createdAt={row.createdAt} />
+      已工作 <WorkingTimer createdAt={row.createdAt} />
     </>
   ) : (
-    "Working..."
+    "工作中…"
   );
   return (
     <div className="border-b border-border/60 pb-2 pt-1">
@@ -3838,7 +3853,7 @@ function BackgroundWorktreeSetupChip({ snapshot }: { snapshot: WorktreeSetupSnap
     () => (openTerminal && terminalId ? () => openTerminal(terminalId) : null),
     [openTerminal, terminalId],
   );
-  const scriptName = snapshot.setupScript?.name ?? "Setup script";
+  const scriptName = snapshot.setupScript?.name ?? "设置脚本";
   return (
     <Popover>
       <PopoverTrigger
@@ -3847,7 +3862,7 @@ function BackgroundWorktreeSetupChip({ snapshot }: { snapshot: WorktreeSetupSnap
             variant="ghost-muted"
             size="micro"
             className="ml-auto min-w-0 shrink-0"
-            aria-label={`${scriptName} is still running. Show setup progress.`}
+            aria-label={`${scriptName} 仍在运行，查看设置进度。`}
           />
         }
       >
@@ -3871,7 +3886,7 @@ function CompactingLabel() {
   return (
     <span className="inline-flex items-center gap-1.5">
       <Minimize2Icon aria-hidden="true" className="size-3" />
-      Compacting…
+      正在压缩…
     </span>
   );
 }
@@ -3881,7 +3896,7 @@ function ThinkingTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "think
   const { isCompacting, isPreparingWorktree } = use(TimelineRowActivityCtx);
   // Reserve the activity row during setup so the handoff keeps the same height.
   if (isPreparingWorktree || isCompacting) return <WorkLogRow label="" />;
-  const activity = <LiveActivityRow label="Thinking" iconName="brain" active shimmer />;
+  const activity = <LiveActivityRow label="思考中" iconName="brain" active shimmer />;
   const { groupId } = row;
   if (groupId === undefined) return activity;
   return (
@@ -3969,7 +3984,7 @@ function LiveActivityContent({
                   : "text-icon-muted",
             )}
             role={announceFailure ? "img" : undefined}
-            aria-label={announceFailure ? "Tool call failed" : undefined}
+            aria-label={announceFailure ? "工具调用失败" : undefined}
           >
             <ToolActivityIconView
               icon={toolIcon}
@@ -4069,7 +4084,7 @@ function LiveWorkEntryTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "
       )}
       aria-label={
         failed
-          ? `${thoughtLine ? `${thoughtLine} ` : ""}${threadLabel?.text ?? label}, tool call failed`
+          ? `${thoughtLine ? `${thoughtLine} ` : ""}${threadLabel?.text ?? label}，工具调用失败`
           : undefined
       }
       aria-expanded={row.expanded}
@@ -4097,9 +4112,9 @@ function LiveWorkEntryTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "
         label={
           thoughtIsStatus ? (
             row.active ? (
-              "Thinking"
+              "思考中"
             ) : (
-              "Thought"
+              "思考"
             )
           ) : row.entry.questionAnswer && hasQuestionAnswer(row.entry.questionAnswer) ? (
             <span className="flex min-w-0 gap-1.5">
@@ -4110,10 +4125,7 @@ function LiveWorkEntryTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "
             </span>
           ) : row.entry.itemType === "reasoning" ? (
             <ReactMarkdown
-              remarkPlugins={[
-                remarkGfm,
-                [remarkThoughtPreview, row.active ? "Thinking" : "Thought"],
-              ]}
+              remarkPlugins={[remarkGfm, [remarkThoughtPreview, row.active ? "思考中" : "思考"]]}
             >
               {row.entry.detail ?? label}
             </ReactMarkdown>
@@ -4213,7 +4225,7 @@ function WorkGroupHeader(props: {
   return (
     <WorkLogButton
       ref={props.active && !props.failed ? observeVisibleAnimation : undefined}
-      aria-label={props.failed ? `${props.label}, tool call failed` : props.label}
+      aria-label={props.failed ? `${props.label}，工具调用失败` : props.label}
       aria-expanded={props.expanded}
       onClick={props.onToggle}
       icon={
@@ -4340,7 +4352,7 @@ function UserMessageMentionChip(props: {
           <ContextChip
             kind="mention"
             render={<button type="button" />}
-            aria-label={`Preview ${props.record.path}`}
+            aria-label={`预览 ${props.record.path}`}
             data-markdown-copy={props.copyMarkdown}
             onClick={() => {
               if (ctx.threadRef)
@@ -4421,7 +4433,7 @@ function UserMessagePreviewAnnotationDetails(props: {
         <button
           type="button"
           className="block max-h-64 w-full cursor-zoom-in overflow-hidden border-b border-border/70 bg-muted"
-          aria-label={`Preview ${props.image.name}`}
+          aria-label={`预览 ${props.image.name}`}
           onClick={() => {
             if (!props.image) return;
             const preview = buildExpandedImagePreview([props.image], props.image.id);
@@ -4430,18 +4442,18 @@ function UserMessagePreviewAnnotationDetails(props: {
         >
           <img
             src={props.image.previewUrl}
-            alt="Annotated preview crop"
+            alt="带标注的预览裁剪图"
             className="max-h-64 w-full object-contain"
           />
         </button>
       ) : (
         <div className="border-b border-border/70 bg-muted/40 px-3 py-2 text-secondary-label text-xs">
-          Screenshot unavailable
+          截图不可用
         </div>
       )}
       <div className="min-w-0 px-3 py-2.5">
         <div className="text-message-foreground text-xs font-medium">
-          {props.record.pageTitle?.trim() || props.record.pageUrl || "Preview annotation"}
+          {props.record.pageTitle?.trim() || props.record.pageUrl || "预览标注"}
         </div>
         {props.record.comment ? (
           <div className="mt-1 whitespace-pre-wrap wrap-break-word text-sm">
@@ -4489,8 +4501,7 @@ function UserMessagePreviewAnnotationDetails(props: {
             })}
             {(props.record.elements?.length ?? 0) > visibleElements.length ? (
               <div className="text-secondary-label text-3xs">
-                {(props.record.elements?.length ?? 0) - visibleElements.length} more selected
-                elements
+                还有 {(props.record.elements?.length ?? 0) - visibleElements.length} 个已选元素
               </div>
             ) : null}
           </div>
@@ -4556,7 +4567,7 @@ function UnavailableUserMessageContextChip(props: UserMessageContextRenderContex
     <UnresolvedChip
       label={props.reference.label}
       copyMarkdown={props.copyMarkdown}
-      tooltip="This context is no longer available."
+      tooltip="此上下文已不可用。"
     />
   );
 }
@@ -4657,7 +4668,7 @@ const userMessageContextPresentationRegistry = createContextPresentationRegistry
             isVideo={isVideo}
             theme={context.resolvedTheme}
             disabled={disabled}
-            accessibleLabel={`${isVideo ? "Video" : "File"} attachment, ${record.name}, ${size}`}
+            accessibleLabel={`${isVideo ? "视频" : "文件"}附件，${record.name}，${size}`}
             copyMarkdown={context.copyMarkdown}
             onOpen={() =>
               isVideo ? context.onExpandVideo(attachment) : context.onOpenFile(attachment)
@@ -4693,7 +4704,7 @@ const userMessageContextPresentationRegistry = createContextPresentationRegistry
         record.kind === "element" ? (
           <UserMessageContextPopover
             copyMarkdown={context.copyMarkdown}
-            accessibleLabel={`Browser element, ${record.label}`}
+            accessibleLabel={`浏览器元素，${record.label}`}
             kind="element"
             icon={<MousePointerClickIcon />}
             label={record.label}
@@ -4713,7 +4724,7 @@ const userMessageContextPresentationRegistry = createContextPresentationRegistry
         }
         const isPullRequest = isPullRequestSummaryContext(record);
         const label = reviewCommentContextLabel(record);
-        const kindLabel = isPullRequest ? pullRequestContextKindLabel(record) : "Review comment";
+        const kindLabel = isPullRequest ? pullRequestContextKindLabel(record) : "审查评论";
         const pullRequestState = pullRequestContextDisplayState(record) ?? "unknown";
         if (isPullRequest && record.pullRequest !== undefined) {
           return (
@@ -4760,7 +4771,7 @@ const userMessageContextPresentationRegistry = createContextPresentationRegistry
         record.kind === "preview-annotation" ? (
           <UserMessageContextPopover
             copyMarkdown={context.copyMarkdown}
-            accessibleLabel={`Preview annotation, ${record.label}`}
+            accessibleLabel={`预览标注，${record.label}`}
             kind="preview-annotation"
             icon={<MousePointerClickIcon />}
             label={record.label}
@@ -4869,7 +4880,7 @@ const CollapsibleUserMessageBody = memo(function CollapsibleUserMessageBody(prop
               onClick={() => setExpanded((value) => !value)}
               className="-ml-1"
             >
-              {expanded ? "Show less" : "Show full message"}
+              {expanded ? "收起" : "显示完整消息"}
             </Button>
           ) : null}
           {props.footer ? (
@@ -5325,7 +5336,7 @@ function buildToolCallExpandedBody(
             "input" in workEntry.toolData
           ? workEntry.toolData.input
           : undefined;
-    if (input !== undefined) addBlock(`Tool input\n${JSON.stringify(input, null, 2)}`);
+    if (input !== undefined) addBlock(`工具输入\n${JSON.stringify(input, null, 2)}`);
   }
   const command = workEntry.command?.trim();
   const raw = workEntryRawCommand(workEntry);
@@ -5520,7 +5531,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
     const resetAt = failureItem.failure.resetAt;
     const resetTime = resetAt ? formatUpcomingTimestamp(resetAt, timestampFormat) : null;
     const label = warning
-      ? `Usage limit reached.${resetTime ? ` Retry after ${resetTime}.` : ""}`
+      ? `已达到用量限额。${resetTime ? `请在 ${resetTime} 后重试。` : ""}`
       : workEntry.label;
     const retryRunId =
       failureItem.runId !== null &&
@@ -5567,7 +5578,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
               onClick={() => onRetryWorkspacePreparation(retryRunId)}
             >
               <RotateCcwIcon aria-hidden />
-              Retry
+              重试
             </Button>
           </div>
         ) : null}
@@ -5598,8 +5609,8 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
   const previewText =
     isReasoning && expanded
       ? workEntry.toolLifecycleStatus === "inProgress"
-        ? "Thinking"
-        : "Thought"
+        ? "思考中"
+        : "思考"
       : questionHeading || (displayLabel ?? workEntryDisplayLabel(workEntry, workspaceRoot));
   const answerPreview =
     workEntry.questionAnswer && hasQuestionAnswer(workEntry.questionAnswer)
@@ -5718,7 +5729,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
         <span
           className={iconWrapperClass}
           role={showFailedIndicator ? "img" : undefined}
-          aria-label={showFailedIndicator ? "Tool call failed" : undefined}
+          aria-label={showFailedIndicator ? "工具调用失败" : undefined}
         >
           <ToolActivityIconView
             icon={entryToolIcon}
@@ -5740,7 +5751,7 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
                     remarkGfm,
                     [
                       remarkThoughtPreview,
-                      workEntry.toolLifecycleStatus === "inProgress" ? "Thinking" : "Thought",
+                      workEntry.toolLifecycleStatus === "inProgress" ? "思考中" : "思考",
                     ],
                   ]}
                 >
@@ -5779,26 +5790,26 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
             <button
               type="button"
               className="shrink-0 rounded-sm text-sm text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-              aria-label={`Open ${createdThread.title ?? "created thread"}`}
+              aria-label={`打开 ${createdThread.title ?? "新建会话"}`}
               onClick={(event) => {
                 event.stopPropagation();
                 ctx.onOpenThread(createdThread.targetThreadId);
               }}
               onKeyDown={stopRowToggle}
             >
-              Open chat
+              打开对话
             </button>
           ) : null}
           {notifiedSubagentThreadId ? (
             <InlineButton
-              aria-label="Open subagent thread"
+              aria-label="打开子 Agent 会话"
               onClick={(event) => {
                 event.stopPropagation();
                 ctx.onOpenThread(notifiedSubagentThreadId);
               }}
               onKeyDown={stopRowToggle}
             >
-              Open subagent
+              打开子 Agent
             </InlineButton>
           ) : null}
           {showFailedIndicator &&

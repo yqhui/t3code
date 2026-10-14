@@ -115,7 +115,7 @@ export function PullRequestGuideTab({
     canWrite ? (
       <Button size={size} variant="outline" disabled={running} onClick={() => void write()}>
         {running ? <Spinner /> : <SparklesIcon aria-hidden className="size-3.5" />}
-        {running ? "Reading the change..." : label}
+        {running ? "正在阅读更改…" : label}
       </Button>
     ) : null;
 
@@ -130,16 +130,16 @@ export function PullRequestGuideTab({
     return (
       <div className="flex min-h-48 flex-col items-center justify-center gap-2 px-4 py-10 text-center">
         <p className="text-sm font-medium text-foreground">
-          {running ? "Writing a review guide" : "No review guide yet"}
+          {running ? "正在编写审查指南" : "还没有审查指南"}
         </p>
         <p className="max-w-md text-xs text-muted-foreground">
           {failure ??
             query.error ??
             (running
-              ? "An agent is reading the change. A large one takes a few minutes. You can leave; you will be told when it is ready."
-              : "A guide is a tour of the change: stops through the code in reading order, with the calls only a maintainer can make.")}
+              ? "Agent 正在阅读此更改。较大的更改需要几分钟。你可以离开；就绪后会通知你。"
+              : "指南是对更改的导览：按阅读顺序途经代码中的各站，并附上只有维护者才能做出的判断。")}
         </p>
-        {writeButton(failure === null ? "Write guide" : "Try again", "sm")}
+        {writeButton(failure === null ? "编写指南" : "重试", "sm")}
       </div>
     );
   }
@@ -151,10 +151,10 @@ export function PullRequestGuideTab({
         {running ? <Spinner /> : <TriangleAlertIcon />}
         <AlertDescription>
           {running
-            ? "Rewriting this guide. You will be told when the new one is ready."
-            : (failure ?? "Written before the latest push.")}
+            ? "正在重写此指南。新指南就绪后会通知你。"
+            : (failure ?? "写于最近一次推送之前。")}
         </AlertDescription>
-        {!running && canWrite ? <AlertAction>{writeButton("Rewrite", "xs")}</AlertAction> : null}
+        {!running && canWrite ? <AlertAction>{writeButton("重写", "xs")}</AlertAction> : null}
       </Alert>
     ) : null;
 

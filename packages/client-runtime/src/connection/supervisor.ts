@@ -227,7 +227,7 @@ function failureFromExit<A>(
     failure: {
       error: new ConnectionTransientError({
         reason: "transport",
-        detail: `${target.label} connection failed unexpectedly.`,
+        detail: `${target.label} 连接意外失败。`,
       }),
       attemptSpan: Option.none(),
     },
@@ -264,7 +264,7 @@ export const make = Effect.fn("EnvironmentSupervisor.make")(function* (
   const usesRelay = connectionRoutes(entry).some(
     (route) => route.target._tag === "RelayConnectionTarget",
   );
-  const setupTimeoutDetail = `${target.label} did not respond during connection setup.${
+  const setupTimeoutDetail = `${target.label} 在连接建立期间未响应。${
     usesRelay ? ` ${NETWORK_BLOCKING_HINT}` : ""
   }`;
   yield* annotateTarget(target);
@@ -648,7 +648,7 @@ export const make = Effect.fn("EnvironmentSupervisor.make")(function* (
           yield* Fiber.interrupt(probe);
           return yield* new ConnectionTransientError({
             reason: "timeout",
-            detail: `${target.label} did not respond to a connection health check.`,
+            detail: `${target.label} 未响应连接健康检查。`,
           });
         }
         if (probeEvent._tag === "ProbeCompleted") {

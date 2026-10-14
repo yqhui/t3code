@@ -114,7 +114,7 @@ function createWindow(
     resizable: false,
     show: false,
     skipTaskbar: true,
-    title: "T3 Code Snapshot Animation",
+    title: "T3 Code 快照动画",
     transparent: true,
     webPreferences: {
       backgroundThrottling: false,
@@ -163,7 +163,7 @@ const applyDetails=value=>{
   if(!value)return;
   details.dataset.ready="";
   document.getElementById("app").textContent=value.appName;
-  document.getElementById("title").textContent=value.windowTitle||"Captured window";
+  document.getElementById("title").textContent=value.windowTitle||"已截取的窗口";
   document.getElementById("fallback").textContent=value.appName.slice(0,1);
   if(value.appIconDataUrl){
     const icon=document.getElementById("icon");icon.src=value.appIconDataUrl;icon.style.display="block";document.getElementById("fallback").style.display="none";

@@ -143,7 +143,7 @@ export async function deliverSnapShot(
   const compressed = await compressImageToByteLimit(original, PROVIDER_SEND_TURN_MAX_IMAGE_BYTES);
   if (!compressed.ok) {
     finishSnapShotAnimation(item.id);
-    throw new Error("The captured window is too large to attach.");
+    throw new Error("捕获的窗口过大，无法附加。");
   }
   const file = compressed.file;
   const source = resizeSnapShotSource(capture.source, compressed.imageSize);
@@ -163,7 +163,7 @@ export async function deliverSnapShot(
       source,
     })
   ) {
-    throw new Error("Remove an attachment, then try this capture again.");
+    throw new Error("请移除一个附件，然后重试此捕获。");
   }
   const persisted: PersistedComposerImageAttachment = {
     id: capture.id,
@@ -179,7 +179,7 @@ export async function deliverSnapShot(
       ?.persistedAttachments.filter((attachment) => attachment.id !== capture.id) ?? [];
   await store.syncPersistedAttachments(target, [...persistedAttachments, persisted]);
   if (!store.getComposerDraft(target)?.persistedAttachments.some(({ id }) => id === capture.id)) {
-    throw new Error("The captured window could not be saved to the draft.");
+    throw new Error("捕获的窗口无法保存到草稿。");
   }
 
   // Reveal the attachment under the flying capture before the desktop tears the overlay down,
@@ -285,8 +285,8 @@ export function SnapShotCoordinator() {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot taken, but no project is available",
-                description: "Add a project, then capture the window again.",
+                title: "已拍摄快照，但没有可用项目",
+                description: "请添加项目，然后重新捕获窗口。",
               }),
             );
             continue;
@@ -302,9 +302,9 @@ export function SnapShotCoordinator() {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
-                description: `Capture ${item.id}: ${
-                  error instanceof Error ? error.message : "Try the capture again."
+                title: "快照失败",
+                description: `捕获 ${item.id}：${
+                  error instanceof Error ? error.message : "请重试此捕获。"
                 }`,
               }),
             );
@@ -317,8 +317,8 @@ export function SnapShotCoordinator() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Snapshot failed",
-            description: error instanceof Error ? error.message : "Try the capture again.",
+            title: "快照失败",
+            description: error instanceof Error ? error.message : "请重试此捕获。",
           }),
         );
       })
@@ -376,8 +376,8 @@ export function SnapShotCoordinator() {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "Snapshot failed",
-                description: state.message ?? "Try the capture again.",
+                title: "快照失败",
+                description: state.message ?? "请重试此捕获。",
               }),
             );
           });

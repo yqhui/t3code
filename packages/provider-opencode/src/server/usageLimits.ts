@@ -81,7 +81,7 @@ export const readOpenCodeGoUsageLimits = Effect.fn("readOpenCodeGoUsageLimits")(
       {
         id: "go_rolling",
         kind: "session",
-        label: "Go · Session",
+        label: "Go · 会话",
         windowDurationMins: 5 * 60,
         usedPercent: clampPercent(body.usage.rolling.percent),
         resetsAt: DateTime.formatIso(body.usage.rolling.resetsAt),
@@ -89,7 +89,7 @@ export const readOpenCodeGoUsageLimits = Effect.fn("readOpenCodeGoUsageLimits")(
       {
         id: "go_weekly",
         kind: "weekly",
-        label: "Go · Weekly",
+        label: "Go · 每周",
         windowDurationMins: 7 * 24 * 60,
         usedPercent: clampPercent(body.usage.weekly.percent),
         resetsAt: DateTime.formatIso(body.usage.weekly.resetsAt),
@@ -97,7 +97,7 @@ export const readOpenCodeGoUsageLimits = Effect.fn("readOpenCodeGoUsageLimits")(
       {
         id: "go_monthly",
         kind: "monthly",
-        label: "Go · Monthly",
+        label: "Go · 每月",
         usedPercent: clampPercent(body.usage.monthly.percent),
         resetsAt: DateTime.formatIso(body.usage.monthly.resetsAt),
       },
@@ -119,7 +119,7 @@ export const readOpenCodeGoUsageLimits = Effect.fn("readOpenCodeGoUsageLimits")(
       makeUnavailableUsageLimits({
         checkedAt,
         reason: "probeFailed",
-        message: "OpenCode Go could not read usage.",
+        message: "OpenCode Go 无法读取用量。",
       }),
     ),
   );

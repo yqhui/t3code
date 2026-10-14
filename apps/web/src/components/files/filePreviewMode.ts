@@ -13,18 +13,18 @@ export const isMarkdownPreviewFile = (path: string): boolean => /\.(?:md|mdx)$/i
 export function filePreviewReadErrorMessage(error: ProjectReadFileError): string {
   switch (error.failure) {
     case "path_not_file":
-      return "The path is a directory or special file, not a regular file.";
+      return "该路径是目录或特殊文件，不是常规文件。";
     case "binary_file":
-      return "The file is binary and cannot be displayed as text.";
+      return "该文件为二进制文件，无法以文本显示。";
     case "workspace_path_outside_root":
-      return "The requested path is outside the workspace.";
+      return "请求的路径在工作区之外。";
     case "resolved_path_outside_root":
-      return "The path resolves to a location outside the workspace.";
+      return "该路径解析到工作区之外的位置。";
     case "operation_failed":
       // A realpath failure can mean a missing path, permissions, or another I/O error.
       return error.operation === "realpath-workspace-root"
-        ? "The workspace folder could not be accessed."
-        : "The file could not be accessed or read. It may be missing or inaccessible.";
+        ? "无法访问工作区文件夹。"
+        : "无法访问或读取该文件。它可能已丢失或不可访问。";
     default:
       return error.message;
   }

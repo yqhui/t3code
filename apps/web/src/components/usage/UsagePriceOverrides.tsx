@@ -67,15 +67,15 @@ const priceTargetsAtom = Atom.make((get): readonly UsagePriceTarget[] =>
           : null,
       unavailable:
         environment.connection.phase !== "connected"
-          ? "Offline"
+          ? "离线"
           : settings === null
-            ? "Prices not loaded"
+            ? "价格尚未加载"
             : environment.serverConfig?.environment.capabilities.usagePriceOverrides !== true
-              ? "Update server to edit prices"
+              ? "更新服务器以编辑价格"
               : access === "pending"
-                ? "Checking permissions…"
+                ? "正在检查权限…"
                 : access === "denied"
-                  ? "Read-only access"
+                  ? "只读访问"
                   : null,
     };
   }),
@@ -169,13 +169,13 @@ export function UsagePriceOverrides({
   const errors = usagePriceTableErrors(selected, stagedDrafts);
   for (const draft of stagedDrafts) {
     if (!draft.isNew) continue;
-    if (draft.model.trim() === "") errors.set(draft.id, "Enter a model ID.");
+    if (draft.model.trim() === "") errors.set(draft.id, "请输入模型 ID。");
     else if (
       attempt === null &&
       (customModels.includes(draft.model.trim()) ||
         drafts.some((other) => other.id !== draft.id && other.model.trim() === draft.model.trim()))
     )
-      errors.set(draft.id, "This model already has a row. Edit its prices there.");
+      errors.set(draft.id, "此模型已有一行，请在该行编辑价格。");
   }
   const failedDestinations =
     attempt?.destinations.filter(
@@ -185,7 +185,7 @@ export function UsagePriceOverrides({
   const hasChanges = stagedDrafts.length > 0;
   const destinationLabel =
     selected.length === 1 ? selected[0]!.label : `${selected.length} environments`;
-  const selectionLabel = selectedIds === null ? "All environments" : destinationLabel;
+  const selectionLabel = selectedIds === null ? "所有环境" : destinationLabel;
   const discard = () => {
     setDrafts([]);
     setAttempt(null);
@@ -237,7 +237,7 @@ export function UsagePriceOverrides({
       (destination) =>
         environments.find(
           (environment) => environment.environmentId === destination.environmentId,
-        ) ?? { ...destination, prices: null, aliases: null, unavailable: "Environment removed" },
+        ) ?? { ...destination, prices: null, aliases: null, unavailable: "环境已移除" },
     );
     const changes = new Map(
       targets.map((target) => [target.environmentId, usagePriceTableChanges(target, edits)]),
@@ -285,16 +285,14 @@ export function UsagePriceOverrides({
     >
       <DialogPopup className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Custom model prices</DialogTitle>
-          <DialogDescription>
-            Prices and mappings apply to all past and future usage on the environments you select.
-          </DialogDescription>
+          <DialogTitle>自定义模型价格</DialogTitle>
+          <DialogDescription>价格和映射适用于所选环境中所有过去和未来的用量。</DialogDescription>
         </DialogHeader>
         <DialogPanel>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <Label id="usage-prices-apply-label" className="shrink-0">
-                Apply to
+                应用到
               </Label>
               <Menu>
                 <MenuTrigger
@@ -313,7 +311,7 @@ export function UsagePriceOverrides({
                     closeOnClick={false}
                     onCheckedChange={(checked) => selectEnvironments(checked ? null : new Set())}
                   >
-                    All environments
+                    所有环境
                   </MenuCheckboxItem>
                   <MenuSeparator />
                   {environments.map((environment) => (
@@ -341,18 +339,18 @@ export function UsagePriceOverrides({
                 </MenuPopup>
               </Menu>
             </div>
-            <span className="text-xs text-muted-foreground">USD / million tokens</span>
+            <span className="text-xs text-muted-foreground">美元 / 百万 Token</span>
           </div>
           {selected.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               {environments.length === 0
-                ? "Connect an environment to set model prices."
-                : "Select an environment to see and change its model prices."}
+                ? "连接环境以设置模型价格。"
+                : "选择环境以查看和更改模型价格。"}
             </p>
           ) : (
             <>
               <div className="min-w-0 overflow-hidden rounded-lg border border-border">
-                <Table className="min-w-180 table-fixed" aria-label="Custom model prices">
+                <Table className="min-w-180 table-fixed" aria-label="自定义模型价格">
                   <colgroup>
                     <col className="w-[22%]" />
                     <col className="w-[18%]" />
@@ -363,8 +361,8 @@ export function UsagePriceOverrides({
                   </colgroup>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Model ID</TableHead>
-                      <TableHead>Map to</TableHead>
+                      <TableHead>模型 ID</TableHead>
+                      <TableHead>映射到</TableHead>
                       {USAGE_PRICE_FIELDS.map((field) => (
                         <TableHead key={field.key}>{field.label}</TableHead>
                       ))}
@@ -372,7 +370,7 @@ export function UsagePriceOverrides({
                         <Button
                           size="icon-xs"
                           variant="ghost"
-                          aria-label="Add model price"
+                          aria-label="添加模型价格"
                           disabled={locked}
                           onClick={() => {
                             const id = `new:${nextRowId.current++}`;
@@ -391,8 +389,8 @@ export function UsagePriceOverrides({
                         <TableCell colSpan={7} className="text-center whitespace-normal">
                           <p className="py-6 text-muted-foreground">
                             {selected.some((environment) => environment.prices === null)
-                              ? "Some environment prices are unavailable."
-                              : "No custom prices or mappings. Add a row to set one."}
+                              ? "部分环境的价格不可用。"
+                              : "暂无自定义价格或映射。添加一行以设置。"}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -413,12 +411,12 @@ export function UsagePriceOverrides({
                                       focusRowRef.current = null;
                                     }
                                   }}
-                                  aria-label="New model ID"
+                                  aria-label="新模型 ID"
                                   aria-invalid={
                                     (row.model.trim() !== "" && errors.has(row.id)) || undefined
                                   }
                                   list="usage-price-models"
-                                  placeholder="Model ID"
+                                  placeholder="模型 ID"
                                   autoComplete="off"
                                   spellCheck={false}
                                   disabled={locked}
@@ -446,18 +444,24 @@ export function UsagePriceOverrides({
                             </TableCell>
                             {row.removed ? (
                               <TableCell colSpan={5}>
-                                <span className="text-muted-foreground">
-                                  Automatic pricing after saving
-                                </span>
+                                <span className="text-muted-foreground">保存后自动定价</span>
                               </TableCell>
                             ) : (
                               <TableCell>
                                 <Input
                                   size="compact"
                                   value={row.alias ?? aliasCell.value}
-                                  aria-label={`Map ${row.model || "new model"} to model`}
+                                  aria-label={`将 ${row.model || "新模型"} 映射到模型`}
                                   list="usage-alias-models"
-                                  placeholder={row.isNew ? "Optional" : aliasCell.placeholder}
+                                  placeholder={
+                                    row.isNew
+                                      ? "可选"
+                                      : aliasCell.placeholder === "Mixed"
+                                        ? "不一致"
+                                        : aliasCell.placeholder === "Unavailable"
+                                          ? "不可用"
+                                          : aliasCell.placeholder
+                                  }
                                   autoComplete="off"
                                   spellCheck={false}
                                   disabled={locked}
@@ -468,7 +472,7 @@ export function UsagePriceOverrides({
                             {row.removed ? null : alias !== "" ? (
                               <TableCell colSpan={4} className="whitespace-normal">
                                 <span className="break-all text-muted-foreground">
-                                  Counted as {alias}
+                                  计入 {alias}
                                 </span>
                               </TableCell>
                             ) : (
@@ -479,14 +483,18 @@ export function UsagePriceOverrides({
                                     <Input
                                       size="compact"
                                       inputMode="decimal"
-                                      aria-label={`${field.label} price for ${row.model || "new model"}`}
+                                      aria-label={`${row.model || "新模型"} 的${field.label}价格`}
                                       value={row.values[field.key] ?? (row.isNew ? "" : cell.value)}
                                       placeholder={
                                         row.isNew
                                           ? field.optional
-                                            ? "Input rate"
+                                            ? "输入费率"
                                             : "0.00"
-                                          : cell.placeholder
+                                          : cell.placeholder === "Mixed"
+                                            ? "不一致"
+                                            : cell.placeholder === "Unavailable"
+                                              ? "不可用"
+                                              : cell.placeholder
                                       }
                                       autoComplete="off"
                                       disabled={locked}
@@ -506,10 +514,10 @@ export function UsagePriceOverrides({
                                   disabled={locked}
                                   aria-label={
                                     row.removed
-                                      ? `Undo reset for ${row.model}`
+                                      ? `撤销 ${row.model} 的重置`
                                       : row.isNew
-                                        ? "Remove new model"
-                                        : `Reset price for ${row.model} to automatic`
+                                        ? "移除新模型"
+                                        : `将 ${row.model} 的价格重置为自动`
                                   }
                                   onClick={() => {
                                     if (row.isNew)
@@ -528,11 +536,7 @@ export function UsagePriceOverrides({
                                   )}
                                 </TooltipTrigger>
                                 <TooltipPopup>
-                                  {row.removed
-                                    ? "Undo reset"
-                                    : row.isNew
-                                      ? "Remove row"
-                                      : "Reset to automatic"}
+                                  {row.removed ? "撤销重置" : row.isNew ? "移除行" : "重置为自动"}
                                 </TooltipPopup>
                               </Tooltip>
                             </TableCell>
@@ -562,11 +566,8 @@ export function UsagePriceOverrides({
                   ))}
               </datalist>
               <p className="text-xs text-muted-foreground">
-                Blank cache rates use the input price. Enter 0 for free tokens. A mapped model’s
-                usage counts as the model it maps to.
-                {selected.length > 1
-                  ? " Mixed cells keep each environment’s rate until you edit them."
-                  : ""}
+                缓存费率留空时使用输入价格。免费 Token 请输入 0。映射模型的 用量计入目标模型。
+                {selected.length > 1 ? " 不一致的单元格在编辑前保留各环境的费率。" : ""}
               </p>
             </>
           )}
@@ -585,10 +586,10 @@ export function UsagePriceOverrides({
                       }
                     >
                       {result?.status === "failed"
-                        ? `Not saved · ${result.error}`
+                        ? `未保存 · ${result.error}`
                         : result?.status === "saved"
-                          ? "Saved"
-                          : "Saving…"}
+                          ? "已保存"
+                          : "正在保存…"}
                     </span>
                   </div>
                 );
@@ -598,12 +599,12 @@ export function UsagePriceOverrides({
         </DialogPanel>
         <DialogFooter variant="bare" className="items-center sm:justify-between">
           <span className="text-xs text-muted-foreground">
-            {hasChanges ? `Changes apply to ${destinationLabel}` : ""}
+            {hasChanges ? `更改应用到 ${destinationLabel}` : ""}
           </span>
           <div className="flex w-full flex-wrap justify-end gap-2 sm:w-auto">
             {hasChanges ? (
               <Button variant="ghost" disabled={pending} onClick={discard}>
-                {failedDestinations.length > 0 ? "Discard pending changes" : "Discard changes"}
+                {failedDestinations.length > 0 ? "丢弃待处理的更改" : "丢弃更改"}
               </Button>
             ) : null}
             <Button
@@ -615,10 +616,10 @@ export function UsagePriceOverrides({
               onClick={() => void save(failedDestinations.length > 0)}
             >
               {pending
-                ? "Saving…"
+                ? "正在保存…"
                 : failedDestinations.length > 0
-                  ? "Retry failed saves"
-                  : "Save changes"}
+                  ? "重试失败的保存"
+                  : "保存更改"}
             </Button>
           </div>
         </DialogFooter>

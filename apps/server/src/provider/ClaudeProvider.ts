@@ -147,7 +147,7 @@ function claudeAuthMetadata(input: {
   if (normalizeClaudeAuthMethod(input.authMethod) === "apiKey") {
     return {
       type: "apiKey",
-      label: "Claude API Key",
+      label: "Claude API 密钥",
     };
   }
 
@@ -524,7 +524,7 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Claude is disabled in T3 Code settings.",
+        message: "Claude 已在 T3 Code 设置中禁用。",
       },
     });
   }
@@ -551,8 +551,8 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         status: "error",
         auth: { status: "unknown" },
         message: isCommandMissingCause(error)
-          ? "Claude Agent CLI (`claude`) was not found on PATH."
-          : "Failed to execute Claude Agent CLI health check.",
+          ? "在 PATH 中未找到 Claude Agent CLI（`claude`）。"
+          : "执行 Claude Agent CLI 健康检查失败。",
       },
     });
   }
@@ -568,8 +568,7 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         version: null,
         status: "error",
         auth: { status: "unknown" },
-        message:
-          "Claude Agent CLI is installed but failed to run. Timed out while running command.",
+        message: "Claude Agent CLI 已安装，但运行失败：执行命令超时。",
       },
     });
   }
@@ -592,7 +591,7 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         version: parsedVersion,
         status: "error",
         auth: { status: "unknown" },
-        message: "Claude Agent CLI is installed but failed to run.",
+        message: "Claude Agent CLI 已安装，但运行失败。",
       },
     });
   }
@@ -626,7 +625,7 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         version: parsedVersion,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Could not verify Claude authentication status from initialization result.",
+        message: "无法根据初始化结果验证 Claude 认证状态。",
       },
     });
   }
@@ -644,7 +643,7 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
         version: parsedVersion,
         status: "error",
         auth: { status: "unauthenticated" },
-        message: "Claude Code is not authenticated. Run `claude auth login` and try again.",
+        message: "Claude Code 尚未认证。请运行 `claude auth login` 后重试。",
       },
     });
   }
@@ -718,7 +717,7 @@ export const makePendingClaudeProvider = (
           version: null,
           status: "warning",
           auth: { status: "unknown" },
-          message: "Claude is disabled in T3 Code settings.",
+          message: "Claude 已在 T3 Code 设置中禁用。",
         },
       });
     }
@@ -733,7 +732,7 @@ export const makePendingClaudeProvider = (
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Claude provider status has not been checked in this session yet.",
+        message: "此会话尚未检查 Claude 提供商状态。",
       },
     });
   });

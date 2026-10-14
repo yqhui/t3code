@@ -14,8 +14,7 @@ export function subscribeCodexAuthCallback(input: CodexAuthCallbackInput) {
     new ProviderSetupError({
       instanceId: input.instanceId,
       operation: "callback",
-      detail:
-        error instanceof Error ? error.message : "Could not receive sign-in on this computer.",
+      detail: error instanceof Error ? error.message : "无法在此电脑上接收登录回调。",
     });
   return Stream.unwrap(
     Effect.gen(function* () {
@@ -24,7 +23,7 @@ export function subscribeCodexAuthCallback(input: CodexAuthCallbackInput) {
           codexAuthorizationRequest(input.authorizationUrl);
           const destination = providerAuthReturnUrl(input.returnUrl);
           if (!destination || !isLoopbackHost(new URL(destination).hostname))
-            throw new Error("The local sign-in receiver needs a local T3 Code return address.");
+            throw new Error("本地登录接收服务需要本地 T3 Code 返回地址。");
           return destination;
         },
         catch: failure,

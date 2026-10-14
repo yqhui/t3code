@@ -65,15 +65,15 @@ const formatPendingPrimaryActionLabel = (input: {
   questionIndex: number;
 }) => {
   if (input.isResponding) {
-    return "Submitting...";
+    return "正在提交…";
   }
   if (input.compact) {
-    return input.isLastQuestion ? "Submit" : "Next";
+    return input.isLastQuestion ? "提交" : "下一题";
   }
   if (!input.isLastQuestion) {
-    return "Next question";
+    return "下一题";
   }
-  return input.questionIndex > 0 ? "Submit answers" : "Submit answer";
+  return input.questionIndex > 0 ? "提交全部回答" : "提交回答";
 };
 
 // The composer's labeled primary actions (Submit, Refine, Implement) share the send button's
@@ -146,7 +146,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
             onClick={() => {
               if (canOperateThread) onInterrupt();
             }}
-            aria-label="Stop generation"
+            aria-label="停止生成"
           />
         }
       >
@@ -154,7 +154,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
           <rect x="2" y="2" width="8" height="8" rx="1.5" />
         </svg>
       </TooltipTrigger>
-      <TooltipPopup>Interrupt</TooltipPopup>
+      <TooltipPopup>中断</TooltipPopup>
     </Tooltip>
   );
 
@@ -170,7 +170,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
               {...pointerFocusProps}
               onClick={onPreviousPendingQuestion}
               disabled={pendingAction.isResponding}
-              aria-label="Previous question"
+              aria-label="上一题"
             >
               <ChevronLeftIcon className="size-3.5" />
             </Button>
@@ -182,7 +182,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
               onClick={onPreviousPendingQuestion}
               disabled={pendingAction.isResponding}
             >
-              Previous
+              上一题
             </Button>
           )
         ) : null}
@@ -217,7 +217,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
           {...pointerFocusProps}
           disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
         >
-          {isConnecting || isSendBusy ? "Sending..." : "Refine"}
+          {isConnecting || isSendBusy ? "正在发送…" : "完善"}
         </button>
       );
     }
@@ -230,7 +230,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
           {...pointerFocusProps}
           disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
         >
-          {isConnecting || isSendBusy ? "Sending..." : "Implement"}
+          {isConnecting || isSendBusy ? "正在发送…" : "实施"}
         </button>
         <Menu>
           <MenuTrigger
@@ -241,7 +241,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                   messageActionPillClassName,
                   "h-9 rounded-l-none border-l border-message-action-foreground/20 px-2 sm:h-8",
                 )}
-                aria-label="Implementation actions"
+                aria-label="实施操作"
                 {...pointerFocusProps}
                 disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
               />
@@ -256,7 +256,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                 if (canOperateThread) onImplementPlanInNewThread();
               }}
             >
-              Implement in a new thread
+              在新会话中实施
             </MenuItem>
           </MenuPopup>
         </Menu>
@@ -277,34 +277,34 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
   const compactsBeforeSend = compactTokens !== null && !keepFullHistory;
 
   const submitLabel = showResume
-    ? "Resume thread"
+    ? "继续会话"
     : isEditingQueuedMessage
-      ? "Update queued message"
+      ? "更新排队消息"
       : compactsBeforeSend
-        ? "Compact and send"
+        ? "压缩并发送"
         : isQueuing
-          ? "Queue message"
+          ? "排队消息"
           : isRunning
-            ? "Steer message"
-            : "Submit message";
+            ? "引导消息"
+            : "发送消息";
   const submitStatus = isEnvironmentUnavailable
-    ? "Environment disconnected"
+    ? "环境已断开"
     : (sendDisabledReason ??
       (isConnecting
-        ? "Connecting"
+        ? "正在连接"
         : isPreparingWorktree
-          ? "Preparing worktree"
+          ? "正在准备 Worktree"
           : isSendBusy
             ? isEditingQueuedMessage
-              ? "Updating queued message"
-              : "Submitting message"
+              ? "正在更新排队消息"
+              : "正在发送消息"
             : null));
   const submitTooltip =
     submitStatus ??
     (compactsBeforeSend
-      ? `Summarize ${compactTokens} tokens of history, then send`
+      ? `先摘要 ${compactTokens} Token 的历史记录，再发送`
       : isRunning && !isEditingQueuedMessage
-        ? `Click to ${followUpBehavior}, Ctrl/⌘-click${alternateShortcutLabel ? ` or ${alternateShortcutLabel}` : ""} to ${alternateAction}`
+        ? `点击${followUpBehavior}，Ctrl/⌘-点击${alternateShortcutLabel ? ` 或 ${alternateShortcutLabel}` : ""}则${alternateAction}`
         : submitLabel);
 
   const sendButton = (
@@ -377,20 +377,20 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
               )}
               {...pointerFocusProps}
               aria-pressed={!keepFullHistory}
-              aria-label={`Compact ${compactTokens} tokens of history before sending`}
+              aria-label={`发送前先压缩 ${compactTokens} Token 的历史记录`}
               disabled={!canOperateThread}
               onClick={onToggleKeepFullHistory}
             />
           }
         >
           <Minimize2Icon aria-hidden="true" />
-          {keepFullHistory ? "Full" : "Compact"}
+          {keepFullHistory ? "完整" : "压缩"}
           <span>{compactTokens}</span>
         </TooltipTrigger>
         <TooltipPopup>
           {keepFullHistory
-            ? `Next send keeps all ${compactTokens} tokens. Click to compact first`
-            : `Next send compacts ${compactTokens} tokens first. Click to keep full history`}
+            ? `下次发送将保留全部 ${compactTokens} Token。点击可先压缩`
+            : `下次发送将先压缩 ${compactTokens} Token。点击可保留完整历史`}
         </TooltipPopup>
       </Tooltip>
       {submit}

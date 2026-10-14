@@ -128,11 +128,11 @@ export function GuideTour({
           {banner}
           {diff.error !== null ? (
             <p className="text-xs text-muted-foreground">
-              The diff could not be loaded, so excerpts are missing: {diff.error}
+              无法加载 Diff，因此摘录缺失：{diff.error}
             </p>
           ) : null}
           {stop === null ? (
-            <p className="text-sm text-muted-foreground">This change has no files to tour.</p>
+            <p className="text-sm text-muted-foreground">此更改没有可导览的文件。</p>
           ) : (
             <GuideStop
               key={position}

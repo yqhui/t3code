@@ -89,7 +89,7 @@ export function usePullRequestLinking(environmentId: EnvironmentId | null | unde
     const changeLink = async (threadRef: ScopedThreadRef, url: string, linked: boolean) => {
       const parsed = parseChangeRequestUrl(url);
       if (parsed === null || threadRef.environmentId !== environmentId || (linked && !canLink(url)))
-        throw new Error("The pull request is not available in this environment.");
+        throw new Error("该拉取请求在此环境中不可用。");
       const legacyProject = findProjectForChangeRequest(environmentProjects, parsed);
       const mutation = planThreadPullRequestMutation({
         capabilities,
@@ -100,15 +100,14 @@ export function usePullRequestLinking(environmentId: EnvironmentId | null | unde
           sourceControlRepositorySelector(legacyProject?.repositoryIdentity) ?? undefined,
         linked,
       });
-      if (mutation === null)
-        throw new Error("This environment does not support linking this pull request.");
+      if (mutation === null) throw new Error("此环境不支持关联此拉取请求。");
       const result = await (mutation.type === "thread.meta.update"
         ? updateMetadata({ environmentId: threadRef.environmentId, input: mutation.input })
         : mutation.type === "thread.pull-request.link"
           ? link({ environmentId: threadRef.environmentId, input: mutation.input })
           : unlink({ environmentId: threadRef.environmentId, input: mutation.input }));
       if (result._tag === "Failure") {
-        if (isAtomCommandInterrupted(result)) throw new Error("Link update interrupted.");
+        if (isAtomCommandInterrupted(result)) throw new Error("链接更新已中断。");
         throw squashAtomCommandFailure(result);
       }
     };

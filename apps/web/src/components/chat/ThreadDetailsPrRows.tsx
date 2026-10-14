@@ -123,7 +123,7 @@ export function ThreadDetailsPrRows({
         className="w-full active:scale-100"
       >
         <MorphIcon aria-hidden className="size-4 shrink-0" icon={expanded ? Minus : Plus} />
-        {expanded ? "Show less" : `Show ${rest.length} more`}
+        {expanded ? "收起" : `再显示 ${rest.length} 条`}
       </ThreadDetailsControl>
     </>
   );

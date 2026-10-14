@@ -288,14 +288,12 @@ export function GuideExcerpt({
                     kind="draft"
                     rangeLabel={`${excerpt.path}:${getReviewPositionAnchor(draft.position).line}`}
                     text=""
-                    placeholder={
-                      commenting.canComment ? "Add a comment…" : "Ask the agent about these lines…"
-                    }
-                    submitLabel={commenting.canComment ? "Add to review" : "Ask agent"}
+                    placeholder={commenting.canComment ? "添加评论…" : "向 Agent 询问这些行…"}
+                    submitLabel={commenting.canComment ? "添加到审查" : "询问 Agent"}
                     {...(commenting.canComment && onAskAgent !== null
                       ? {
                           secondaryAction: {
-                            label: "Ask agent",
+                            label: "询问 Agent",
                             onAction: (text: string) => askAgent(text),
                           },
                         }
@@ -321,13 +319,13 @@ export function GuideExcerpt({
             renderHeaderMetadata={() => (
               <span className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="tabular-nums">
-                  {excerpt.side === "old" ? "removed code, " : ""}showing {slice.shown} of{" "}
-                  {slice.total} diff lines
+                  {excerpt.side === "old" ? "已删除的代码，" : ""}显示 {slice.total} 行 Diff 中的{" "}
+                  {slice.shown} 行
                 </span>
                 <Button
                   size="icon-xs"
                   variant="ghost-muted"
-                  aria-label={`Open ${excerpt.path} in Code`}
+                  aria-label={`在代码页签中打开 ${excerpt.path}`}
                   onClick={() => onOpenFile(excerpt.path)}
                 >
                   <ArrowUpRightIcon aria-hidden />
@@ -338,16 +336,16 @@ export function GuideExcerpt({
         </div>
       ) : loading ? (
         <p className="rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
-          Loading {excerpt.path}...
+          正在加载 {excerpt.path}…
         </p>
       ) : (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground">
           <span className="min-w-0 truncate">
-            <span className="font-mono text-foreground">{excerpt.path}</span> lines {excerpt.start}-
-            {excerpt.end} are not in the loaded diff.
+            <span className="font-mono text-foreground">{excerpt.path}</span> 的第 {excerpt.start}-
+            {excerpt.end} 行不在已加载的 Diff 中。
           </span>
           <Button size="xs" variant="outline" onClick={() => onOpenFile(excerpt.path)}>
-            Open in Code
+            在代码页签中打开
           </Button>
         </div>
       )}

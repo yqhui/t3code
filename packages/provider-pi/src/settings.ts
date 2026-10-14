@@ -22,16 +22,16 @@ export const PiSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("pi").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Path to the Pi coding agent binary.",
+        title: "可执行文件路径",
+        description: "Pi 编程 Agent 可执行文件的路径。",
         providerSettingsForm: { placeholder: "pi", clearWhenEmpty: "omit" },
       }),
     ),
     launchArgs: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Launch arguments",
-        description: "Additional CLI arguments passed to pi --mode rpc on session start.",
+        title: "启动参数",
+        description: "会话启动时传递给 pi --mode rpc 的额外 CLI 参数。",
         providerSettingsForm: { clearWhenEmpty: "omit" },
       }),
     ),

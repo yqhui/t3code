@@ -55,18 +55,18 @@ export function useCloudLinkController() {
   const [operationError, setOperationError] = useState<string | null>(null);
 
   const reportUpdateFailure = (cause: unknown) => {
-    const message = cause instanceof Error ? cause.message : "Could not update T3 Connect access.";
+    const message = cause instanceof Error ? cause.message : "无法更新 T3 Connect 访问。";
     const traceId = findErrorTraceId(cause);
     console.error("[t3-connect] Could not update T3 Connect", { message, traceId, cause });
-    setOperationError(traceId ? `${message} Trace ID: ${traceId}` : message);
+    setOperationError(traceId ? `${message} Trace ID：${traceId}` : message);
     toastManager.add({
       type: "error",
-      title: "Could not update T3 Connect",
+      title: "无法更新 T3 Connect",
       description: message,
       data: traceId
         ? {
             secondaryActionProps: {
-              children: "Copy trace ID",
+              children: "复制 Trace ID",
               onClick: () => void navigator.clipboard?.writeText(traceId),
             },
           }
@@ -86,7 +86,7 @@ export function useCloudLinkController() {
     setOperationError(null);
     const target = primaryCloudLinkState.target;
     if (!target) {
-      reportUpdateFailure(new Error("Local environment is not ready yet."));
+      reportUpdateFailure(new Error("本地环境尚未就绪。"));
       return false;
     }
     const environmentId = EnvironmentId.make(target.environmentId);
@@ -95,9 +95,7 @@ export function useCloudLinkController() {
         !readEnvironmentScope(environmentId, AuthRelayReadScope) ||
         !readEnvironmentScope(environmentId, AuthRelayWriteScope)
       ) {
-        reportUpdateFailure(
-          new Error("This connection needs permission to view and manage T3 Connect settings."),
-        );
+        reportUpdateFailure(new Error("此连接需要查看和管理 T3 Connect 设置的权限。"));
         return false;
       }
       return true;
@@ -105,7 +103,7 @@ export function useCloudLinkController() {
     const readLinkState = () => {
       const state = readCachedPrimaryCloudLinkState(target);
       if (state === null) {
-        reportUpdateFailure(new Error("Wait until the current T3 Connect settings can be read."));
+        reportUpdateFailure(new Error("请等待当前 T3 Connect 设置可读取。"));
       }
       return state;
     };
@@ -142,7 +140,7 @@ export function useCloudLinkController() {
       }
       const clerkToken = tokenResult.value;
       if (!clerkToken) {
-        reportUpdateFailure(new Error("Sign in to T3 Connect before enabling this."));
+        reportUpdateFailure(new Error("启用此功能前请先登录 T3 Connect。"));
         return false;
       }
       const currentManagedTunnel = currentLinkState.managedTunnelActive ?? currentLinkState.linked;

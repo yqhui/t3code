@@ -208,7 +208,7 @@ function getPublishProviderReadiness(input: {
   if (!discovered) {
     return {
       ready: false,
-      hint: "Provider status unavailable. Open Settings -> Source Control and rescan.",
+      hint: "提供商状态不可用。请打开设置 → 源代码管理并重新扫描。",
     };
   }
   if (discovered.status !== "available") {
@@ -219,7 +219,7 @@ function getPublishProviderReadiness(input: {
       ready: false,
       hint:
         Option.getOrNull(discovered.auth.detail) ??
-        `${discovered.label} is not authenticated. Open Settings -> Source Control for setup guidance.`,
+        `${discovered.label} 尚未认证。请打开设置 → 源代码管理查看配置指南。`,
     };
   }
   return { ready: true, hint: null };
@@ -248,48 +248,47 @@ function getMenuActionDisabledReason({
 
   if (item.id === "commit") {
     if (!hasChanges) {
-      return "Worktree is clean. Make changes before committing.";
+      return "Worktree 没有更改。请先修改再提交。";
     }
-    return "Commit is currently unavailable.";
+    return "目前无法提交。";
   }
 
   if (item.id === "push") {
     if (!hasBranch) {
-      return "Detached HEAD: check out a branch before pushing.";
+      return "HEAD 已分离：请先检出分支再推送。";
     }
     if (hasChanges) {
-      return "Commit or stash local changes before pushing.";
+      return "请先提交或贮藏本地更改再推送。";
     }
     if (isBehind) {
-      return "Branch is behind upstream. Pull/rebase before pushing.";
+      return "分支落后于上游。请先拉取或变基再推送。";
     }
     if (!gitStatus.hasUpstream && !hasPrimaryRemote) {
-      return 'Add an "origin" remote before pushing.';
+      return '请先添加 "origin" 远程仓库再推送。';
     }
     if (!isAhead) {
-      return "No local commits to push.";
+      return "没有可推送的本地 Commit。";
     }
-    return "Push is currently unavailable.";
+    return "目前无法推送。";
   }
 
   if (!hasBranch) {
-    return `Detached HEAD: check out a branch before creating a ${terminology.singular}.`;
+    return `HEAD 已分离：请先检出分支再创建${terminology.singular}。`;
   }
   if (!gitStatus.hasUpstream && !hasPrimaryRemote) {
-    return `Add an "origin" remote before creating a ${terminology.singular}.`;
+    return `请先添加 "origin" 远程仓库再创建${terminology.singular}。`;
   }
   if ((gitStatus.aheadOfDefaultCount ?? gitStatus.aheadCount) <= 0) {
-    return `No local commits to include in a ${terminology.singular}.`;
+    return `没有可包含在${terminology.singular}中的本地 Commit。`;
   }
   if (isBehind) {
-    return `Branch is behind upstream. Pull/rebase before creating a ${terminology.singular}.`;
+    return `分支落后于上游。请先拉取或变基再创建${terminology.singular}。`;
   }
-  return `Create ${terminology.singular} is currently unavailable.`;
+  return `目前无法创建${terminology.singular}。`;
 }
 
-const COMMIT_DIALOG_TITLE = "Commit changes";
-const COMMIT_DIALOG_DESCRIPTION =
-  "Review and confirm your commit. Leave the message blank to auto-generate one.";
+const COMMIT_DIALOG_TITLE = "提交更改";
+const COMMIT_DIALOG_DESCRIPTION = "审查并确认提交。消息留空时将自动生成。";
 
 function GitActionItemIcon({
   icon,
@@ -321,8 +320,10 @@ function GitQuickActionIcon({
     }
     return <SourceControlIcon className={className} />;
   }
-  if (quickAction.label === "Commit") return <GitCommitIcon className={className} />;
-  if (quickAction.label === "Push") return <CloudUploadIcon className={className} />;
+  if (quickAction.label === "Commit" || quickAction.label === "提交")
+    return <GitCommitIcon className={className} />;
+  if (quickAction.label === "Push" || quickAction.label === "推送")
+    return <CloudUploadIcon className={className} />;
   return <InfoIcon className={className} />;
 }
 
@@ -597,7 +598,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
       if (result._tag === "Failure") {
         if (!isAtomCommandInterrupted(result)) {
           const error = squashAtomCommandFailure(result);
-          setPublishError(error instanceof Error ? error.message : "An error occurred.");
+          setPublishError(error instanceof Error ? error.message : "发生错误。");
         }
         return;
       }
@@ -646,10 +647,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
   return (
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <WizardPopup>
-        <WizardHeader
-          title="Publish repository"
-          description="Pick where to host it, then point us at a repo to push to."
-        >
+        <WizardHeader title="发布仓库" description="选择托管位置，然后指定要推送到的仓库。">
           <WizardSteps
             steps={publishWizardSteps}
             currentStep={publishWizardStep}
@@ -667,7 +665,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
         <WizardPanel>
           <div className={cn("space-y-2", publishWizardStep !== 0 && "hidden")}>
             <span id="publish-provider-cards-label" className="text-xs font-medium text-foreground">
-              Provider
+              提供商
             </span>
             <RadioGroup
               value={publishProvider}
@@ -703,13 +701,12 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                                 openSourceControlSettings();
                               }}
                             >
-                              Setup Required
+                              需要配置
                             </Button>
                           }
                         />
                         <TooltipPopup side="top" align="end">
-                          {readiness.hint ??
-                            "Open Settings -> Source Control to configure this provider."}
+                          {readiness.hint ?? "打开设置 → 源代码管理以配置此提供商。"}
                         </TooltipPopup>
                       </Tooltip>
                     </div>
@@ -744,7 +741,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                 htmlFor="publish-repository-path"
                 className="text-xs font-medium text-foreground"
               >
-                Repository
+                仓库
               </label>
               <div className="flex items-stretch overflow-hidden rounded-md border border-input bg-background focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-ring">
                 <span className="flex shrink-0 items-center gap-1.5 border-r border-input bg-muted/50 px-2.5 font-mono text-xs text-muted-foreground">
@@ -776,7 +773,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                 id="publish-visibility-cards-label"
                 className="text-xs font-medium text-foreground"
               >
-                Visibility
+                可见性
               </span>
               <RadioGroup
                 value={publishVisibility}
@@ -790,14 +787,14 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                 {[
                   {
                     value: "private" as const,
-                    label: "Private",
-                    description: "Only invited people",
+                    label: "私有",
+                    description: "仅受邀人员",
                     Icon: LockIcon,
                   },
                   {
                     value: "public" as const,
-                    label: "Public",
-                    description: "Anyone on the web",
+                    label: "公开",
+                    description: "所有人",
                     Icon: GlobeIcon,
                   },
                 ].map((option) => {
@@ -842,12 +839,12 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                     publishAdvancedOpen ? "" : "-rotate-90",
                   )}
                 />
-                Advanced
+                高级
               </button>
               {publishAdvancedOpen ? (
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="space-y-1.5" htmlFor="publish-remote-name">
-                    <span className="text-xs font-medium text-foreground">Remote</span>
+                    <span className="text-xs font-medium text-foreground">远程仓库</span>
                     <Input
                       id="publish-remote-name"
                       value={publishRemoteName}
@@ -861,7 +858,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                       id="publish-protocol-label"
                       className="text-xs font-medium text-foreground"
                     >
-                      Protocol
+                      协议
                     </span>
                     <ToggleGroup
                       value={[publishProtocol]}
@@ -889,7 +886,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                 className="flex items-center gap-2 rounded-md border border-input bg-muted/40 px-3 py-2 text-xs text-muted-foreground dark:border-transparent dark:bg-white/[0.035]"
               >
                 <Spinner size="sm" aria-hidden />
-                Publishing repository to {publishProviderLabel}...
+                正在将仓库发布到 {publishProviderLabel}…
               </div>
             ) : null}
             {publishError && !publishRepositoryAction.isPending ? (
@@ -897,7 +894,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                 role="alert"
                 className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive"
               >
-                <p className="font-medium">Publish failed</p>
+                <p className="font-medium">发布失败</p>
                 <p className="mt-0.5 text-destructive/90">{publishError}</p>
               </div>
             ) : null}
@@ -911,14 +908,12 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                     <CheckIcon className="size-4" aria-hidden />
                   </span>
                   <h3 className="text-sm font-semibold text-foreground">
-                    {publishResult.status === "pushed"
-                      ? "Repository published"
-                      : "Repository created"}
+                    {publishResult.status === "pushed" ? "仓库已发布" : "仓库已创建"}
                   </h3>
                   <p className="max-w-xs text-pretty text-xs text-muted-foreground">
                     {publishResult.status === "pushed"
-                      ? `${publishResult.branch} is now live on ${publishProviderLabel}.`
-                      : `Remote "${publishResult.remoteName}" is set up. Make a commit and push it to share your code.`}
+                      ? `${publishResult.branch} 已发布到 ${publishProviderLabel}。`
+                      : `远程仓库 "${publishResult.remoteName}" 已配置。提交并推送以分享代码。`}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 rounded-lg border border-input bg-muted/40 px-3 py-2 dark:border-transparent dark:bg-white/[0.035]">
@@ -935,12 +930,12 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                     void openLink(publishResult.repository.url).catch(() => undefined);
                   }}
                 >
-                  Open on {publishProviderLabel}
+                  在 {publishProviderLabel} 上打开
                 </Button>
               </>
             ) : (
               <div className="rounded-md border border-input bg-background px-3 py-2 text-xs text-muted-foreground dark:border-transparent dark:bg-white/[0.035]">
-                Publish result unavailable.
+                发布结果不可用。
               </div>
             )}
           </div>
@@ -948,7 +943,7 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
 
         <WizardFooter>
           {publishWizardStep === 2 ? (
-            <Button onClick={() => handleOpenChange(false)}>Done</Button>
+            <Button onClick={() => handleOpenChange(false)}>完成</Button>
           ) : (
             <>
               <Button
@@ -969,14 +964,14 @@ function PublishRepositoryDialog(props: PublishRepositoryDialogProps) {
                   disabled={!hasReadyPublishProvider || !selectedPublishProviderReadiness.ready}
                   onClick={() => setPublishWizardStep((step) => Math.min(1, step + 1))}
                 >
-                  Next
+                  下一步
                 </Button>
               ) : (
                 <Button disabled={!canSubmitPublishRepository} onClick={submitPublishRepository}>
                   {publishRepositoryAction.isPending ? (
                     <>
                       <Spinner size="sm" aria-hidden />
-                      Publishing...
+                      正在发布…
                     </>
                   ) : (
                     "Publish"
@@ -1202,9 +1197,9 @@ export default function GitActionsControl({
     [gitStatusForActions, hasPrimaryRemote, isDefaultRef, isGitActionRunning],
   );
   const quickActionDisabledReason = !canWriteSourceControl
-    ? "This connection cannot change source control."
+    ? "此连接无法更改源代码管理。"
     : quickAction.disabled
-      ? (quickAction.hint ?? "This action is currently unavailable.")
+      ? (quickAction.hint ?? "此操作目前不可用。")
       : null;
   const gitActionProgress = resolveGitActionProgressPresentation(vcsActionState);
   const pendingDefaultBranchActionCopy = pendingDefaultBranchAction
@@ -1328,8 +1323,8 @@ export default function GitActionsControl({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Action failed",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "操作失败",
+            description: error instanceof Error ? error.message : "发生错误。",
             timeout: errorToastTiming.timeout,
             ...(scopedToastData !== undefined ? { data: scopedToastData } : {}),
           }),
@@ -1487,8 +1482,8 @@ export default function GitActionsControl({
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Pull failed",
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: "拉取失败",
+              description: error instanceof Error ? error.message : "发生错误。",
               timeout: errorToastTiming.timeout,
               ...(threadToastData !== undefined ? { data: threadToastData } : {}),
             }),
@@ -1497,11 +1492,11 @@ export default function GitActionsControl({
         }
 
         const pullResult = result.value;
-        const title = pullResult.status === "pulled" ? "Pulled" : "Already up to date";
+        const title = pullResult.status === "pulled" ? "已拉取" : "已是最新版本";
         const description =
           pullResult.status === "pulled"
-            ? `Updated ${pullResult.refName} from ${pullResult.upstreamRef ?? "upstream"}`
-            : `${pullResult.refName} is already synchronized.`;
+            ? `已从 ${pullResult.upstreamRef ?? "upstream"} 更新 ${pullResult.refName}`
+            : `${pullResult.refName} 已同步。`;
         if (isPanel) {
           setInlineSuccess({ title, description, scopeKey: successScopeKey });
           return;
@@ -1570,7 +1565,7 @@ export default function GitActionsControl({
       if (!gitCwd) {
         toastManager.add({
           type: "error",
-          title: "Editor opening is unavailable.",
+          title: "无法打开编辑器。",
           data: threadToastData,
         });
         return;
@@ -1585,8 +1580,8 @@ export default function GitActionsControl({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "无法打开文件",
+            description: error instanceof Error ? error.message : "发生错误。",
             ...(threadToastData !== undefined ? { data: threadToastData } : {}),
           }),
         );
@@ -1608,8 +1603,8 @@ export default function GitActionsControl({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Git initialization failed",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: "Git 初始化失败",
+          description: error instanceof Error ? error.message : "发生错误。",
           ...(threadToastData !== undefined ? { data: threadToastData } : {}),
         }),
       );
@@ -1682,12 +1677,12 @@ export default function GitActionsControl({
           }}
         >
           <CloudUploadIcon />
-          <MenuItemLabel>Publish repository...</MenuItemLabel>
+          <MenuItemLabel>发布仓库…</MenuItemLabel>
         </MenuItem>
       ) : null}
       {gitStatusForActions?.refName === null && (
         <p className="px-2 py-1.5 text-xs text-warning">
-          Detached HEAD: create and check out a branch to enable push and pull request actions.
+          HEAD 已分离：创建并检出分支以启用推送和拉取请求操作。
         </p>
       )}
       {gitStatusForActions &&
@@ -1695,7 +1690,7 @@ export default function GitActionsControl({
         !gitStatusForActions.hasWorkingTreeChanges &&
         gitStatusForActions.behindCount > 0 &&
         gitStatusForActions.aheadCount === 0 && (
-          <p className="px-2 py-1.5 text-xs text-warning">Behind upstream. Pull/rebase first.</p>
+          <p className="px-2 py-1.5 text-xs text-warning">落后于上游。请先拉取或变基。</p>
         )}
       {gitStatusError && <p className="px-2 py-1.5 text-xs text-destructive">{gitStatusError}</p>}
     </>
@@ -1714,9 +1709,7 @@ export default function GitActionsControl({
             onClick={initializeGit}
           >
             <GitBranchPlusIcon className="size-4" />
-            <MenuItemLabel>
-              {initAction.isPending ? "Initializing..." : "Initialize Git"}
-            </MenuItemLabel>
+            <MenuItemLabel>{initAction.isPending ? "正在初始化…" : "初始化 Git"}</MenuItemLabel>
           </MenuItem>
         ) : (
           <>
@@ -1745,7 +1738,7 @@ export default function GitActionsControl({
             >
               <MenuSubTrigger density="touch" disabled={isGitActionRunning}>
                 <SourceControlIcon className="size-4" />
-                <MenuItemLabel>Git actions</MenuItemLabel>
+                <MenuItemLabel>Git 操作</MenuItemLabel>
               </MenuSubTrigger>
               <MenuSubPopup>{gitItems}</MenuSubPopup>
             </MenuSub>
@@ -1762,13 +1755,13 @@ export default function GitActionsControl({
         >
           <GitBranchPlusIcon className="size-3.5" aria-hidden />
           <span className={cn("ml-0.5", isPanel && THREAD_DETAILS_PANEL_LABEL_CLASS)}>
-            {initAction.isPending ? "Initializing..." : "Initialize Git"}
+            {initAction.isPending ? "正在初始化…" : "初始化 Git"}
           </span>
         </ThreadDetailsControl>
       ) : compact && !gitActionProgress && !visibleInlineSuccess ? null : (
         <ActionGroup
           role="group"
-          aria-label="Git actions"
+          aria-label="Git 操作"
           {...(isPanel ? { ref: panelAnchorRef } : {})}
           className={cn(
             "shrink-0",
@@ -1879,7 +1872,7 @@ export default function GitActionsControl({
                 <MenuTrigger
                   render={
                     <ThreadDetailsControl
-                      aria-label="Git action options"
+                      aria-label="Git 操作选项"
                       size={isPanel ? "sm" : "icon-xs"}
                       variant={isPanel ? "ghost" : "outline"}
                       part="secondary"
@@ -1916,7 +1909,7 @@ export default function GitActionsControl({
           onClick={onOpenChanges}
         >
           <FileDiffIcon className={THREAD_DETAILS_PANEL_ICON_CLASS} aria-hidden />
-          <span className={cn("flex-1 text-left", THREAD_DETAILS_PANEL_LABEL_CLASS)}>Changes</span>
+          <span className={cn("flex-1 text-left", THREAD_DETAILS_PANEL_LABEL_CLASS)}>更改</span>
           <span className="flex items-center gap-1 font-mono text-2xs tabular-nums">
             <span className="text-success">+{formatDiffCount(changesTotals?.insertions ?? 0)}</span>
             <span className="text-destructive">
@@ -1945,12 +1938,12 @@ export default function GitActionsControl({
           <DialogPanel>
             <div className="space-y-3 rounded-xl bg-zinc-25 p-3 text-sm ring-1 ring-black/5 dark:bg-white/[0.035] dark:ring-white/5">
               <div className="grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1">
-                <span className="text-muted-foreground">Branch</span>
+                <span className="text-muted-foreground">分支</span>
                 <span className="flex items-center justify-between gap-2">
                   <span className="font-medium">
                     {gitStatusForActions?.refName ?? "(detached HEAD)"}
                   </span>
-                  {isDefaultRef && <span className="text-right text-warning">Default branch</span>}
+                  {isDefaultRef && <span className="text-right text-warning">默认分支</span>}
                 </span>
               </div>
               <div className="space-y-1">
@@ -1967,10 +1960,10 @@ export default function GitActionsControl({
                         }}
                       />
                     )}
-                    <span className="text-muted-foreground">Files</span>
+                    <span className="text-muted-foreground">文件</span>
                     {!allSelected && !isEditingFiles && (
                       <span className="text-muted-foreground">
-                        ({selectedFiles.length} of {allFiles.length})
+                        （{selectedFiles.length} / {allFiles.length}）
                       </span>
                     )}
                   </div>
@@ -1985,7 +1978,7 @@ export default function GitActionsControl({
                   )}
                 </div>
                 {!gitStatusForActions || allFiles.length === 0 ? (
-                  <p className="font-medium">none</p>
+                  <p className="font-medium">无</p>
                 ) : (
                   <div className="space-y-2">
                     <div className="h-44 rounded-lg bg-card ring-1 ring-black/5 dark:bg-white/[0.025] dark:ring-white/5">
@@ -2018,7 +2011,7 @@ export default function GitActionsControl({
                                   type="button"
                                   className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
                                   disabled={!canOperateThread}
-                                  aria-label={`Open ${file.path} in editor`}
+                                  aria-label={`在编辑器中打开 ${file.path}`}
                                   onClick={() => openChangedFileInEditor(file.path)}
                                 >
                                   <StartTruncatedPath
@@ -2027,7 +2020,7 @@ export default function GitActionsControl({
                                   />
                                   <span className="shrink-0">
                                     {isExcluded ? (
-                                      <span className="text-muted-foreground">Excluded</span>
+                                      <span className="text-muted-foreground">已排除</span>
                                     ) : (
                                       <>
                                         <span className="text-diff-addition">
@@ -2061,11 +2054,11 @@ export default function GitActionsControl({
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium">Commit message (optional)</p>
+              <p className="text-sm font-medium">提交消息（可选）</p>
               <Textarea
                 value={dialogCommitMessage}
                 onChange={(event) => setDialogCommitMessage(event.target.value)}
-                placeholder="Leave empty to auto-generate"
+                placeholder="留空以自动生成"
                 size="sm"
               />
             </div>
@@ -2081,7 +2074,7 @@ export default function GitActionsControl({
                 setIsEditingFiles(false);
               }}
             >
-              Cancel
+              取消
             </Button>
             <Button
               variant="outline"
@@ -2089,14 +2082,14 @@ export default function GitActionsControl({
               disabled={!canChangeThreadBranch || noneSelected}
               onClick={runDialogActionOnNewBranch}
             >
-              Commit on new branch
+              在新分支上提交
             </Button>
             <Button
               size="sm"
               disabled={!canWriteSourceControl || noneSelected}
               onClick={runDialogAction}
             >
-              Commit
+              提交
             </Button>
           </DialogFooter>
         </DialogPopup>
@@ -2121,7 +2114,7 @@ export default function GitActionsControl({
         <DialogPopup className="max-w-xl">
           <DialogHeader>
             <DialogTitle>
-              {pendingDefaultBranchActionCopy?.title ?? "Run action on default branch?"}
+              {pendingDefaultBranchActionCopy?.title ?? "在默认分支上执行操作？"}
             </DialogTitle>
             <DialogDescription>{pendingDefaultBranchActionCopy?.description}</DialogDescription>
           </DialogHeader>
@@ -2132,7 +2125,7 @@ export default function GitActionsControl({
               size="sm"
               onClick={() => setPendingDefaultBranchAction(null)}
             >
-              Abort
+              中止
             </Button>
             <Button
               className="w-full max-w-full sm:w-auto"
@@ -2149,7 +2142,7 @@ export default function GitActionsControl({
               onClick={checkoutFeatureBranchAndContinuePendingAction}
               disabled={!canChangeThreadBranch}
             >
-              Check out feature branch & continue
+              检出功能分支并继续
             </Button>
           </DialogFooter>
         </DialogPopup>

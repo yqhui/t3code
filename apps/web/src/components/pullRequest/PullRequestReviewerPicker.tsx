@@ -78,11 +78,11 @@ export function PullRequestReviewerPicker({
       toastManager.add({
         type: "error",
         title: candidate.isRequested
-          ? `Could not take back the review request to ${candidate.login}`
-          : `Could not ask ${candidate.login} for a review`,
+          ? `无法撤回向 ${candidate.login} 发出的审查请求`
+          : `无法向 ${candidate.login} 请求审查`,
         description: readableFailure(
           squashAtomCommandFailure(result),
-          "The host refused it. Check that you have write access on this repository, and that they still have access to it.",
+          "主机拒绝了请求。请确认你有此仓库的写入权限，并且对方仍有访问权限。",
         ),
       });
       return;
@@ -90,30 +90,30 @@ export function PullRequestReviewerPicker({
     toastManager.add({
       type: "success",
       title: candidate.isRequested
-        ? `Review request to ${candidate.login} taken back`
-        : `Review requested from ${candidate.login}`,
+        ? `已撤回向 ${candidate.login} 发出的审查请求`
+        : `已向 ${candidate.login} 请求审查`,
     });
   };
 
   return (
     <PullRequestCandidatePicker
       icon={<UserPlusIcon className="size-3.5" />}
-      label="Request a review"
+      label="请求审查"
       allowed={allowed}
-      disabledReason="Asking someone to review needs write access on this repository"
+      disabledReason="请求他人审查需要此仓库的写入权限"
       open={open}
       onOpenChange={setOpen}
       query={query}
       onQueryChange={setQuery}
-      searchLabel="Search people with access"
+      searchLabel="搜索有访问权限的人员"
       isPending={candidatesQuery.isPending && candidatesQuery.data === null}
       error={candidatesQuery.data === null ? candidatesQuery.error : null}
       candidates={candidates}
-      emptyLabel="Nobody else has access to this repository."
-      noMatchLabel="Nobody with access matches that."
-      errorLabel="The people with access could not be read."
+      emptyLabel="没有其他人有此仓库的访问权限。"
+      noMatchLabel="未找到匹配的有访问权限人员。"
+      errorLabel="无法读取有访问权限的人员。"
       truncated={candidatesQuery.data?.truncated === true}
-      truncatedLabel="This repository has more people with access than are listed here. Ask for the rest on the host."
+      truncatedLabel="有此仓库访问权限的人员多于此处列出的数量。请在主机上请求其余人员审查。"
       candidateKey={(candidate) => `${candidate.kind}:${candidate.id}`}
       disabled={pending !== null}
       onSelect={(candidate) => void toggle(candidate)}
@@ -122,10 +122,10 @@ export function PullRequestReviewerPicker({
         <>
           <PullRequestActorLabel actor={candidate} className="flex-1" />
           {candidate.kind === "team" ? (
-            <span className="shrink-0 text-muted-foreground">team</span>
+            <span className="shrink-0 text-muted-foreground">团队</span>
           ) : null}
           {candidate.isRequested ? (
-            <CheckIcon aria-label="Already asked" className="size-3.5 shrink-0" />
+            <CheckIcon aria-label="已请求审查" className="size-3.5 shrink-0" />
           ) : null}
         </>
       )}

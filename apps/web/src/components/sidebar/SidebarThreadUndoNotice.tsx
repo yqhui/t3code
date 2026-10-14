@@ -12,14 +12,14 @@ export function SidebarThreadUndoNotice() {
 
   if (!notice) return null;
   const shortcut = shortcutLabelForCommand(keybindings, "thread.undo");
-  const noun = `${notice.action === "Discarded" ? "draft" : "thread"}${notice.count === 1 ? "" : "s"}`;
+  const noun = notice.action === "Discarded" ? "草稿" : "会话";
 
   return (
     <Alert role="status" variant="sidebar">
       <AlertDescription>
-        {notice.action} {notice.count} {noun},{" "}
+        {notice.action} {notice.count} 个{noun}，
         <InlineButton onClick={undoLatestThreadAction}>
-          {shortcut ? `${shortcut} to undo` : "Undo"}
+          {shortcut ? `按 ${shortcut} 撤销` : "撤销"}
         </InlineButton>
       </AlertDescription>
     </Alert>

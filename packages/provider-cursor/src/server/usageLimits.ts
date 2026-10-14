@@ -86,7 +86,7 @@ export const readCursorUsageLimits = Effect.fn("readCursorUsageLimits")(function
       return makeUnavailableUsageLimits({
         checkedAt,
         reason: "unsupported",
-        message: "Cursor usage requires a CLI login or CURSOR_AUTH_TOKEN.",
+        message: "读取 Cursor 用量需要 CLI 登录或 CURSOR_AUTH_TOKEN。",
       });
     }
     if (!token && platform === "darwin" && credentialStore !== "file") {
@@ -94,14 +94,14 @@ export const readCursorUsageLimits = Effect.fn("readCursorUsageLimits")(function
         return makeUnavailableUsageLimits({
           checkedAt,
           reason: "unsupported",
-          message: "Enable Cursor account usage in T3 Code to read its Keychain login.",
+          message: "请在 T3 Code 中启用 Cursor 账户用量，以读取钥匙串中的登录信息。",
         });
       }
       if (endpoint !== DEFAULT_CURSOR_API_ENDPOINT) {
         return makeUnavailableUsageLimits({
           checkedAt,
           reason: "unsupported",
-          message: "Cursor account usage requires the default Cursor endpoint when using Keychain.",
+          message: "使用钥匙串时，读取 Cursor 账户用量需要默认 Cursor 端点。",
         });
       }
       const keychain = yield* CursorKeychain.CursorKeychain;
@@ -147,7 +147,7 @@ export const readCursorUsageLimits = Effect.fn("readCursorUsageLimits")(function
       makeUnavailableUsageLimits({
         checkedAt,
         reason: "probeFailed",
-        message: "Cursor could not read usage limits.",
+        message: "Cursor 无法读取用量限额。",
       }),
     ),
   );

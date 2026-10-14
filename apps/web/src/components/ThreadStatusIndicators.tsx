@@ -188,20 +188,20 @@ export function resolveThreadPullRequestBadgePresentation({
     return {
       Icon: PullRequestGlyph.stack,
       toneClassName: aggregate.toneClassName,
-      label: `Stack of ${badge.layers} pull requests, ${aggregate.label.toLowerCase()}`,
+      label: `${badge.layers} 个拉取请求的堆栈，${aggregate.label.toLowerCase()}`,
       text: badge.layers,
     };
   }
   if (number === undefined || url === undefined) return null;
 
-  const tooltip = status?.tooltip ?? `PR #${number}, status pending`;
+  const tooltip = status?.tooltip ?? `PR #${number}，状态待更新`;
   if (badge?.kind === "pull-request" && badge.others > 0) {
     // Unrelated links fold into one state, so a count of merged PRs reads as merged.
     const aggregate = PULL_REQUEST_STATE_PRESENTATION[badge.state];
     return {
       Icon: aggregate.Icon,
       toneClassName: aggregate.toneClassName,
-      label: `${tooltip}, and ${badge.others} more linked; overall ${aggregate.label.toLowerCase()}`,
+      label: `${tooltip}，另有 ${badge.others} 个已关联；总体${aggregate.label.toLowerCase()}`,
       text: `+${badge.others + 1}`,
     };
   }
@@ -802,8 +802,8 @@ export function ThreadTerminalStatusButton({
   const status = terminalStatusFromRunningIds(terminalIds);
   const label =
     terminalIds.length === 1
-      ? "1 terminal process running. Open terminal"
-      : `${terminalIds.length} terminal processes running. Open terminal`;
+      ? "1 个终端进程正在运行。打开终端"
+      : `${terminalIds.length} 个终端进程正在运行。打开终端`;
   return (
     <Tooltip>
       <TooltipTrigger
@@ -878,6 +878,18 @@ export function ThreadStatusLabel({
   status: ThreadStatusPill;
   compact?: boolean;
 }) {
+  const displayLabel =
+    (
+      {
+        "Pending Approval": "等待批准",
+        "Awaiting Input": "等待输入",
+        Working: "工作中",
+        Connecting: "正在连接",
+        Waiting: "等待中",
+        "Plan Ready": "计划已就绪",
+        Completed: "已完成",
+      } as Readonly<Record<string, string>>
+    )[status.label] ?? status.label;
   if (compact) {
     return (
       <Tooltip>
@@ -885,7 +897,7 @@ export function ThreadStatusLabel({
           render={
             <span
               role="img"
-              aria-label={status.label}
+              aria-label={displayLabel}
               className={`inline-flex size-3.5 shrink-0 items-center justify-center ${status.colorClass}`}
             />
           }
@@ -896,7 +908,7 @@ export function ThreadStatusLabel({
             }`}
           />
         </TooltipTrigger>
-        <TooltipPopup side="top">{status.label}</TooltipPopup>
+        <TooltipPopup side="top">{displayLabel}</TooltipPopup>
       </Tooltip>
     );
   }
@@ -907,7 +919,7 @@ export function ThreadStatusLabel({
         render={
           <span
             role="img"
-            aria-label={status.label}
+            aria-label={displayLabel}
             className={`inline-flex items-center gap-1 text-3xs ${status.colorClass}`}
           />
         }
@@ -917,9 +929,9 @@ export function ThreadStatusLabel({
             status.pulse ? "animate-status-pulse" : ""
           }`}
         />
-        <span className="hidden md:inline">{status.label}</span>
+        <span className="hidden md:inline">{displayLabel}</span>
       </TooltipTrigger>
-      <TooltipPopup side="top">{status.label}</TooltipPopup>
+      <TooltipPopup side="top">{displayLabel}</TooltipPopup>
     </Tooltip>
   );
 }
@@ -1025,7 +1037,7 @@ export function ThreadRowLeadingStatus({
       {pendingLink ? (
         <PullRequestGlyph.pullRequest
           className="size-3 text-muted-foreground"
-          aria-label={`PR #${pendingLink.number}, status pending`}
+          aria-label={`PR #${pendingLink.number}，状态待更新`}
         />
       ) : null}
       {threadStatus ? <ThreadStatusLabel status={threadStatus} /> : null}
@@ -1049,7 +1061,7 @@ export function ThreadRowTrailingStatus({ thread }: { thread: SidebarThreadSumma
   // glyph is what tells the environments apart.
   const isRemoteThread = thread.environmentId !== primaryEnvironmentId;
   const remoteEnvLabel = environment?.label ?? null;
-  const threadEnvironmentLabel = isRemoteThread ? (remoteEnvLabel ?? "Remote") : null;
+  const threadEnvironmentLabel = isRemoteThread ? (remoteEnvLabel ?? "远程") : null;
   const remoteMachine = resolveEnvironmentMachineKind(environment?.serverConfig ?? null);
   const terminalStatus = terminalStatusFromRunningIds(runningTerminalIds);
 
@@ -1065,7 +1077,7 @@ export function ThreadRowTrailingStatus({ thread }: { thread: SidebarThreadSumma
             render={
               <span
                 role="img"
-                aria-label={terminalStatus.label}
+                aria-label="终端进程运行中"
                 className={`inline-flex items-center justify-center ${terminalStatus.colorClass}`}
               />
             }
@@ -1075,7 +1087,7 @@ export function ThreadRowTrailingStatus({ thread }: { thread: SidebarThreadSumma
               onAnimationStart={synchronizeTerminalPulse}
             />
           </TooltipTrigger>
-          <TooltipPopup side="top">{terminalStatus.label}</TooltipPopup>
+          <TooltipPopup side="top">终端进程运行中</TooltipPopup>
         </Tooltip>
       ) : null}
       {isRemoteThread ? (
@@ -1083,7 +1095,7 @@ export function ThreadRowTrailingStatus({ thread }: { thread: SidebarThreadSumma
           <TooltipTrigger
             render={
               <span
-                aria-label={threadEnvironmentLabel ?? "Remote"}
+                aria-label={threadEnvironmentLabel ?? "远程"}
                 className="inline-flex items-center justify-center"
               />
             }
@@ -1171,7 +1183,7 @@ export function ThreadSearchPullRequestNumber({
             )
           : (status?.colorClass ?? "text-secondary-label")
       }
-      aria-label={status?.tooltip ?? `Pull request #${reference.number}`}
+      aria-label={status?.tooltip ?? `拉取请求 #${reference.number}`}
     />
   ) : null;
 }

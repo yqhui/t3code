@@ -343,7 +343,7 @@ const make = Effect.gen(function* () {
       const client = parseClientId(request.client_id ?? "");
       if (client === undefined) {
         return yield* new McpOAuthPageError({
-          description: "This sign-in link names an unknown app. Start the sign-in again from it.",
+          description: "此登录链接指向一个未知的应用。请在该应用中重新发起登录。",
         });
       }
       const redirectUri = request.redirect_uri;
@@ -352,7 +352,7 @@ const make = Effect.gen(function* () {
         !client.redirectUris.some((registered) => redirectMatches(registered, redirectUri))
       ) {
         return yield* new McpOAuthPageError({
-          description: "This sign-in link sends you to an address the app did not register.",
+          description: "此登录链接会将你导向该应用未注册的地址。",
         });
       }
       const state = request.state;
@@ -439,7 +439,7 @@ const make = Effect.gen(function* () {
               Effect.andThen(
                 Effect.fail(
                   new McpOAuthPageError({
-                    description: "The code could not be checked. Try again.",
+                    description: "配对码校验失败，请重试。",
                   }),
                 ),
               ),
@@ -456,7 +456,7 @@ const make = Effect.gen(function* () {
           )
         ) {
           return yield* new McpOAuthPageError({
-            description: "Your session cannot approve this request. Enter a pairing code instead.",
+            description: "你的会话无法批准此请求。请改为输入配对码。",
           });
         }
       }

@@ -16,24 +16,24 @@ export const ComposerPendingApprovalPanel = memo(function ComposerPendingApprova
   const Detail = approval.requestKind === "mcp-elicitation" ? "span" : "code";
   const fallbackLabel =
     approval.requestKind === "mcp-elicitation"
-      ? "App access approval"
+      ? "应用访问批准"
       : approval.requestKind === "command"
-        ? "Command approval"
+        ? "命令批准"
         : approval.requestKind === "file-read"
-          ? "File read approval"
+          ? "文件读取批准"
           : approval.requestKind === "permission"
-            ? "App permission approval"
-            : "File change approval";
+            ? "应用权限批准"
+            : "文件更改批准";
   const detailAriaLabel =
     approval.requestKind === "mcp-elicitation"
-      ? "App access request"
+      ? "应用访问请求"
       : approval.requestKind === "command"
-        ? "Command"
+        ? "命令"
         : approval.requestKind === "file-read"
-          ? "File to read"
+          ? "要读取的文件"
           : approval.requestKind === "permission"
-            ? "Permission request"
-            : "File change";
+            ? "权限请求"
+            : "文件更改";
 
   return (
     <span
@@ -60,7 +60,7 @@ export const ComposerPendingApprovalPanel = memo(function ComposerPendingApprova
         tabIndex={0}
       >
         {approval.responseCapability === "not_resumable"
-          ? "Provider process is gone — interrupt or restart the run to respond."
+          ? "提供商进程已消失——请中断或重新启动运行以响应。"
           : approval.detail || fallbackLabel}
       </Detail>
     </span>

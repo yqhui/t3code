@@ -73,17 +73,17 @@ const checkForUpdatesFromMenu = Effect.gen(function* () {
   if (updateState.status === "up-to-date") {
     yield* electronDialog.showMessageBox({
       type: "info",
-      title: "You're up to date!",
-      message: `T3 Code ${updateState.currentVersion} is currently the newest version available.`,
-      buttons: ["OK"],
+      title: "已是最新版本",
+      message: `T3 Code ${updateState.currentVersion} 已是当前可用的最新版本。`,
+      buttons: ["确定"],
     });
   } else if (updateState.status === "error") {
     yield* electronDialog.showMessageBox({
       type: "warning",
-      title: "Update check failed",
-      message: "Could not check for updates.",
-      detail: updateState.message ?? "An unknown error occurred. Please try again later.",
-      buttons: ["OK"],
+      title: "检查更新失败",
+      message: "无法检查更新。",
+      detail: updateState.message ?? "发生未知错误。请稍后重试。",
+      buttons: ["确定"],
     });
   }
 }).pipe(Effect.withSpan("desktop.menu.checkForUpdates"));
@@ -98,10 +98,10 @@ const handleCheckForUpdatesMenuClick = Effect.gen(function* () {
     });
     yield* electronDialog.showMessageBox({
       type: "info",
-      title: "Updates unavailable",
-      message: "Automatic updates are not available right now.",
+      title: "更新不可用",
+      message: "自动更新目前不可用。",
       detail: disabledReason.value,
-      buttons: ["OK"],
+      buttons: ["确定"],
     });
     return;
   }
@@ -166,76 +166,82 @@ export const make = Effect.gen(function* () {
       template.push({
         label: environment.displayName,
         submenu: [
-          { role: "about", label: `About ${environment.displayName}` },
+          { role: "about", label: `关于 ${environment.displayName}` },
           {
-            label: "Check for Updates...",
+            label: "检查更新…",
             click: checkForUpdatesClick,
           },
           { type: "separator" },
           {
-            label: "Settings...",
+            label: "设置…",
             accelerator: "CmdOrCtrl+,",
             click: settingsClick,
           },
           { type: "separator" },
-          { role: "services" },
+          { role: "services", label: "服务" },
           { type: "separator" },
-          { role: "hide", label: `Hide ${environment.displayName}` },
-          { role: "hideOthers" },
-          { role: "unhide" },
+          { role: "hide", label: `隐藏 ${environment.displayName}` },
+          { role: "hideOthers", label: "隐藏其他应用" },
+          { role: "unhide", label: "显示全部" },
           { type: "separator" },
-          { role: "quit", label: `Quit ${environment.displayName}` },
+          { role: "quit", label: `退出 ${environment.displayName}` },
         ],
       });
     }
 
     template.push(
       {
-        label: "File",
+        label: "文件",
         submenu: [
           ...(environment.platform === "darwin"
             ? []
             : [
                 {
-                  label: "Settings...",
+                  label: "设置…",
                   accelerator: "CmdOrCtrl+,",
                   click: settingsClick,
                 },
                 { type: "separator" as const },
               ]),
-          { role: environment.platform === "darwin" ? "close" : "quit" },
+          {
+            role: environment.platform === "darwin" ? "close" : "quit",
+            label: environment.platform === "darwin" ? "关闭窗口" : "退出",
+          },
         ],
       },
       {
-        label: "Edit",
+        label: "编辑",
         submenu: [
-          { role: "undo" },
-          { role: "redo" },
+          { role: "undo", label: "撤销" },
+          { role: "redo", label: "重做" },
           { type: "separator" },
-          { role: "cut" },
-          { role: "copy" },
-          { role: "paste" },
+          { role: "cut", label: "剪切" },
+          { role: "copy", label: "复制" },
+          { role: "paste", label: "粘贴" },
           {
-            label: "Paste as Text",
+            label: "粘贴为纯文本",
             accelerator: "CmdOrCtrl+Shift+V",
             click: pasteAsTextClick,
           },
-          { role: "delete" },
+          { role: "delete", label: "删除" },
           { type: "separator" },
-          { role: "selectAll" },
+          { role: "selectAll", label: "全选" },
           ...(environment.platform === "darwin"
             ? [
                 { type: "separator" as const },
                 {
-                  label: "Speech",
-                  submenu: [{ role: "startSpeaking" as const }, { role: "stopSpeaking" as const }],
+                  label: "语音",
+                  submenu: [
+                    { role: "startSpeaking" as const, label: "开始朗读" },
+                    { role: "stopSpeaking" as const, label: "停止朗读" },
+                  ],
                 },
               ]
             : []),
         ],
       },
       {
-        label: "View",
+        label: "视图",
         submenu: [
           /*
             Not the reload, DevTools or zoom roles: those act on the focused
@@ -243,37 +249,38 @@ export const make = Effect.gen(function* () {
             the guest page and the app UI appears stuck. These always target
             the main window (see DesktopWindow.zoomMain).
           */
-          { label: "Reload", accelerator: "CmdOrCtrl+R", click: mainContentsClick("reload") },
+          { label: "重新加载", accelerator: "CmdOrCtrl+R", click: mainContentsClick("reload") },
           {
-            label: "Force Reload",
+            label: "强制重新加载",
             accelerator: "Shift+CmdOrCtrl+R",
             click: mainContentsClick("forceReload"),
           },
           {
-            label: "Toggle Developer Tools",
+            label: "切换开发者工具",
             accelerator: environment.platform === "darwin" ? "Alt+Command+I" : "Ctrl+Shift+I",
             click: mainContentsClick("toggleDevTools"),
           },
           { type: "separator" },
-          { label: "Actual Size", accelerator: "CmdOrCtrl+0", click: zoomClick("reset") },
-          { label: "Zoom In", accelerator: "CmdOrCtrl+=", click: zoomClick("in") },
+          { label: "实际大小", accelerator: "CmdOrCtrl+0", click: zoomClick("reset") },
+          { label: "放大", accelerator: "CmdOrCtrl+=", click: zoomClick("in") },
           {
-            label: "Zoom In",
+            label: "放大",
             accelerator: "CmdOrCtrl+Plus",
             visible: false,
             click: zoomClick("in"),
           },
-          { label: "Zoom Out", accelerator: "CmdOrCtrl+-", click: zoomClick("out") },
+          { label: "缩小", accelerator: "CmdOrCtrl+-", click: zoomClick("out") },
           { type: "separator" },
-          { role: "togglefullscreen" },
+          { role: "togglefullscreen", label: "切换全屏" },
         ],
       },
-      { role: "windowMenu" },
+      { role: "windowMenu", label: "窗口" },
       {
         role: "help",
+        label: "帮助",
         submenu: [
           {
-            label: "Check for Updates...",
+            label: "检查更新…",
             click: checkForUpdatesClick,
           },
         ],

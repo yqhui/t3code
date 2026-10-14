@@ -39,8 +39,8 @@ export function CliCommandSettingsRow() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: action === "install" ? "Could not install t3" : "Could not remove t3",
-              description: error instanceof Error ? error.message : "Something went wrong.",
+              title: action === "install" ? "无法安装 t3" : "无法移除 t3",
+              description: error instanceof Error ? error.message : "出现了一些问题。",
             }),
           );
         })
@@ -52,12 +52,12 @@ export function CliCommandSettingsRow() {
   if (!bridge || !state?.supported) return null;
   const installed = state.installedPath !== null;
   const description = state.shadowedBy
-    ? `Another t3 at ${state.shadowedBy} runs first in a new terminal. Remove it to use T3 Code's.`
+    ? `新终端中会优先运行位于 ${state.shadowedBy} 的另一个 t3。请将其移除以使用 T3 Code 的版本。`
     : !installed
-      ? "Run T3 Code's CLI as `t3` from any terminal."
+      ? "在任何终端中以 `t3` 运行 T3 Code 的 CLI。"
       : state.onPath
-        ? `Installed at ${state.installedPath}. Open a new terminal to use it.`
-        : `Installed at ${state.installedPath}, which is not on your PATH yet. Add its folder to your PATH to run \`t3\`.`;
+        ? `已安装到 ${state.installedPath}。打开一个新终端即可使用。`
+        : `已安装到 ${state.installedPath}，但尚未加入 PATH。请将其所在文件夹加入 PATH 以运行 \`t3\`。`;
 
   return (
     <SettingsRow
@@ -70,7 +70,7 @@ export function CliCommandSettingsRow() {
           disabled={pending}
           onClick={() => change(installed ? "uninstall" : "install")}
         >
-          {installed ? "Remove" : "Install"}
+          {installed ? "移除" : "安装"}
         </Button>
       }
     />

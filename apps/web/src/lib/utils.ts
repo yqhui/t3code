@@ -28,9 +28,9 @@ export function getLocalFileManagerName(platform: string): string {
     return "Finder";
   }
   if (isWindowsPlatform(platform)) {
-    return "File Explorer";
+    return "文件资源管理器";
   }
-  return "Files";
+  return "文件";
 }
 
 export function randomUUID(): string {

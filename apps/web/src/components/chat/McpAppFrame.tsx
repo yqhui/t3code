@@ -330,7 +330,7 @@ export function McpAppFrame(props: {
         if (!info.value.callable) throw new McpAppHostRefusal("This app cannot call that tool.");
         if (!info.value.readOnly) {
           const approved = await ask(
-            `Allow ${app.server} to run ${info.value.title ?? name}?\n${JSON.stringify(args, null, 2)}`,
+            `允许 ${app.server} 运行 ${info.value.title ?? name}？\n${JSON.stringify(args, null, 2)}`,
           );
           if (approved !== true) throw new McpAppHostRefusal("Declined by the user.");
         }
@@ -360,7 +360,7 @@ export function McpAppFrame(props: {
       sendMessage: async (text) => {
         const send = latest.current.props.onSendMessage;
         if (send === undefined) throw new McpAppHostRefusal("Messages are not available here.");
-        const approved = await ask(`Send this message from ${app.server}?\n${text}`);
+        const approved = await ask(`从 ${app.server} 发送此消息？\n${text}`);
         if (approved !== true) throw new McpAppHostRefusal("Declined by the user.");
         await send(text);
       },
@@ -470,7 +470,7 @@ export function McpAppFrame(props: {
   if (closed) {
     return (
       <div className="flex items-center justify-between gap-2 rounded-lg border border-border px-3 py-2 text-muted-foreground text-xs">
-        <span>The {app.server} app was closed</span>
+        <span>{app.server} 应用已关闭</span>
         <Button
           size="xs"
           variant="ghost"
@@ -483,7 +483,7 @@ export function McpAppFrame(props: {
             setClosed(false);
           }}
         >
-          Show app
+          显示应用
         </Button>
       </div>
     );
@@ -514,7 +514,7 @@ export function McpAppFrame(props: {
           <div className="flex h-10 shrink-0 items-center justify-between border-border border-b px-3 text-sm">
             <span className="truncate">{app.server}</span>
             <Button
-              aria-label="Exit full screen"
+              aria-label="退出全屏"
               size="icon-sm"
               variant="ghost"
               onClick={() => setDisplayMode("inline")}
@@ -525,13 +525,13 @@ export function McpAppFrame(props: {
         ) : null}
         {navigatedAway ? (
           <p className="flex size-full items-center justify-center text-muted-foreground text-xs">
-            The {app.server} app left its page and was stopped
+            {app.server} 应用已离开其页面并停止
           </p>
         ) : src !== null ? (
           <iframe
             ref={frameRef}
             src={src}
-            title={`${app.server} app`}
+            title={`${app.server} 应用`}
             // Never allow-same-origin: the opaque origin keeps the app out of the session.
             sandbox="allow-scripts allow-forms"
             allow={mcpAppAllowAttribute(app.permissions)}
@@ -541,7 +541,7 @@ export function McpAppFrame(props: {
           />
         ) : asset._tag === "Failure" || mintFailed ? (
           <p className="flex size-full items-center justify-center text-muted-foreground text-xs">
-            Unable to load the {app.server} app
+            无法加载 {app.server} 应用
           </p>
         ) : null}
       </div>

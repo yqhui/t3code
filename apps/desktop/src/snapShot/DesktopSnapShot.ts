@@ -94,18 +94,15 @@ const MAX_CAPTURE_WIDTH = 2_560;
 const MAX_CAPTURE_HEIGHT = 1_600;
 const SHORTCUT_COOLDOWN_NS = 200_000_000n;
 const WAYLAND_MODIFIER_PAIR_UNAVAILABLE_MESSAGE =
-  "Modifier-pair shortcuts aren't available in this Wayland session. Choose another shortcut or use Take snapshot from the command palette.";
+  "此 Wayland 会话不支持双修饰键快捷键。请选择其他快捷键，或使用命令面板中的“拍摄快照”。";
 const FLASH_ANIMATION_DURATION_MS = 180;
 const FLASH_STATIC_DURATION_MS = 60;
 const FLASH_FRAME_INTERVAL_MS = 16;
 const FLASH_PEAK_OPACITY = 0.08;
 const MAC_SCREEN_CAPTURE_SETTINGS_URL = MAC_PERMISSION_SETTINGS_URLS["screen-recording"];
-const MAC_SCREEN_CAPTURE_PERMISSION_MESSAGE =
-  "Allow Screen Recording in System Settings, then restart T3 Code.";
-const MAC_ACCESSIBILITY_PERMISSION_MESSAGE =
-  "Allow Accessibility in System Settings, then restart T3 Code.";
-const MAC_BOTH_PERMISSIONS_MESSAGE =
-  "Allow Accessibility and Screen Recording in System Settings, then restart T3 Code.";
+const MAC_SCREEN_CAPTURE_PERMISSION_MESSAGE = "请在系统设置中允许“屏幕录制”，然后重启 T3 Code。";
+const MAC_ACCESSIBILITY_PERMISSION_MESSAGE = "请在系统设置中允许“辅助功能”，然后重启 T3 Code。";
+const MAC_BOTH_PERMISSIONS_MESSAGE = "请在系统设置中允许“辅助功能”和“屏幕录制”，然后重启 T3 Code。";
 const MAC_PERMISSION_MESSAGES = new Set([
   MAC_SCREEN_CAPTURE_PERMISSION_MESSAGE,
   MAC_ACCESSIBILITY_PERMISSION_MESSAGE,
@@ -139,21 +136,21 @@ export class DesktopSnapShotError extends Schema.TaggedError<DesktopSnapShotErro
   override get message(): string {
     switch (this.operation) {
       case "list-pending":
-        return "Could not list pending snapshots.";
+        return "无法列出待处理的快照。";
       case "read":
-        return "Could not read the snapshot.";
+        return "无法读取快照。";
       case "acknowledge":
-        return "Could not remove the snapshot.";
+        return "无法移除快照。";
       case "unsupported":
-        return "SnapShots are not supported here.";
+        return "此环境不支持快照。";
       case "disabled":
-        return "Enable SnapShots in Settings first.";
+        return "请先在设置中启用快照。";
       case "no-window-selected":
-        return "No window was selected.";
+        return "未选择任何窗口。";
       case "window-unavailable":
-        return "The active window is not available for capture.";
+        return "活动窗口无法截图。";
       case "capture":
-        return "Could not capture the active window.";
+        return "无法截取活动窗口。";
     }
   }
 }
@@ -216,27 +213,26 @@ export class DesktopSnapShotSetupError extends Schema.TaggedError<DesktopSnapSho
 ) {
   override get message(): string {
     if (this.action === "preview-config" || this.action === "apply-config") {
-      if (this.reason === "unsupported-session")
-        return "Config setup requires a Niri or Hyprland session.";
+      if (this.reason === "unsupported-session") return "配置设置需要 Niri 或 Hyprland 会话。";
       return this.action === "preview-config"
-        ? "Couldn't prepare your capture shortcut changes."
-        : "Couldn't save your capture shortcut.";
+        ? "无法准备截图快捷键更改。"
+        : "无法保存你的截图快捷键。";
     }
     const kde = this.action === "install-kde-helper" || this.action === "remove-kde-helper";
     const hyprland =
       this.action === "install-hyprland-helper" || this.action === "remove-hyprland-helper";
     if (this.reason === "unsupported-session")
       return hyprland
-        ? "Helper setup requires a Hyprland Wayland session outside a sandbox."
+        ? "辅助程序安装需要在沙箱外的 Hyprland Wayland 会话。"
         : kde
-          ? "Helper setup requires a KDE Plasma Wayland session outside a sandbox."
-          : "Extension setup requires a GNOME Wayland session outside a sandbox.";
-    if (this.reason === "shortcut-permissions") return "Could not open shortcut permissions.";
+          ? "辅助程序安装需要在沙箱外的 KDE Plasma Wayland 会话。"
+          : "扩展安装需要在沙箱外的 GNOME Wayland 会话。";
+    if (this.reason === "shortcut-permissions") return "无法打开快捷键权限。";
     return hyprland
-      ? "Could not set up Hyprland capture."
+      ? "无法设置 Hyprland 截图。"
       : kde
-        ? "Could not set up KDE capture."
-        : "Could not set up the GNOME extension.";
+        ? "无法设置 KDE 截图。"
+        : "无法安装 GNOME 扩展。";
   }
 }
 
@@ -307,7 +303,7 @@ function snapShotAppName(
   sourceName: string,
 ): string {
   const appName =
-    active?.owner.name.trim() || linuxWindow?.appName.trim() || sourceName.trim() || "Window";
+    active?.owner.name.trim() || linuxWindow?.appName.trim() || sourceName.trim() || "窗口";
   if (active?.platform !== "windows") return appName;
   return appName.replace(/\.exe$/i, "").trim() || appName;
 }
@@ -476,7 +472,7 @@ async function captureSource({
         linuxFeedback = snapshot.feedback;
         if (linuxFeedback) onLinuxFeedback(linuxFeedback);
         linuxWindow = snapshot.window;
-        source = { name: linuxWindow?.title || "Active window" };
+        source = { name: linuxWindow?.title || "活动窗口" };
         png = snapshot.png;
       } else {
         const [selected] = await Electron.desktopCapturer.getSources({
@@ -679,12 +675,12 @@ function observedPairMessage(
 ): string {
   const modifier = snapShotShortcutModifierPair(shortcut);
   const label = snapShotModifierPairLabel(modifier, platform === "darwin");
-  const base = `${label} is observed and cannot be reserved exclusively.`;
+  const base = `${label} 会被全局监听，无法独占使用。`;
   if (modifier === "meta" && platform !== "darwin") {
-    return `${base} This key can also open the system's own menu.`;
+    return `${base} 此键还可能打开系统自带菜单。`;
   }
   if (modifier === "alt" && platform === "win32") {
-    return `${base} This key can also activate app menu bars.`;
+    return `${base} 此键还可能激活应用菜单栏。`;
   }
   return base;
 }
@@ -694,13 +690,13 @@ function probeGlobalShortcut(accelerator: string): DesktopSnapShotShortcutAvaila
     if (!Electron.globalShortcut.register(accelerator, () => undefined)) {
       return {
         available: false,
-        message: "This shortcut is already used by the system or another app.",
+        message: "此快捷键已被系统或其他应用使用。",
       };
     }
     Electron.globalShortcut.unregister(accelerator);
     return { available: true, message: null };
   } catch {
-    return { available: false, message: "The system could not register this shortcut." };
+    return { available: false, message: "系统无法注册此快捷键。" };
   }
 }
 
@@ -939,8 +935,7 @@ export const make = Effect.gen(function* () {
           kind: "snap-shot",
           capturedAt,
           appName:
-            boundedSnapShotString(snapShotAppName(active, linuxWindow, source.name), 255) ??
-            "Window",
+            boundedSnapShotString(snapShotAppName(active, linuxWindow, source.name), 255) ?? "窗口",
           windowTitle:
             boundedSnapShotString(
               active?.title.trim() || linuxWindow?.title.trim() || source.name,
@@ -1013,18 +1008,18 @@ export const make = Effect.gen(function* () {
   ) {
     const mode = captureMode(environment.platform);
     if (mode === "unavailable") {
-      return { available: false, message: "SnapShots are not supported on this platform." };
+      return { available: false, message: "此平台不支持快照。" };
     }
     if (mode === "portal" && niriSocketPath()) {
       return {
         available: false,
-        message: "Configure the capture shortcut in your Niri config, not in T3 Code.",
+        message: "请在 Niri 配置中设置截图快捷键，而不是在 T3 Code 中。",
       };
     }
     if (mode === "portal" && isHyprlandCaptureSession()) {
       return {
         available: false,
-        message: "Change the capture binding in your Hyprland config, then save it.",
+        message: "请在 Hyprland 配置中更改截图绑定，然后保存。",
       };
     }
     if (isModifierPairShortcut(shortcut)) {
@@ -1056,11 +1051,11 @@ export const make = Effect.gen(function* () {
         Effect.match({
           onSuccess: () => ({
             available: true,
-            message: "Your desktop will confirm this shortcut when you save it.",
+            message: "保存时你的桌面环境会确认此快捷键。",
           }),
           onFailure: (error) => ({
             available: false,
-            message: error.cause instanceof Error ? error.cause.message : "Unsupported shortcut.",
+            message: error.cause instanceof Error ? error.cause.message : "不支持的快捷键。",
           }),
         }),
       );
@@ -1141,8 +1136,8 @@ export const make = Effect.gen(function* () {
         message:
           mode === "unavailable"
             ? environment.platform === "linux"
-              ? "SnapShots require a Wayland session. X11 capture is not supported."
-              : "SnapShots are not supported on this platform."
+              ? "快照需要 Wayland 会话。不支持 X11 截图。"
+              : "此平台不支持快照。"
             : null,
       });
       return;
@@ -1167,9 +1162,9 @@ export const make = Effect.gen(function* () {
       const registered = yield* Effect.tryPromise(async () => {
         const { startNiriCaptureShortcut } = await import("./NiriCaptureShortcut.ts");
         return startNiriCaptureShortcut(linuxAppId, onCurrentShortcut, () => {
-          void runPromise(
-            setShortcutFailure("The Niri capture endpoint disconnected. Restart T3 Code."),
-          ).catch(() => undefined);
+          void runPromise(setShortcutFailure("Niri 截图端点已断开连接。请重启 T3 Code。")).catch(
+            () => undefined,
+          );
         });
       }).pipe(
         Effect.tap((stop) =>
@@ -1189,8 +1184,8 @@ export const make = Effect.gen(function* () {
         shortcutConfigPath: niriCaptureConfigPath(home),
         shortcutActionRegistered: registered,
         shortcutMessage: registered
-          ? "Set up the shortcut to add it to your Niri config."
-          : "Could not start the Niri capture endpoint. Another T3 Code instance may be using it.",
+          ? "请使用快捷键设置将其添加到你的 Niri 配置。"
+          : "无法启动 Niri 截图端点。可能另一个 T3 Code 实例正在使用它。",
         message: null,
       });
       return;
@@ -1247,9 +1242,7 @@ export const make = Effect.gen(function* () {
           Ref.update(stateRef, (state) => ({
             ...state,
             shortcutMessage:
-              error.cause instanceof Error
-                ? error.cause.message
-                : "Could not connect to your desktop's shortcut service.",
+              error.cause instanceof Error ? error.cause.message : "无法连接到桌面的快捷键服务。",
           })),
         ),
       );
@@ -1337,7 +1330,7 @@ export const make = Effect.gen(function* () {
           });
           yield* Effect.tryPromise(async () => {
             const active = await activeWindow("darwin");
-            if (!active) throw new Error("No window is available to test capture.");
+            if (!active) throw new Error("没有可用于测试截图的窗口。");
             await captureMacWindowSnapshot(
               active,
               path.join(directory, "test.png"),
@@ -1534,7 +1527,7 @@ export const make = Effect.gen(function* () {
                   message:
                     error.cause instanceof Error
                       ? error.cause.message
-                      : "Could not check desktop capture support. Check your desktop session and try again.",
+                      : "无法检查桌面截图支持。请检查你的桌面会话后重试。",
                 }),
               ),
             )

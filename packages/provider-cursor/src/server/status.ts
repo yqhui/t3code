@@ -52,7 +52,7 @@ export function buildInitialCursorProviderSnapshot(
           version: null,
           status: "warning",
           auth: { status: "unknown" },
-          message: "Cursor is disabled in T3 Code settings.",
+          message: "T3 Code 设置中已禁用 Cursor。",
         },
       });
     }
@@ -67,7 +67,7 @@ export function buildInitialCursorProviderSnapshot(
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Checking Cursor SDK availability...",
+        message: "正在检查 Cursor SDK 是否可用…",
       },
     });
   });
@@ -121,7 +121,20 @@ export function buildCursorCapabilitiesFromSdkModel(model: SDKModel): ModelCapab
       return [
         {
           value,
-          label: entry.displayName?.trim() || value,
+          label:
+            id === "reasoningEffort"
+              ? ((
+                  {
+                    minimal: "最低",
+                    low: "低",
+                    medium: "中",
+                    high: "高",
+                    xhigh: "极高",
+                    max: "最高",
+                  } as Record<string, string>
+                )[value] ??
+                (entry.displayName?.trim() || value))
+              : entry.displayName?.trim() || value,
         },
       ];
     });
@@ -129,7 +142,12 @@ export function buildCursorCapabilitiesFromSdkModel(model: SDKModel): ModelCapab
       continue;
     }
 
-    const label = parameter.displayName?.trim() || toTitleCaseWords(id);
+    const label =
+      id === "reasoningEffort"
+        ? "推理"
+        : id === "contextWindow"
+          ? "上下文窗口"
+          : parameter.displayName?.trim() || toTitleCaseWords(id);
     const defaultValue = cursorSdkDefaultParameterValue(model, nativeId);
     const normalizedValues = new Set(values.map((entry) => entry.value.toLowerCase()));
     if (values.length === 2 && normalizedValues.has("true") && normalizedValues.has("false")) {
@@ -192,10 +210,10 @@ function cursorSdkAuth(user: SDKUser, type: "api-key" | "browser"): ServerProvid
     type,
     label:
       type === "browser"
-        ? "Cursor account"
+        ? "Cursor 账户"
         : apiKeyName
-          ? `Cursor API key (${apiKeyName})`
-          : "Cursor API key",
+          ? `Cursor API 密钥 (${apiKeyName})`
+          : "Cursor API 密钥",
     ...(email ? { email } : {}),
   };
 }
@@ -265,7 +283,7 @@ export const checkCursorProviderStatus = Effect.fn("checkCursorProviderStatus")(
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Cursor is disabled in T3 Code settings.",
+        message: "T3 Code 设置中已禁用 Cursor。",
       },
     });
   }
@@ -282,7 +300,7 @@ export const checkCursorProviderStatus = Effect.fn("checkCursorProviderStatus")(
         version: null,
         status: "error",
         auth: { status: "unauthenticated" },
-        message: "Sign in with Cursor or add CURSOR_API_KEY in provider settings.",
+        message: "请使用 Cursor 登录，或在提供商设置中添加 CURSOR_API_KEY。",
       },
     });
   }
@@ -309,9 +327,9 @@ export const checkCursorProviderStatus = Effect.fn("checkCursorProviderStatus")(
         auth: { status: authenticationFailure ? "unauthenticated" : "unknown" },
         message: authenticationFailure
           ? authenticationType === "browser"
-            ? "Cursor sign-in expired or was rejected. Sign in again in provider settings."
-            : "Cursor SDK authentication failed. Check CURSOR_API_KEY."
-          : "Cursor SDK catalog request failed. Check server logs for details.",
+            ? "Cursor 登录已过期或被拒绝。请在提供商设置中重新登录。"
+            : "Cursor SDK 认证失败。请检查 CURSOR_API_KEY。"
+          : "Cursor SDK 模型目录请求失败。请查看服务器日志以了解详情。",
       },
     });
   }
@@ -327,7 +345,7 @@ export const checkCursorProviderStatus = Effect.fn("checkCursorProviderStatus")(
         version: null,
         status: "error",
         auth: { status: "unknown" },
-        message: `Cursor SDK catalog request timed out after ${CURSOR_SDK_CATALOG_TIMEOUT_MS}ms.`,
+        message: `Cursor SDK 模型目录请求在 ${CURSOR_SDK_CATALOG_TIMEOUT_MS} 毫秒后超时。`,
       },
     });
   }
@@ -344,7 +362,7 @@ export const checkCursorProviderStatus = Effect.fn("checkCursorProviderStatus")(
     },
     discoveredModels,
     ...(discoveredModels.length === 0
-      ? { discoveryWarning: "Cursor SDK model discovery returned no built-in models." }
+      ? { discoveryWarning: "Cursor SDK 模型发现未返回内置模型。" }
       : {}),
   });
 });

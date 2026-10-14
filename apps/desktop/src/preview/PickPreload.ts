@@ -473,7 +473,7 @@ function createButton(label: string, title: string): HTMLButtonElement {
 }
 
 function styleControl(input: HTMLInputElement | HTMLSelectElement): void {
-  input.setAttribute("aria-label", input.getAttribute("aria-label") ?? "Style value");
+  input.setAttribute("aria-label", input.getAttribute("aria-label") ?? "样式值");
   input.className =
     "h-7 min-w-0 w-full appearance-none rounded-md border border-input bg-background px-2 font-mono text-xs text-foreground shadow-xs outline-none";
 }
@@ -603,8 +603,8 @@ function startAnnotation(sendEnabled: boolean): void {
   const composerRow = document.createElement("div");
   composerRow.className = "flex items-start gap-2 p-2";
 
-  const adjust = createButton("", "Expand annotation editor");
-  adjust.setAttribute("aria-label", "Expand annotation editor");
+  const adjust = createButton("", "展开标注编辑器");
+  adjust.setAttribute("aria-label", "展开标注编辑器");
   adjust.setAttribute("aria-expanded", "false");
   adjust.className +=
     " h-8 w-8 shrink-0 bg-muted p-0 text-muted-foreground hover:bg-accent hover:text-accent-foreground";
@@ -613,7 +613,7 @@ function startAnnotation(sendEnabled: boolean): void {
   composerRow.appendChild(adjust);
 
   const comment = document.createElement("textarea");
-  comment.placeholder = "Describe the change…";
+  comment.placeholder = "描述要做的更改…";
   comment.setAttribute("dir", "auto");
   comment.rows = 1;
   comment.className =
@@ -623,16 +623,16 @@ function startAnnotation(sendEnabled: boolean): void {
   const dragHandle = document.createElement("button");
   dragHandle.type = "button";
   dragHandle.textContent = "⠿";
-  dragHandle.title = "Drag annotation editor";
+  dragHandle.title = "拖动标注编辑器";
   dragHandle.className =
     "hidden h-8 w-6 shrink-0 cursor-grab select-none border-0 bg-transparent p-0 font-sans text-lg font-bold leading-5 text-muted-foreground";
   composerRow.appendChild(dragHandle);
 
-  const submit = createButton("Attach", "Attach annotation and screenshot (Enter)");
+  const submit = createButton("附加", "附加标注和截图（Enter）");
   const updateSendHint = () => {
     submit.title = sendEnabled
-      ? "Attach annotation and screenshot (Enter). Send with Cmd/Ctrl+Enter."
-      : "Attach annotation and screenshot (Enter)";
+      ? "附加标注和截图（Enter）。使用 Cmd/Ctrl+Enter 发送。"
+      : "附加标注和截图（Enter）";
   };
   updateSendHint();
   submit.className +=
@@ -780,7 +780,7 @@ function startAnnotation(sendEnabled: boolean): void {
     fontFamily.appendChild(option);
   }
   fontFamily.addEventListener("change", () => setStyleForSelected("font-family", fontFamily.value));
-  textSection.appendChild(createField("Font", fontFamily));
+  textSection.appendChild(createField("字体", fontFamily));
 
   const fontSize = createUnitInput("px", "16");
   fontSize.min = "1";
@@ -788,7 +788,7 @@ function startAnnotation(sendEnabled: boolean): void {
   fontSize.addEventListener("input", () => {
     if (fontSize.value) setStyleForSelected("font-size", `${fontSize.value}px`);
   });
-  textSection.appendChild(createField("Font size", fontSize));
+  textSection.appendChild(createField("字号", fontSize));
 
   const fontWeight = document.createElement("select");
   for (const value of ["300", "400", "500", "600", "700", "800", "900"]) {
@@ -798,7 +798,7 @@ function startAnnotation(sendEnabled: boolean): void {
     fontWeight.appendChild(option);
   }
   fontWeight.addEventListener("change", () => setStyleForSelected("font-weight", fontWeight.value));
-  textSection.appendChild(createField("Font weight", fontWeight));
+  textSection.appendChild(createField("字重", fontWeight));
 
   const lineHeight = document.createElement("input");
   lineHeight.type = "text";
@@ -806,7 +806,7 @@ function startAnnotation(sendEnabled: boolean): void {
   lineHeight.addEventListener("change", () => {
     if (lineHeight.value.trim()) setStyleForSelected("line-height", lineHeight.value.trim());
   });
-  textSection.appendChild(createField("Line height", lineHeight));
+  textSection.appendChild(createField("行高", lineHeight));
 
   const createColorRow = (
     labelText: string,
@@ -847,8 +847,8 @@ function startAnnotation(sendEnabled: boolean): void {
     return { row, color, text };
   };
 
-  const textColor = createColorRow("Text color", "color", colorsSection);
-  const backgroundColor = createColorRow("Background", "background-color", colorsSection);
+  const textColor = createColorRow("文字颜色", "color", colorsSection);
+  const backgroundColor = createColorRow("背景", "background-color", colorsSection);
 
   const opacity = document.createElement("input");
   opacity.type = "range";
@@ -858,7 +858,7 @@ function startAnnotation(sendEnabled: boolean): void {
   opacity.value = "1";
   opacity.style.accentColor = PRIMARY;
   opacity.addEventListener("input", () => setStyleForSelected("opacity", opacity.value));
-  colorsSection.appendChild(createField("Opacity", opacity));
+  colorsSection.appendChild(createField("不透明度", opacity));
 
   const radius = createUnitInput("px", "0");
   radius.min = "0";
@@ -866,9 +866,9 @@ function startAnnotation(sendEnabled: boolean): void {
   radius.addEventListener("input", () => {
     if (radius.value) setStyleForSelected("border-radius", `${radius.value}px`);
   });
-  bordersSection.appendChild(createField("Radius", radius));
+  bordersSection.appendChild(createField("圆角", radius));
 
-  const borderColor = createColorRow("Border color", "border-color", bordersSection);
+  const borderColor = createColorRow("边框颜色", "border-color", bordersSection);
 
   const borderWidth = createUnitInput("px", "0");
   borderWidth.min = "0";
@@ -879,21 +879,21 @@ function startAnnotation(sendEnabled: boolean): void {
       setStyleForSelected("border-width", `${borderWidth.value}px`);
     }
   });
-  bordersSection.appendChild(createField("Border width", borderWidth));
+  bordersSection.appendChild(createField("边框宽度", borderWidth));
 
   const dimensions = document.createElement("div");
   dimensions.style.cssText =
     "display:grid;grid-template-columns:82px minmax(0,1fr);gap:8px;align-items:center";
   const dimensionLabel = document.createElement("div");
   dimensionLabel.className = "grid gap-2 font-sans text-xs font-medium text-muted-foreground";
-  dimensionLabel.innerHTML = "<span>Width</span><span>Height</span>";
+  dimensionLabel.innerHTML = "<span>宽度</span><span>高度</span>";
   const dimensionControls = document.createElement("div");
   dimensionControls.style.cssText = "position:relative;display:grid;gap:3px;padding-left:22px";
   const widthInput = createUnitInput("px", "auto");
   const heightInput = createUnitInput("px", "auto");
   styleControl(widthInput);
   styleControl(heightInput);
-  const aspectLock = createButton("", "Lock aspect ratio");
+  const aspectLock = createButton("", "锁定宽高比");
   aspectLock.setAttribute("aria-pressed", "true");
   aspectLock.style.cssText +=
     ";position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:38px;padding:0";
@@ -958,9 +958,9 @@ function startAnnotation(sendEnabled: boolean): void {
     sizingSection.appendChild(createField(label, input));
     return input;
   };
-  const padding = addSpacingField("Padding", "padding", "0 0 0 0");
-  const margin = addSpacingField("Margin", "margin", "0 0 0 0");
-  const gap = addSpacingField("Gap", "gap", "0px");
+  const padding = addSpacingField("内边距", "padding", "0 0 0 0");
+  const margin = addSpacingField("外边距", "margin", "0 0 0 0");
+  const gap = addSpacingField("间距", "gap", "0px");
 
   const syncStyleControls = (): void => {
     const first = selected.values().next().value as SelectedElement | undefined;
@@ -990,10 +990,10 @@ function startAnnotation(sendEnabled: boolean): void {
   };
 
   const tools: ReadonlyArray<[AnnotationTool, string, string]> = [
-    ["select", "Select", "Select elements (V)"],
-    ["marquee", "Region", "Draw a region or marquee-select elements (R)"],
-    ["draw", "Draw", "Draw freehand (D)"],
-    ["erase", "Erase", "Remove an annotation target (E)"],
+    ["select", "选择", "选择元素（V）"],
+    ["marquee", "区域", "绘制区域或框选元素（R）"],
+    ["draw", "绘制", "自由手绘（D）"],
+    ["erase", "擦除", "移除标注目标（E）"],
   ];
   for (const [candidate, label, title] of tools) {
     const button = createButton(label, title);
@@ -1090,8 +1090,8 @@ function startAnnotation(sendEnabled: boolean): void {
       stylePanel.style.display = selected.size > 0 ? "grid" : "none";
       dragHandle.style.display = "block";
       adjust.setAttribute("aria-expanded", "true");
-      adjust.title = "Collapse annotation editor";
-      adjust.setAttribute("aria-label", "Collapse annotation editor");
+      adjust.title = "收起标注编辑器";
+      adjust.setAttribute("aria-label", "收起标注编辑器");
       if (selected.size > 0) syncStyleControls();
     } else {
       editorExpanded = false;
@@ -1099,8 +1099,8 @@ function startAnnotation(sendEnabled: boolean): void {
       stylePanel.style.display = "none";
       dragHandle.style.display = "none";
       adjust.setAttribute("aria-expanded", "false");
-      adjust.title = "Expand annotation editor";
-      adjust.setAttribute("aria-label", "Expand annotation editor");
+      adjust.title = "展开标注编辑器";
+      adjust.setAttribute("aria-label", "展开标注编辑器");
     }
     queueEditorLayout();
   });
@@ -1400,7 +1400,7 @@ function startAnnotation(sendEnabled: boolean): void {
       return;
     pendingCapture = true;
     submit.disabled = true;
-    submit.textContent = "Capturing…";
+    submit.textContent = "捕获中…";
     // Snapshot everything the annotation will carry before the capture runs.
     // The element context lookup can take up to its timeout, and the user can
     // keep editing meanwhile; the annotation must describe what they submitted.

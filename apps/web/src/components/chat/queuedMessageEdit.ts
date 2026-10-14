@@ -37,8 +37,7 @@ export async function prepareQueuedEditAttachments(input: {
   readonly readImage: (file: File) => Promise<string>;
 }) {
   const files = input.files.length === 0 ? [] : await input.uploadFiles(input.files);
-  if (files.length !== input.files.length)
-    throw new Error("Retry or remove failed uploads before saving.");
+  if (files.length !== input.files.length) throw new Error("保存前请重试或移除上传失败的附件。");
   const images = await Promise.all(
     input.images.map(async (image) => ({
       type: "image" as const,

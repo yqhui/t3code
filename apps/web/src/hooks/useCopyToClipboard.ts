@@ -12,7 +12,7 @@ export class ClipboardApiUnavailableError extends Schema.TaggedError<ClipboardAp
   },
 ) {
   override get message(): string {
-    return `Clipboard API is unavailable while copying ${this.target}.`;
+    return `复制 ${this.target} 时，剪贴板 API 不可用。`;
   }
 }
 
@@ -24,7 +24,7 @@ export class ClipboardWriteError extends Schema.TaggedError<ClipboardWriteError>
   },
 ) {
   override get message(): string {
-    return `Failed to copy ${this.target} to the clipboard.`;
+    return `无法将 ${this.target} 复制到剪贴板。`;
   }
 }
 
@@ -35,7 +35,7 @@ export class ClipboardReadUnavailableError extends Schema.TaggedError<ClipboardR
   },
 ) {
   override get message(): string {
-    return `Clipboard API is unavailable while reading ${this.target}.`;
+    return `读取 ${this.target} 时，剪贴板 API 不可用。`;
   }
 }
 
@@ -47,7 +47,7 @@ export class ClipboardReadError extends Schema.TaggedError<ClipboardReadError>()
   },
 ) {
   override get message(): string {
-    return `Failed to read ${this.target} from the clipboard.`;
+    return `无法从剪贴板读取 ${this.target}。`;
   }
 }
 
@@ -97,7 +97,7 @@ function writeTextWithExecCommand(
 
 export async function writeTextToClipboard(
   value: string,
-  target = "text",
+  target = "文本",
   extraFlavors?: Readonly<Record<string, string>>,
 ) {
   if (typeof window === "undefined") {
@@ -176,7 +176,7 @@ export async function writeTextToClipboard(
   }
 }
 
-export async function readTextFromClipboard(target = "text"): Promise<string> {
+export async function readTextFromClipboard(target = "文本"): Promise<string> {
   if (
     typeof window === "undefined" ||
     typeof navigator === "undefined" ||
@@ -199,7 +199,7 @@ export async function readTextFromClipboard(target = "text"): Promise<string> {
 
 export function useCopyToClipboard<TContext = void>({
   timeout = 2000,
-  target = "text",
+  target = "文本",
   onCopy,
   onError,
   extraFlavors,

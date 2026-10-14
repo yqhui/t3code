@@ -62,7 +62,7 @@ export function SidebarUpdateReleaseNotes({
         {state.status === "available" ? (
           <div>
             <div className="whitespace-nowrap text-sm leading-5 font-medium">
-              Update ready to download
+              更新已就绪，可下载
             </div>
             {state.availableVersion ? (
               <div className="mt-0.5 text-xs leading-4 text-muted-foreground">
@@ -80,15 +80,15 @@ export function SidebarUpdateReleaseNotes({
           const omittedItemCount = Math.max(0, releaseNote.totalItems - releaseNote.items.length);
           const linkLabel =
             omittedItemCount === 0
-              ? "View release on GitHub"
-              : `${omittedItemCount} more ${omittedItemCount === 1 ? "change" : "changes"} on GitHub`;
+              ? "在 GitHub 上查看此版本"
+              : `GitHub 上还有 ${omittedItemCount} 项更改`;
 
           return (
             <div key={releaseNote.version}>
               {index > 0 && <Separator className="my-3" />}
               <section>
                 <h3 className="text-foreground text-xs leading-4 font-semibold">
-                  {index === 0 ? "What's changed" : `Changes in ${releaseNote.version}`}
+                  {index === 0 ? "更新内容" : `${releaseNote.version} 中的更改`}
                 </h3>
                 <ul className="mt-2 space-y-1.5 pl-4 text-xs leading-5 text-popover-foreground/90">
                   {keyReleaseNoteItems(releaseNote.items).map(({ item, key }) => (
@@ -110,7 +110,7 @@ export function SidebarUpdateReleaseNotes({
           <div>
             <Separator className="my-3" />
             <ReleaseLink releaseUrl={getDesktopUpdateReleaseHistoryUrl()} shell={shell}>
-              {`${state.omittedReleaseCount} older ${state.omittedReleaseCount === 1 ? "release" : "releases"} on GitHub`}
+              {`GitHub 上还有 ${state.omittedReleaseCount} 个更早的版本`}
             </ReleaseLink>
           </div>
         ) : null}

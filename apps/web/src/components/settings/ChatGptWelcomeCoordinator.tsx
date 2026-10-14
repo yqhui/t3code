@@ -64,18 +64,18 @@ export function ChatGptWelcomeCoordinator() {
       <DialogPopup>
         <DialogHeader>
           <OpenAI className="mb-2 size-8" aria-hidden="true" />
-          <DialogTitle>Your ChatGPT plan is connected</DialogTitle>
+          <DialogTitle>你的 ChatGPT 套餐已连接</DialogTitle>
           <DialogDescription>
-            Eligible usage in T3 Code uses your ChatGPT plan. Manage your shared usage and any
-            credit settings in ChatGPT.
+            T3 Code 中符合条件的用量将使用你的 ChatGPT 套餐。请在 ChatGPT
+            中管理共享用量及信用额度设置。
           </DialogDescription>
           <p className="text-xs text-muted-foreground">
-            {next?.providerName} on {next?.environmentLabel}
+            {next?.environmentLabel} 上的 {next?.providerName}
           </p>
         </DialogHeader>
         <DialogFooter>
           <ChatGptUsageButton />
-          <Button onClick={dismiss}>Continue</Button>
+          <Button onClick={dismiss}>继续</Button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

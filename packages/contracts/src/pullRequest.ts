@@ -1314,43 +1314,41 @@ const PROVIDER_REQUIREMENT = new Map<
     "github",
     {
       missing:
-        "No GitHub credential on the server. Set GH_TOKEN, or install the GitHub CLI (https://cli.github.com/) and run `gh auth login`.",
+        "服务器上没有 GitHub 凭据。请设置 GH_TOKEN，或安装 GitHub CLI（https://cli.github.com/）并运行 `gh auth login`。",
       unauthenticated:
-        "GitHub has no working credential for this host. Run `gh auth login`, or check the account and hosts in Settings → Source Control.",
+        "GitHub 没有适用于此主机的可用凭据。请运行 `gh auth login`，或在设置 → 源代码管理中检查账户和主机。",
     },
   ],
   [
     "forgejo",
     {
       missing:
-        "Install Forgejo CLI (`fj` 0.6 or later) from https://codeberg.org/forgejo-contrib/forgejo-cli or Gitea CLI (`tea` 0.16 or later) from https://gitea.com/gitea/tea to browse Forgejo pull requests.",
+        "需要安装 Forgejo CLI（`fj` 0.6 或更高版本，来自 https://codeberg.org/forgejo-contrib/forgejo-cli）或 Gitea CLI（`tea` 0.16 或更高版本，来自 https://gitea.com/gitea/tea）才能浏览 Forgejo 拉取请求。",
       unauthenticated:
-        "Authenticate your Forgejo or Gitea server with `fj --host <server-url> auth add-token` on the T3 Code server. If fj is missing or unconfigured for that server, use `tea login add`. A configured fj account must be repaired with fj.",
+        "请在 T3 Code 服务器上使用 `fj --host <server-url> auth add-token` 认证你的 Forgejo 或 Gitea 服务器。如果该服务器缺少 fj 或 fj 未配置，请使用 `tea login add`。已用 fj 配置的账户必须通过 fj 修复。",
     },
   ],
   [
     "gitlab",
     {
       missing:
-        "GitLab CLI (`glab`) is required to browse change requests on this host. Install it from https://gitlab.com/gitlab-org/cli and reload.",
-      unauthenticated: "GitLab CLI is not authenticated. Run `glab auth login` and retry.",
+        "浏览此主机上的变更请求需要 GitLab CLI（`glab`）。请从 https://gitlab.com/gitlab-org/cli 安装并重新加载。",
+      unauthenticated: "GitLab CLI 未认证。请运行 `glab auth login` 后重试。",
     },
   ],
   [
     "azure-devops",
     {
       missing:
-        "Azure CLI (`az`) with the Azure DevOps extension is required. Install `az`, then run `az extension add --name azure-devops`.",
-      unauthenticated: "Azure CLI is not signed in. Run `az login` and retry.",
+        "需要安装带 Azure DevOps 扩展的 Azure CLI（`az`）。请先安装 `az`，然后运行 `az extension add --name azure-devops`。",
+      unauthenticated: "Azure CLI 未登录。请运行 `az login` 后重试。",
     },
   ],
   [
     "bitbucket",
     {
-      missing:
-        "Bitbucket needs API credentials on the server. Add them in Settings → Source Control.",
-      unauthenticated:
-        "Bitbucket rejected the configured credentials. Check them in Settings → Source Control.",
+      missing: "Bitbucket 需要服务器上的 API 凭据。请在设置 → 源代码管理中添加。",
+      unauthenticated: "Bitbucket 拒绝了已配置的凭据。请在设置 → 源代码管理中检查。",
     },
   ],
 ]);
@@ -1451,13 +1449,11 @@ export class PullRequestUnavailableError extends Schema.TaggedError<PullRequestU
       this.provider === undefined ? undefined : PROVIDER_REQUIREMENT.get(this.provider);
     switch (this.reason) {
       case "cli-missing":
-        return (
-          requirement?.missing ?? "The tool this host is read through is not installed or set up."
-        );
+        return requirement?.missing ?? "读取此主机所用的工具未安装或未配置。";
       case "cli-unauthenticated":
-        return requirement?.unauthenticated ?? "This host has no working credentials.";
+        return requirement?.unauthenticated ?? "此主机没有可用的凭据。";
       case "provider-unsupported":
-        return "Change requests cannot be browsed for this project's host yet.";
+        return "尚不支持浏览此项目主机的变更请求。";
     }
   }
 }
@@ -1477,6 +1473,6 @@ export class PullRequestOperationError extends Schema.TaggedError<PullRequestOpe
   }
 
   override get message(): string {
-    return `Pull request operation ${this.operation} failed: ${this.detail}`;
+    return `拉取请求操作 ${this.operation} 失败：${this.detail}`;
   }
 }

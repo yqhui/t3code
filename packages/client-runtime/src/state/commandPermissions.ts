@@ -63,7 +63,7 @@ function makeCommandPermissions<R, E>(
             return yield* Effect.fail(
               new EnvironmentAuthorizationError({
                 ...authScopeRequiredResponse(missing),
-                message: `This connection requires ${missing}.`,
+                message: `此连接需要 ${missing} 权限。`,
               }),
             );
         }),

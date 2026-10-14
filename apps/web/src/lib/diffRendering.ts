@@ -188,13 +188,13 @@ export function getRenderablePatch(
     return {
       kind: "raw",
       text: normalizedPatch,
-      reason: "Unsupported diff format. Showing raw patch.",
+      reason: "不支持的 Diff 格式，显示原始补丁。",
     };
   } catch {
     return {
       kind: "raw",
       text: normalizedPatch,
-      reason: "Failed to parse patch. Showing raw patch.",
+      reason: "补丁解析失败，显示原始补丁。",
     };
   }
 }

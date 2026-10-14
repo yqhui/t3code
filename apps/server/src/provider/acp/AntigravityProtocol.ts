@@ -94,21 +94,21 @@ export function antigravityApprovalOptions(
     request.options.find((entry) => entry.kind === kind && entry.optionId.trim());
   const once = optionWithKind("allow_once");
   if (once) {
-    options.push({ decision: "accept", label: "Allow once" });
+    options.push({ decision: "accept", label: "允许一次" });
   }
   const always = optionWithKind("allow_always");
   if (always) {
     const warning = antigravitySecurityWarning(always);
     options.push({
       decision: "acceptForSession",
-      label: "Allow for this thread",
+      label: "本会话内允许",
       ...(warning ? { warning } : {}),
     });
   }
   if (optionWithKind("reject_once")) {
-    options.push({ decision: "decline", label: "Deny" });
+    options.push({ decision: "decline", label: "拒绝" });
   }
-  options.push({ decision: "cancel", label: "Cancel" });
+  options.push({ decision: "cancel", label: "取消" });
   return options;
 }
 

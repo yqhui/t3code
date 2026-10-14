@@ -397,9 +397,7 @@ export function providerErrorPresentation(
   if (item.retry === undefined) {
     return {
       label:
-        item.failure.class === "usage_limit"
-          ? "Usage limit reached"
-          : item.title?.trim() || "Provider error",
+        item.failure.class === "usage_limit" ? "已达用量限额" : item.title?.trim() || "提供商错误",
       detail: item.failure.message,
     };
   }
@@ -409,17 +407,17 @@ export function providerErrorPresentation(
       : `${item.retry.attempt}/${item.retry.maxAttempts}`;
   const label =
     item.status === "running"
-      ? `Retrying provider (${progress})`
+      ? `正在重试提供商 (${progress})`
       : item.status === "completed"
-        ? `Provider recovered (${progress} retries)`
+        ? `提供商已恢复（重试 ${progress} 次）`
         : item.status === "failed"
-          ? `${item.failure.class === "usage_limit" ? "Usage limit reached" : "Provider error"} after ${progress} retries`
-          : `Provider retry stopped (${progress})`;
+          ? `重试 ${progress} 次后${item.failure.class === "usage_limit" ? "已达用量限额" : "发生提供商错误"}`
+          : `提供商重试已停止 (${progress})`;
   const retryDelay =
     item.status === "running" && item.retry.retryDelayMs !== null && item.retry.retryDelayMs > 0
       ? item.retry.retryDelayMs < 1_000
-        ? ` Retrying in ${item.retry.retryDelayMs}ms.`
-        : ` Retrying in ${(item.retry.retryDelayMs / 1_000).toFixed(1).replace(/\.0$/u, "")}s.`
+        ? ` 将在 ${item.retry.retryDelayMs} 毫秒后重试。`
+        : ` 将在 ${(item.retry.retryDelayMs / 1_000).toFixed(1).replace(/\.0$/u, "")} 秒后重试。`
       : "";
   return {
     label,
@@ -446,7 +444,7 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
     case "thread_created":
       return {
         ...common,
-        label: "Created thread",
+        label: "已创建会话",
       };
     case "compaction":
       return {
@@ -458,16 +456,16 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
     case "reasoning":
       return {
         ...common,
-        label: title ?? "Thinking",
+        label: title ?? "思考中",
         ...(item.text ? { detail: item.text } : {}),
       };
     case "command_execution":
       return {
         ...common,
-        label: title ?? "Ran command",
+        label: title ?? "已运行命令",
         command: item.input,
         rawCommand: item.input,
-        toolTitle: title ?? "Command",
+        toolTitle: title ?? "命令",
         toolData: item,
       };
     case "file_change": {
@@ -476,33 +474,33 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
         label:
           title ??
           (item.changes !== undefined && item.changes.length > 1
-            ? `Changed ${item.changes.length} files`
-            : `Changed ${item.fileName}`),
+            ? `已更改 ${item.changes.length} 个文件`
+            : `已更改 ${item.fileName}`),
         changedFiles: item.changes?.map((change) => change.path) ?? [item.fileName],
-        toolTitle: title ?? "File change",
+        toolTitle: title ?? "文件更改",
         toolData: item,
       };
     }
     case "file_search":
       return {
         ...common,
-        label: title ?? formatSearchToolLabel(item) ?? "Searched files",
+        label: title ?? formatSearchToolLabel(item) ?? "已搜索文件",
         ...(item.pattern ? { detail: item.pattern } : {}),
-        toolTitle: title ?? "File search",
+        toolTitle: title ?? "文件搜索",
         toolData: item,
       };
     case "web_search":
       return {
         ...common,
-        label: title ?? "Searched the web",
+        label: title ?? "已搜索网页",
         ...(item.patterns?.length ? { detail: item.patterns.join(", ") } : {}),
-        toolTitle: title ?? "Web search",
+        toolTitle: title ?? "网页搜索",
         toolData: item,
       };
     case "checkpoint":
       return {
         ...common,
-        label: title ?? "Checkpoint captured",
+        label: title ?? "已创建 Checkpoint",
         changedFiles: item.files.map((file) => file.path),
         toolData: item,
       };
@@ -538,23 +536,23 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
           (classified === "read"
             ? formatReadToolLabel(readPath ?? "")
             : classified === "search"
-              ? (formatSearchToolLabel({ input: item.input }) ?? item.toolName ?? "Tool call")
-              : (item.toolName ?? "Tool call")),
-        toolTitle: title ?? item.toolName ?? "Tool",
+              ? (formatSearchToolLabel({ input: item.input }) ?? item.toolName ?? "工具调用")
+              : (item.toolName ?? "工具调用")),
+        toolTitle: title ?? item.toolName ?? "工具",
         toolData: { input: item.input, output: item.output },
       };
     }
     case "approval_request":
       return {
         ...common,
-        label: title ?? "Approval requested",
+        label: title ?? "已请求批准",
         detail: item.prompt ?? item.requestKind,
         toolData: item,
       };
     case "user_input_request":
       return {
         ...common,
-        label: title ?? (item.questionAnswer ? "Answered questions" : "Input requested"),
+        label: title ?? (item.questionAnswer ? "已回答问题" : "等待输入"),
         ...(item.questionAnswer ? { questionAnswer: item.questionAnswer } : {}),
         toolData: item,
       };

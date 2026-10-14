@@ -376,7 +376,7 @@ export function createPullRequestEnvironmentAtoms<R, E>(
             ) {
               return yield* new PullRequestOperationError({
                 operation: "runAction",
-                detail: "This pull request cannot be merged.",
+                detail: "无法合并此拉取请求。",
               });
             }
             if (detail.capabilities.stackActions) {
@@ -384,7 +384,7 @@ export function createPullRequestEnvironmentAtoms<R, E>(
               if (stack !== null) {
                 return yield* new PullRequestOperationError({
                   operation: "runAction",
-                  detail: "Open this pull request to merge its stack.",
+                  detail: "请打开此拉取请求以合并其堆叠。",
                 });
               }
             }
@@ -393,8 +393,7 @@ export function createPullRequestEnvironmentAtoms<R, E>(
               catch: (cause) =>
                 new PullRequestOperationError({
                   operation: "runAction",
-                  detail:
-                    cause instanceof Error ? cause.message : "Could not choose a merge method.",
+                  detail: cause instanceof Error ? cause.message : "无法选择合并方式。",
                 }),
             });
             preparedInput = { ...actionInput, mergeMethod };

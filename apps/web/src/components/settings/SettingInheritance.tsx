@@ -29,33 +29,31 @@ interface InheritanceLayer {
 }
 
 const WRITING_STYLE_LABELS: Record<string, string> = {
-  repo_conventions: "Repository conventions",
+  repo_conventions: "仓库约定",
   conventional_commits: "Conventional Commits",
-  custom: "Custom instructions",
+  custom: "自定义指令",
 };
 
 /** Human labels for the values the chain can show; falls back to a type summary. */
 function formatValue(key: keyof ServerSettings, value: unknown): string {
   if (value === null || value === undefined) {
     return key === "pullRequestMergeMethod"
-      ? "Last selected"
+      ? "上次选择的"
       : key === "sidebarAutoSettleAfterDays"
-        ? "Never"
+        ? "从不"
         : key === "defaultModelSelection"
-          ? "Automatic"
+          ? "自动"
           : key === "sourceControlWriterModelSelection"
-            ? "Text generation model"
+            ? "文本生成模型"
             : key === "reviewGuideModelSelection"
-              ? "Source control writer model"
+              ? "源代码管理写入模型"
               : key === "defaultThreadEnvMode" || key === "worktreeSubmodules"
-                ? "Inherit"
-                : "Not set";
+                ? "继承"
+                : "未设置";
   }
-  if (typeof value === "boolean") return value ? "On" : "Off";
+  if (typeof value === "boolean") return value ? "开启" : "关闭";
   if (typeof value === "number") {
-    return key === "sidebarAutoSettleAfterDays"
-      ? `${value} ${value === 1 ? "day" : "days"}`
-      : String(value);
+    return key === "sidebarAutoSettleAfterDays" ? `${value} 天` : String(value);
   }
   if (typeof value === "string") {
     if (key === "defaultThreadEnvMode" && (value === "local" || value === "worktree")) {
@@ -69,16 +67,16 @@ function formatValue(key: keyof ServerSettings, value: unknown): string {
         value as keyof typeof PULL_REQUEST_MERGE_METHOD_LABELS
       ];
     }
-    return value === "" ? "Empty" : value;
+    return value === "" ? "空" : value;
   }
-  if (Array.isArray(value)) return `${value.length} ${value.length === 1 ? "item" : "items"}`;
+  if (Array.isArray(value)) return `${value.length} 项`;
   if (typeof value === "object") {
     if ("model" in value && typeof value.model === "string") return value.model;
     if ("mode" in value && typeof value.mode === "string") {
       return WRITING_STYLE_LABELS[value.mode] ?? value.mode;
     }
   }
-  return "Custom";
+  return "自定义";
 }
 
 /**
@@ -100,8 +98,8 @@ export function settingInheritanceLayers(
   if (target.projectId !== null && isProjectScopedSettingKey(key)) {
     layers.push({
       key: "project",
-      label: "Project",
-      value: source === "project" ? formatValue(key, target.settings[key]) : "Inherits",
+      label: "项目",
+      value: source === "project" ? formatValue(key, target.settings[key]) : "继承",
       effective: source === "project",
       set: source === "project",
     });
@@ -109,7 +107,7 @@ export function settingInheritanceLayers(
   layers.push({
     key: "environment",
     label: target.label,
-    value: environmentSet ? formatValue(key, environmentValue) : "Inherits",
+    value: environmentSet ? formatValue(key, environmentValue) : "继承",
     effective: source === "environment" && environmentSet,
     set: environmentSet,
   });
@@ -117,7 +115,7 @@ export function settingInheritanceLayers(
     layers.push({
       key: "t3.json",
       label: "t3.json",
-      value: source === "t3.json" ? formatValue(key, target.settings[key]) : "Inherits",
+      value: source === "t3.json" ? formatValue(key, target.settings[key]) : "继承",
       effective: source === "t3.json",
       set: source === "t3.json",
     });
@@ -129,7 +127,7 @@ export function settingInheritanceLayers(
     : DEFAULT_SERVER_SETTINGS[key];
   layers.push({
     key: "built-in",
-    label: "Default",
+    label: "默认",
     value: formatValue(key, builtIn),
     effective: source === "environment" && !environmentSet,
     set: true,
@@ -183,7 +181,7 @@ export function SettingInheritance({
   if (!key || targets.length === 0) return null;
   const overrideSummary =
     overridingProjects.length > 0
-      ? `${summary} · ${overridingProjects.length} project ${overridingProjects.length === 1 ? "override" : "overrides"}`
+      ? `${summary} · ${overridingProjects.length} 个项目覆盖`
       : summary;
   const chains = targets.flatMap((target) => {
     const environment = environments.find(
@@ -209,7 +207,7 @@ export function SettingInheritance({
                 <Button
                   size="icon-micro"
                   variant="ghost-muted"
-                  aria-label={`${overrideSummary}. Show where this value comes from`}
+                  aria-label={`${overrideSummary}。查看此值的来源`}
                 />
               }
             />
@@ -251,7 +249,7 @@ export function SettingInheritance({
                         layer.effective ? "font-medium text-foreground" : "text-muted-foreground",
                       )}
                     >
-                      {layer.key === "environment" ? "Environment" : layer.label}
+                      {layer.key === "environment" ? "环境" : layer.label}
                     </span>
                     <span
                       className={cn(
@@ -282,10 +280,10 @@ export function SettingInheritance({
                 return (
                   <div className="mt-2 border-t border-border/60 pt-2">
                     <div className="flex items-center justify-between gap-3 px-2 text-xs text-muted-foreground">
-                      <span>Overridden by</span>
+                      <span>覆盖来源</span>
                       {onClearOverrides ? (
                         <InlineButton onClick={() => onClearOverrides(overriding)}>
-                          Reset {overriding.length === 1 ? "it" : "all"}
+                          重置{overriding.length === 1 ? "该项目" : "全部"}
                         </InlineButton>
                       ) : null}
                     </div>

@@ -145,7 +145,7 @@ export async function clearBrowserProfileData(
   const desktopEnvironmentIds = bridge === null ? [] : environmentIds;
   const serverEnvironmentIds = server?.environmentIds ?? [];
   if (desktopEnvironmentIds.length === 0 && serverEnvironmentIds.length === 0) {
-    throw new Error("Browser profile data is not available to clear.");
+    throw new Error("浏览器配置数据无法清除。");
   }
   await Promise.all([
     ...desktopEnvironmentIds.flatMap((environmentId) => [
@@ -166,7 +166,7 @@ export function browserProfileRemovalAvailable(
 }
 
 /**
- * The size a "Responsive" default falls back to when the user switches away
+ * The size a "响应式" default falls back to when the user switches away
  * from Fill and hasn't typed dimensions yet. Fill has no dimensions to carry
  * over, so the picker needs something concrete to seed the inputs with.
  */
@@ -175,9 +175,9 @@ const RESPONSIVE_SEED_SIZE = { width: 1280, height: 800 } as const;
 const NO_GROUPING: Intl.NumberFormatOptions = { useGrouping: false };
 
 const APPEARANCE_LABELS: Readonly<Record<PreviewAppearancePreference, string>> = {
-  system: "System",
-  light: "Light",
-  dark: "Dark",
+  system: "系统",
+  light: "浅色",
+  dark: "深色",
 };
 
 const zoomLabel = (zoomFactor: number) => `${Math.round(zoomFactor * 100)}%`;
@@ -190,7 +190,7 @@ const zoomLabel = (zoomFactor: number) => `${Math.round(zoomFactor * 100)}%`;
 /** Thrown from the post-import settings updater when the cap was hit meanwhile. */
 class ProfileLimitReachedError extends Error {
   constructor() {
-    super("Browser profile limit reached.");
+    super("已达到浏览器配置数量上限。");
     this.name = "ProfileLimitReachedError";
   }
 }
@@ -221,9 +221,9 @@ const viewportSelectValue = (viewport: PreviewViewportSetting): string => {
  */
 const viewportSelectLabel = (viewport: PreviewViewportSetting): string => {
   const value = viewportSelectValue(viewport);
-  if (value === FILL_VALUE) return "Fill panel";
-  if (value === RESPONSIVE_VALUE) return "Responsive";
-  return PREVIEW_VIEWPORT_PRESETS.find((preset) => preset.id === value)?.label ?? "Responsive";
+  if (value === FILL_VALUE) return "填满面板";
+  if (value === RESPONSIVE_VALUE) return "响应式";
+  return PREVIEW_VIEWPORT_PRESETS.find((preset) => preset.id === value)?.label ?? "响应式";
 };
 
 const isValidDimension = (value: number) =>
@@ -297,11 +297,11 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
   return (
     <SettingsRow
       {...searchableSetting("browser-default-viewport")}
-      description="Tab size for you and agents. Fill fits the panel; other sizes show the device toolbar."
+      description="你和 Agent 使用的标签页尺寸。“填满面板”适应面板，其他尺寸会显示设备工具栏。"
       resetAction={
         !disabled && viewport._tag !== DEFAULT_BROWSER_VIEWPORT._tag ? (
           <SettingResetButton
-            label="default browser viewport"
+            label="默认浏览器视口"
             onClick={() => updateSettings({ browserDefaultViewport: DEFAULT_BROWSER_VIEWPORT })}
           />
         ) : null
@@ -313,18 +313,14 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
             onValueChange={selectViewport}
             disabled={disabled}
           >
-            <SelectTrigger
-              size="sm"
-              className="w-full min-w-0 sm:w-44"
-              aria-label="Default browser viewport"
-            >
+            <SelectTrigger size="sm" className="w-full min-w-0 sm:w-44" aria-label="默认浏览器视口">
               <SelectValue>{viewportSelectLabel(viewport)}</SelectValue>
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>
-              <SelectItem value={FILL_VALUE}>Fill panel</SelectItem>
-              <SelectItem value={RESPONSIVE_VALUE}>Responsive</SelectItem>
+              <SelectItem value={FILL_VALUE}>填满面板</SelectItem>
+              <SelectItem value={RESPONSIVE_VALUE}>响应式</SelectItem>
               <SelectGroup>
-                <SelectGroupLabel>Standard</SelectGroupLabel>
+                <SelectGroupLabel>标准</SelectGroupLabel>
                 {PREVIEW_VIEWPORT_PRESETS.map((preset) => (
                   <SelectItem key={preset.id} value={preset.id}>
                     <span className="flex w-full items-center justify-between gap-5">
@@ -353,7 +349,7 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
                 onValueCommitted={(value) => commitDimension("width", value)}
               >
                 <NumberFieldGroup>
-                  <NumberFieldInput aria-label="Default viewport width" />
+                  <NumberFieldInput aria-label="默认视口宽度" />
                 </NumberFieldGroup>
               </NumberField>
               <span className="text-xs text-muted-foreground">×</span>
@@ -368,7 +364,7 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
                 onValueCommitted={(value) => commitDimension("height", value)}
               >
                 <NumberFieldGroup>
-                  <NumberFieldInput aria-label="Default viewport height" />
+                  <NumberFieldInput aria-label="默认视口高度" />
                 </NumberFieldGroup>
               </NumberField>
               <Tooltip>
@@ -378,8 +374,8 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
                       size="icon-sm"
                       variant="ghost-muted"
                       disabled={disabled}
-                      aria-label={`Rotate to ${
-                        presentedSize.height >= presentedSize.width ? "landscape" : "portrait"
+                      aria-label={`旋转为${
+                        presentedSize.height >= presentedSize.width ? "横屏" : "竖屏"
                       }`}
                       onClick={() =>
                         updateSettings({ browserDefaultViewport: rotateViewport(sized) })
@@ -389,7 +385,7 @@ function BrowserViewportSetting({ disabled }: { readonly disabled: boolean }) {
                     </Button>
                   }
                 />
-                <TooltipPopup side="top">Rotate</TooltipPopup>
+                <TooltipPopup side="top">旋转</TooltipPopup>
               </Tooltip>
             </div>
           ) : null}
@@ -406,11 +402,11 @@ function BrowserZoomSetting({ disabled }: { readonly disabled: boolean }) {
   return (
     <SettingsRow
       {...searchableSetting("browser-default-zoom")}
-      description="Page zoom applied to new browser tabs."
+      description="应用于新浏览器标签页的页面缩放。"
       resetAction={
         !disabled && zoomFactor !== DEFAULT_PREVIEW_ZOOM_FACTOR ? (
           <SettingResetButton
-            label="default browser zoom"
+            label="默认浏览器缩放"
             onClick={() =>
               updateSettings({ browserDefaultZoomFactor: DEFAULT_PREVIEW_ZOOM_FACTOR })
             }
@@ -426,7 +422,7 @@ function BrowserZoomSetting({ disabled }: { readonly disabled: boolean }) {
             if (next !== undefined) updateSettings({ browserDefaultZoomFactor: next });
           }}
         >
-          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="Default browser zoom">
+          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="默认浏览器缩放">
             <SelectValue>{zoomLabel(zoomFactor)}</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -449,11 +445,11 @@ function BrowserAppearanceSetting({ disabled }: { readonly disabled: boolean }) 
   return (
     <SettingsRow
       {...searchableSetting("browser-default-appearance")}
-      description="The color scheme pages are told to prefer. System follows your OS setting."
+      description="网页优先使用的配色方案。“系统”遵循操作系统设置。"
       resetAction={
         !disabled && appearance !== DEFAULT_PREVIEW_APPEARANCE ? (
           <SettingResetButton
-            label="default browser appearance"
+            label="默认浏览器外观"
             onClick={() => updateSettings({ browserDefaultAppearance: DEFAULT_PREVIEW_APPEARANCE })}
           />
         ) : null
@@ -468,11 +464,7 @@ function BrowserAppearanceSetting({ disabled }: { readonly disabled: boolean }) 
             }
           }}
         >
-          <SelectTrigger
-            size="sm"
-            className="w-full sm:w-40"
-            aria-label="Default browser appearance"
-          >
+          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="默认浏览器外观">
             <SelectValue>{APPEARANCE_LABELS[appearance]}</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -496,12 +488,12 @@ function BrowserRecordingInputSettings({ disabled }: { readonly disabled: boolea
     <>
       <SettingsRow
         {...searchableSetting("browser-recording-key-presses")}
-        description="Show pressed keys and shortcuts in new recordings. Password fields are excluded."
+        description="在新录制中显示按键和快捷键，不包含密码字段。"
         control={
           <Switch
             disabled={disabled}
             checked={showKeys}
-            aria-label="Show key presses in recordings"
+            aria-label="在录制中显示按键"
             onCheckedChange={(checked) =>
               updateSettings({ browserRecordingShowKeyPresses: Boolean(checked) })
             }
@@ -510,12 +502,12 @@ function BrowserRecordingInputSettings({ disabled }: { readonly disabled: boolea
       />
       <SettingsRow
         {...searchableSetting("browser-recording-mouse-presses")}
-        description="Highlight mouse presses and held buttons in new recordings."
+        description="在新录制中高亮鼠标点击和持续按住的按钮。"
         control={
           <Switch
             disabled={disabled}
             checked={showMouse}
-            aria-label="Show mouse presses in recordings"
+            aria-label="在录制中显示鼠标点击"
             onCheckedChange={(checked) =>
               updateSettings({ browserRecordingShowMousePresses: Boolean(checked) })
             }
@@ -533,11 +525,11 @@ function BrowserRecordingFrameRateSetting({ disabled }: { readonly disabled: boo
   return (
     <SettingsRow
       {...searchableSetting("browser-recording-frame-rate")}
-      description="Maximum recording rate. 30 fps saves CPU and storage; 60 fps is smoother."
+      description="最高录制帧率。30 fps 更节省 CPU 和存储，60 fps 更流畅。"
       resetAction={
         !disabled && frameRate !== DEFAULT_BROWSER_RECORDING_FRAME_RATE ? (
           <SettingResetButton
-            label="browser recording frame rate"
+            label="浏览器录制帧率"
             onClick={() =>
               updateSettings({ browserRecordingFrameRate: DEFAULT_BROWSER_RECORDING_FRAME_RATE })
             }
@@ -555,11 +547,7 @@ function BrowserRecordingFrameRateSetting({ disabled }: { readonly disabled: boo
             }
           }}
         >
-          <SelectTrigger
-            size="sm"
-            className="w-full sm:w-40"
-            aria-label="Browser recording frame rate"
-          >
+          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="浏览器录制帧率">
             <SelectValue>{frameRate} fps</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -576,7 +564,7 @@ function BrowserRecordingFrameRateSetting({ disabled }: { readonly disabled: boo
 }
 
 const LINK_TARGET_LABELS: Readonly<Record<BrowserLinkTarget, string>> = {
-  system: "Your default browser",
+  system: "默认浏览器",
   app: "T3 Code",
 };
 
@@ -587,11 +575,11 @@ function BrowserLinkTargetSetting({ disabled }: { readonly disabled: boolean }) 
   return (
     <SettingsRow
       {...searchableSetting("browser-link-target")}
-      description="Where links in the chat and terminal open. Hold ⌘ or Ctrl while clicking a link to open it in your default browser either way."
+      description="聊天和终端中链接的打开位置。按住 ⌘ 或 Ctrl 点击链接，无论此设置如何，都会在默认浏览器中打开。"
       resetAction={
         !disabled && linkTarget !== DEFAULT_BROWSER_LINK_TARGET ? (
           <SettingResetButton
-            label="link target"
+            label="链接打开方式"
             onClick={() => updateSettings({ browserLinkTarget: DEFAULT_BROWSER_LINK_TARGET })}
           />
         ) : null
@@ -606,7 +594,7 @@ function BrowserLinkTargetSetting({ disabled }: { readonly disabled: boolean }) 
             }
           }}
         >
-          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="Open links in">
+          <SelectTrigger size="sm" className="w-full sm:w-40" aria-label="链接打开方式">
             <SelectValue>{LINK_TARGET_LABELS[linkTarget]}</SelectValue>
           </SelectTrigger>
           <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -629,7 +617,7 @@ function DeviceIntegrationSettings() {
   const environmentId = connected ? selected.environmentId : null;
 
   return (
-    <SettingsSection id="devices" title="Devices">
+    <SettingsSection id="devices" title="设备">
       <DeviceIntegrationControls
         key={`${environmentId}:${JSON.stringify(search)}`}
         environmentId={environmentId}
@@ -688,10 +676,10 @@ function DeviceIntegrationControls({
       const results = await Promise.allSettled(
         environments.map(async (environment) => {
           if (environment.connection.phase !== "connected" || !environment.serverConfig) {
-            throw new Error("Environment disconnected");
+            throw new Error("环境已断开连接");
           }
           if (!readEnvironmentScope(environment.environmentId, AuthSettingsWriteScope)) {
-            throw new Error("This connection cannot change device settings.");
+            throw new Error("此连接无权更改设备设置。");
           }
           return configure({
             environmentId: environment.environmentId,
@@ -706,8 +694,8 @@ function DeviceIntegrationControls({
       if (failed.length > 0) {
         toastManager.add({
           type: "error",
-          title: "Device settings not saved on all environments",
-          description: `Could not update ${failed.map((environment) => environment.label).join(", ")}.`,
+          title: "设备设置未在所有环境中保存",
+          description: `无法更新 ${failed.map((environment) => environment.label).join(", ")}。`,
         });
       }
     } finally {
@@ -738,14 +726,13 @@ function DeviceIntegrationControls({
                     if (result._tag === "Failure")
                       setUpdateError({
                         tool,
-                        message:
-                          "Update failed. Check this host's network connection and try again.",
+                        message: "更新失败。请检查此主机的网络连接后重试。",
                       });
                   })
                   .finally(() => setPending(null));
               }}
             >
-              {pending === `update-${tool}` ? "Updating…" : `Update to v${version.requiredVersion}`}
+              {pending === `update-${tool}` ? "正在更新…" : `更新到 v${version.requiredVersion}`}
             </Button>
           ) : null}
           {state.supportsToolInspection ? (
@@ -761,7 +748,7 @@ function DeviceIntegrationControls({
                 );
               }}
             >
-              {pending === "check" ? "Checking…" : "Check versions"}
+              {pending === "check" ? "正在检查…" : "检查版本"}
             </Button>
           ) : null}
         </div>
@@ -800,7 +787,7 @@ function DeviceIntegrationControls({
                 busy ||
                 pending !== null
               }
-              aria-label="Device hub"
+              aria-label="设备中心"
               onCheckedChange={(checked) =>
                 void update("hub", {
                   enabled: Boolean(checked),
@@ -817,7 +804,7 @@ function DeviceIntegrationControls({
             {...searchableSetting("device-platform-support")}
             description={
               connectedEnvironments.length > 1
-                ? `Status for ${connectedEnvironments.find((environment) => environment.environmentId === environmentId)?.label}. Select an environment to inspect its simulator support.`
+                ? `${connectedEnvironments.find((environment) => environment.environmentId === environmentId)?.label} 的状态。请选择环境以查看其模拟器支持情况。`
                 : undefined
             }
             status={
@@ -841,7 +828,7 @@ function DeviceIntegrationControls({
                   void list({ environmentId, input: {} }).finally(() => setPending(null));
                 }}
               >
-                {pending === "check" ? "Checking…" : "Refresh"}
+                {pending === "check" ? "正在检查…" : "刷新"}
               </Button>
             }
           />
@@ -869,7 +856,7 @@ function DeviceIntegrationControls({
                 (!projectScope && (!loaded || !anyHubEnabled || busy)) ||
                 pending !== null
               }
-              aria-label="Agent device access"
+              aria-label="Agent 设备访问权限"
               onCheckedChange={(checked) =>
                 projectScope
                   ? updateSettings({ enableAgentDeviceAccess: Boolean(checked) })
@@ -897,11 +884,11 @@ function BrowserAutoShowFloatingPreviewSetting({ disabled }: { readonly disabled
   return (
     <SettingsRow
       {...searchableSetting("browser-auto-show-floating-preview")}
-      description="Show the floating preview when an agent opens a browser or device unless the agent says otherwise."
+      description="Agent 打开浏览器或设备时显示悬浮预览，除非 Agent 指定不显示。"
       resetAction={
         !disabled && autoShow !== DEFAULT_BROWSER_AUTO_SHOW_FLOATING_PREVIEW ? (
           <SettingResetButton
-            label="auto-show floating preview"
+            label="自动显示悬浮预览"
             onClick={() =>
               updateSettings({
                 browserAutoShowFloatingPreview: DEFAULT_BROWSER_AUTO_SHOW_FLOATING_PREVIEW,
@@ -917,7 +904,7 @@ function BrowserAutoShowFloatingPreviewSetting({ disabled }: { readonly disabled
           onCheckedChange={(checked) =>
             updateSettings({ browserAutoShowFloatingPreview: Boolean(checked) })
           }
-          aria-label="Auto-show floating preview"
+          aria-label="自动显示悬浮预览"
         />
       }
     />
@@ -929,7 +916,7 @@ function BrowserAutoShowFloatingPreviewSetting({ disabled }: { readonly disabled
  *
  * One menu creates profiles and imports into them, because the two are the
  * same decision from the user's side: "I want a profile that has my Helium
- * logins in it". Import targets include "New profile" so that case does not
+ * logins in it". Import targets include "新配置" so that case does not
  * require creating one first and then finding a second control.
  *
  * Built-ins render without a rename field: they are synthesized rather than
@@ -1024,8 +1011,8 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
     if (!removalAvailable) {
       toastManager.add({
         type: "error",
-        title: `Could not clear ${name}'s data`,
-        description: "You're not connected to a server yet.",
+        title: `无法清除 ${name} 的数据`,
+        description: "尚未连接到服务器。",
       });
       return;
     }
@@ -1036,17 +1023,17 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
       serverProfileData,
     )
       .then(() => {
-        toastManager.add({ type: "success", title: `Cleared ${name}'s cookies and cache` });
+        toastManager.add({ type: "success", title: `已清除 ${name} 的 Cookie 和缓存` });
       })
       .catch(() => {
-        toastManager.add({ type: "error", title: `Could not clear ${name}'s data` });
+        toastManager.add({ type: "error", title: `无法清除 ${name} 的数据` });
       });
   };
 
   const removeProfile = async (id: string) => {
     if (!settingsHydrated || importInFlightRef.current) return;
     if (!removalAvailable) {
-      setProfileRemovalError("Connect to an environment before removing this profile.");
+      setProfileRemovalError("移除此配置前，请先连接环境。");
       return;
     }
     setProfileRemovalError(null);
@@ -1061,7 +1048,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
         serverProfileData,
       );
     } catch {
-      setProfileRemovalError("Profile data could not be deleted. Try again.");
+      setProfileRemovalError("无法删除配置数据，请重试。");
       setProfileRemovalInFlight(false);
       return;
     }
@@ -1224,7 +1211,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
   return (
     <SettingsRow
       {...searchableSetting("browser-profiles")}
-      description="Profiles separate cookies and logins. Incognito data is cleared when the app closes."
+      description="配置用于隔离 Cookie 和登录状态。关闭应用时会清除无痕浏览数据。"
       control={
         <Menu onOpenChange={(open) => open && loadSources()}>
           <MenuTrigger
@@ -1237,25 +1224,23 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
             }
           >
             <PlusIcon />
-            Add profile
+            添加配置
           </MenuTrigger>
           <MenuPopup align="end">
             <MenuItem
               disabled={!settingsHydrated || atProfileLimit}
-              onClick={() => createProfile("New profile")}
+              onClick={() => createProfile("新配置")}
             >
-              Blank profile
+              空白配置
             </MenuItem>
-            {atProfileLimit ? (
-              <MenuItem disabled>You&rsquo;ve reached the profile limit</MenuItem>
-            ) : null}
+            {atProfileLimit ? <MenuItem disabled>已达到配置数量上限</MenuItem> : null}
             <MenuSeparator />
             <MenuGroup>
-              <MenuGroupLabel>Import from</MenuGroupLabel>
+              <MenuGroupLabel>导入来源</MenuGroupLabel>
               {sources === null ? (
-                <MenuItem disabled>Looking for browsers…</MenuItem>
+                <MenuItem disabled>正在查找浏览器…</MenuItem>
               ) : importableSources.length === 0 ? (
-                <MenuItem disabled>No supported browsers found</MenuItem>
+                <MenuItem disabled>未找到支持的浏览器</MenuItem>
               ) : (
                 // Every source is a plain row — running, needs-permission and
                 // ready all look the same here. The wizard picks up whatever
@@ -1282,7 +1267,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                     </MenuItem>
                   ))}
                   {primaryEnvironment == null ? (
-                    <MenuItem disabled>Connect to an environment to import cookies</MenuItem>
+                    <MenuItem disabled>请连接环境以导入 Cookie</MenuItem>
                   ) : null}
                 </>
               )}
@@ -1327,7 +1312,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                     nativeInput
                     size="sm"
                     className="w-full max-w-56"
-                    aria-label={`Rename ${profile.name}`}
+                    aria-label={`重命名 ${profile.name}`}
                     disabled={profileWritesDisabled || importInFlight}
                     maxLength={BROWSER_PROFILE_NAME_MAX_LENGTH}
                     value={profile.name}
@@ -1337,7 +1322,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                 {/* Dimmed with the rest of the row, whose controls are all disabled. */}
                 {isDefault ? (
                   <span className={cn("flex", profileWritesDisabled && "opacity-64")}>
-                    <Badge>Default</Badge>
+                    <Badge>默认</Badge>
                   </span>
                 ) : null}
               </span>
@@ -1348,7 +1333,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                       size="icon-xs"
                       variant="ghost-muted"
                       disabled={profileWritesDisabled || importInFlight}
-                      aria-label={`${profile.name} options`}
+                      aria-label={`${profile.name} 选项`}
                     />
                   }
                 >
@@ -1363,7 +1348,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                       }
                     }}
                   >
-                    Set as default
+                    设为默认
                   </MenuItem>
                   <MenuItem
                     disabled={!settingsHydrated || !removalAvailable}
@@ -1374,7 +1359,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                       } else clearProfileData(profile.id, profile.name);
                     }}
                   >
-                    Clear cookies and cache
+                    清除 Cookie 和缓存
                   </MenuItem>
                   {builtIn ? null : (
                     <MenuItem
@@ -1384,16 +1369,14 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                         if (settingsHydrated) setProfilePendingRemoval(profile);
                       }}
                     >
-                      Remove profile and data
+                      移除配置及数据
                     </MenuItem>
                   )}
                   {!removalAvailable ? (
                     <>
                       <MenuSeparator />
                       <MenuItem disabled>
-                        {environmentsReady
-                          ? "Connect to an environment to clear profile data"
-                          : "Checking environments…"}
+                        {environmentsReady ? "请连接环境以清除配置数据" : "正在检查环境…"}
                       </MenuItem>
                     </>
                   ) : null}
@@ -1414,10 +1397,10 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove “{profilePendingRemoval?.name}”?</AlertDialogTitle>
+            <AlertDialogTitle>移除“{profilePendingRemoval?.name}”？</AlertDialogTitle>
             <AlertDialogDescription>
-              Its cookies and logins are deleted. Desktop tabs already open in this profile stay
-              open until you close them; server browser tabs close now.
+              这会删除其 Cookie
+              和登录状态。已在此配置中打开的桌面标签页会保留，直到你关闭它们；服务器浏览器标签页会立即关闭。
             </AlertDialogDescription>
             {profileRemovalError ? (
               <p aria-live="polite" className="text-sm text-destructive">
@@ -1425,9 +1408,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
               </p>
             ) : null}
             {!removalAvailable ? (
-              <p className="text-sm text-muted-foreground">
-                Connect to an environment to remove this profile and its data.
-              </p>
+              <p className="text-sm text-muted-foreground">请连接环境以移除此配置及其数据。</p>
             ) : null}
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1435,7 +1416,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
               disabled={profileRemovalInFlight}
               render={<Button variant="outline" disabled={profileRemovalInFlight} />}
             >
-              Cancel
+              取消
             </AlertDialogClose>
             <Button
               variant="destructive"
@@ -1446,7 +1427,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                 }
               }}
             >
-              {profileRemovalInFlight ? "Removing…" : "Remove profile"}
+              {profileRemovalInFlight ? "正在移除…" : "移除配置"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>
@@ -1459,15 +1440,13 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Clear “{profilePendingClear?.name}”’s cookies and cache?
-            </AlertDialogTitle>
+            <AlertDialogTitle>清除“{profilePendingClear?.name}”的 Cookie 和缓存？</AlertDialogTitle>
             <AlertDialogDescription>
-              You are signed out of its sites. Server browser tabs open in this profile close now.
+              这会登出该配置中的网站，并立即关闭在此配置中打开的服务器浏览器标签页。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
             <Button
               variant="destructive"
               onClick={() => {
@@ -1476,7 +1455,7 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
                 setProfilePendingClear(null);
               }}
             >
-              Clear data
+              清除数据
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>
@@ -1504,8 +1483,8 @@ function BrowserProfilesSetting({ disabled }: { readonly disabled: boolean }) {
               .catch(() => {
                 toastManager.add({
                   type: "error",
-                  title: "Could not open System Settings",
-                  description: "Open Privacy & Security → Full Disk Access manually.",
+                  title: "无法打开系统设置",
+                  description: "请手动打开“隐私与安全性 → 完全磁盘访问权限”。",
                 });
               });
           }}
@@ -1537,9 +1516,9 @@ export function IntegrationsSettingsPanel() {
       {/* Server-authoritative agent access is scoped by the header selection;
           the preview defaults below are device-local and ignore it. */}
       <ProjectDefaultsSettings category="integrations" />
-      <SettingsSection id="browser" title="Browser">
+      <SettingsSection id="browser" title="浏览器">
         {previewDefaultsDisabled ? (
-          <SettingsUnavailableGroup message="Only available in the desktop app.">
+          <SettingsUnavailableGroup message="仅在桌面应用中可用。">
             {previewDefaults}
           </SettingsUnavailableGroup>
         ) : (

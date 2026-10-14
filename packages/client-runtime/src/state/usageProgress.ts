@@ -44,8 +44,8 @@ export function updatingProvidersLabel(
   providerLabel: (provider: UsageProviderKind) => string,
 ) {
   return providers.length === 1
-    ? `Updating ${providerLabel(providers[0]!)}…`
-    : `Updating ${providers.length} providers…`;
+    ? `正在更新 ${providerLabel(providers[0]!)}…`
+    : `正在更新 ${providers.length} 个提供商…`;
 }
 
 /**
@@ -82,10 +82,10 @@ export function usageProgress(
           ? null
           : updatingProvidersLabel(providers, providerLabel)
         : environments.length === 1
-          ? "Updating…"
+          ? "正在更新…"
           : waiting.length === 1
-            ? `Updating ${waiting[0]!.label}…`
-            : `Updating ${waiting.length} environments…`,
+            ? `正在更新 ${waiting[0]!.label}…`
+            : `正在更新 ${waiting.length} 个环境…`,
   };
 }
 

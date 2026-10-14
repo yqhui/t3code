@@ -620,16 +620,16 @@ export const CodexSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("codex").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Path to the Codex binary used by this instance.",
+        title: "可执行文件路径",
+        description: "此实例使用的 Codex 可执行文件路径。",
         providerSettingsForm: { placeholder: "codex", clearWhenEmpty: "omit" },
       }),
     ),
     homePath: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "CODEX_HOME path",
-        description: "Custom Codex home and config directory.",
+        title: "CODEX_HOME 路径",
+        description: "自定义 Codex 主目录和配置目录。",
         providerSettingsForm: {
           placeholder: "~/.codex",
           clearWhenEmpty: "omit",
@@ -639,9 +639,8 @@ export const CodexSettings = makeProviderSettingsSchema(
     shadowHomePath: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Shadow home path",
-        description:
-          "Account-specific Codex home. Keeps auth.json separate while sharing state from CODEX_HOME.",
+        title: "影子主目录路径",
+        description: "账户专用的 Codex 主目录。单独保存 auth.json，同时共享 CODEX_HOME 中的状态。",
         providerSettingsForm: {
           placeholder: "~/.codex-t3/personal",
           clearWhenEmpty: "omit",
@@ -651,8 +650,8 @@ export const CodexSettings = makeProviderSettingsSchema(
     launchArgs: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Launch arguments",
-        description: "Additional CLI arguments passed to codex app-server on session start.",
+        title: "启动参数",
+        description: "会话启动时传递给 codex app-server 的额外 CLI 参数。",
       }),
     ),
     customModels: Schema.Array(CustomModelSetting).pipe(
@@ -679,17 +678,16 @@ export const ClaudeSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("claude").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Path to the Claude binary used by this instance.",
+        title: "可执行文件路径",
+        description: "此实例使用的 Claude 可执行文件路径。",
         providerSettingsForm: { placeholder: "claude", clearWhenEmpty: "omit" },
       }),
     ),
     homePath: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "CLAUDE_CONFIG_DIR path",
-        description:
-          "Custom Claude home and config directory. Keeps .claude.json and .claude separate.",
+        title: "CLAUDE_CONFIG_DIR 路径",
+        description: "自定义 Claude 主目录和配置目录。单独保存 .claude.json 和 .claude。",
         providerSettingsForm: { placeholder: "~/.claude", clearWhenEmpty: "omit" },
       }),
     ),
@@ -700,10 +698,10 @@ export const ClaudeSettings = makeProviderSettingsSchema(
     launchArgs: Schema.String.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Launch arguments",
-        description: "Additional CLI arguments passed on session start.",
+        title: "启动参数",
+        description: "会话启动时传递的额外 CLI 参数。",
         providerSettingsForm: {
-          placeholder: "e.g. --chrome",
+          placeholder: "例如 --chrome",
           clearWhenEmpty: "omit",
         },
       }),
@@ -713,11 +711,10 @@ export const ClaudeSettings = makeProviderSettingsSchema(
     ).pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Auto-compact after",
-        description:
-          "Compact after 100,000 to 1,000,000 tokens. Leave empty to use Claude's default.",
+        title: "自动压缩阈值",
+        description: "达到 100,000 至 1,000,000 Token 后压缩上下文。留空以使用 Claude 的默认值。",
         providerSettingsForm: {
-          placeholder: "e.g. 300000",
+          placeholder: "例如 300000",
           clearWhenEmpty: "omit",
         },
       }),
@@ -735,9 +732,9 @@ export type ClaudeSettings = typeof ClaudeSettings.Type;
  * the instance config and never open a browser.
  */
 export const ANTIGRAVITY_AUTH_METHODS = [
-  { value: "oauth-personal", label: "Google account" },
+  { value: "oauth-personal", label: "Google 账户" },
   { value: "oauth-business", label: "Gemini Enterprise" },
-  { value: "gemini-api-key", label: "Gemini API key" },
+  { value: "gemini-api-key", label: "Gemini API 密钥" },
   { value: "agent-platform", label: "Agent Platform (Vertex AI)" },
 ] as const satisfies ReadonlyArray<ProviderSettingsFormOption>;
 export const AntigravityAuthMethod = Schema.Literals(
@@ -754,9 +751,8 @@ export const AntigravitySettings = makeProviderSettingsSchema(
     authMethod: AntigravityAuthMethod.pipe(
       Schema.withDecodingDefault(Effect.succeed("oauth-personal" as const)),
       Schema.annotateKey({
-        title: "Sign-in method",
-        description:
-          "Google accounts use your subscription; API keys and Agent Platform bill usage.",
+        title: "登录方式",
+        description: "Google 账户使用订阅额度；API 密钥和 Agent Platform 按用量计费。",
         providerSettingsForm: {
           control: "select",
           options: ANTIGRAVITY_AUTH_METHODS,
@@ -768,11 +764,11 @@ export const AntigravitySettings = makeProviderSettingsSchema(
       secretSetting,
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "API key",
-        description: "Gemini or Vertex AI express key. Stored separately on the host.",
+        title: "API 密钥",
+        description: "Gemini 或 Vertex AI Express 密钥。在主机上单独存储。",
         providerSettingsForm: {
           control: "password",
-          placeholder: "Optional",
+          placeholder: "可选",
           clearWhenEmpty: "omit",
         },
       }),
@@ -780,26 +776,25 @@ export const AntigravitySettings = makeProviderSettingsSchema(
     gcpProject: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "GCP project",
-        description:
-          "Required for Gemini Enterprise. Agent Platform uses it when no API key is set.",
+        title: "GCP 项目",
+        description: "Gemini Enterprise 必填。未设置 API 密钥时，Agent Platform 也会使用此项目。",
         providerSettingsForm: { placeholder: "my-project-id", clearWhenEmpty: "omit" },
       }),
     ),
     gcpLocation: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "GCP location",
-        description: "Region for Gemini Enterprise or Agent Platform.",
+        title: "GCP 区域",
+        description: "Gemini Enterprise 或 Agent Platform 使用的区域。",
         providerSettingsForm: { placeholder: "us-central1", clearWhenEmpty: "omit" },
       }),
     ),
     binaryPath: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Custom ACP executable. Leave empty to select automatically.",
-        providerSettingsForm: { placeholder: "Automatic", clearWhenEmpty: "persist" },
+        title: "可执行文件路径",
+        description: "自定义 ACP 可执行文件。留空以自动选择。",
+        providerSettingsForm: { placeholder: "自动", clearWhenEmpty: "persist" },
       }),
     ),
     customModels: Schema.Array(CustomModelSetting).pipe(

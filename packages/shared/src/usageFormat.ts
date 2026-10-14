@@ -165,7 +165,7 @@ export function formatHourShort(hourStart: string, timeZone?: string): string {
 export function formatDateTimeShort(instant: string, timeZone?: string): string {
   const date = new Date(instant);
   if (Number.isNaN(date.getTime())) return instant;
-  return dateTimeFormatter("en-US", {
+  return dateTimeFormatter("zh-CN", {
     ...(timeZone === undefined ? {} : { timeZone }),
     month: "short",
     day: "numeric",
@@ -196,8 +196,8 @@ export function formatRelativeHourShort(
   const calendarDaysAgo = Math.round((referenceDay - instantDay) / (24 * HOUR_MS));
   const hour = formatHourShort(hourStart, timeZone);
 
-  if (calendarDaysAgo === 0) return `${hour} today`;
-  if (calendarDaysAgo === 1) return `${hour} yesterday`;
+  if (calendarDaysAgo === 0) return `今天 ${hour}`;
+  if (calendarDaysAgo === 1) return `昨天 ${hour}`;
   return formatDateTimeShort(hourStart, timeZone);
 }
 

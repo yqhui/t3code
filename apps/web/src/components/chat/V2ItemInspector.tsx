@@ -139,11 +139,7 @@ function useFetchedTurnItem(
       environmentId,
       pending: item === wireItem && detail.isPending,
       error:
-        item !== wireItem
-          ? null
-          : detail.data?.item === null
-            ? "Output is no longer available."
-            : detail.error,
+        item !== wireItem ? null : detail.data?.item === null ? "输出不再可用。" : detail.error,
       empty: fetches && item !== wireItem,
     },
   };
@@ -165,7 +161,7 @@ function ToolOutput(props: ToolOutputState) {
       key={resource.index}
       environmentId={props.environmentId}
       resource={resource}
-      alt="Tool output image"
+      alt="工具输出图片"
       maxHeightRem={16}
       onImageExpand={props.onImageExpand}
     />
@@ -173,11 +169,11 @@ function ToolOutput(props: ToolOutputState) {
   const text = props.output ? (
     <div className="max-h-80 overflow-auto text-muted-foreground">{props.output}</div>
   ) : props.pending ? (
-    <div className="text-muted-foreground italic">Loading output…</div>
+    <div className="text-muted-foreground italic">正在加载输出…</div>
   ) : props.error ? (
-    <div className="text-destructive">Couldn&apos;t load output: {props.error}</div>
+    <div className="text-destructive">无法加载输出：{props.error}</div>
   ) : props.empty && images.length === 0 ? (
-    <div className="text-muted-foreground italic">No output.</div>
+    <div className="text-muted-foreground italic">暂无输出。</div>
   ) : null;
   return (
     <>
@@ -231,7 +227,7 @@ function ToolCallBody(
       {call.argsText ? <StructuredValue value={call.argsText} highlightJson /> : null}
       <ToolOutput {...props} />
       {props.exitCode !== undefined && props.exitCode !== 0 ? (
-        <div className="text-destructive">exit {props.exitCode}</div>
+        <div className="text-destructive">退出码 {props.exitCode}</div>
       ) : null}
     </div>
   );
@@ -289,7 +285,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
                 variant="outline"
                 onClick={() => props.onOpenTurnDiff(item.runId!, item.fileName)}
               >
-                Open diff
+                打开 Diff
               </Button>
             ) : null}
           </div>
@@ -355,7 +351,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
                   </a>
                 ) : (
                   <p className="font-medium text-foreground">
-                    {result.title ?? result.url ?? "Search result"}
+                    {result.title ?? result.url ?? "搜索结果"}
                   </p>
                 )}
                 {result.snippet ? <p className="text-muted-foreground">{result.snippet}</p> : null}
@@ -393,7 +389,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
       {item.type === "checkpoint" ? (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-muted-foreground">
-            {support.checkpoint?.status ?? item.status} · {item.files.length} files
+            {support.checkpoint?.status ?? item.status} · {item.files.length} 个文件
           </span>
           {props.onRollbackCheckpoint && support.checkpoint?.status === "ready" ? (
             <Button
@@ -407,7 +403,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
               }
             >
               <RotateCcwIcon className="size-3" />
-              Roll back
+              回退
             </Button>
           ) : null}
         </div>
@@ -416,13 +412,13 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
       {item.type === "fork" ? (
         <Button size="xs" variant="outline" onClick={() => props.onOpenThread(item.targetThreadId)}>
           <GitBranchIcon className="size-3" />
-          Open fork
+          打开分叉
         </Button>
       ) : null}
 
       {item.type === "subagent" && item.childThreadId !== null ? (
         <Button size="xs" variant="outline" onClick={() => props.onOpenThread(item.childThreadId!)}>
-          Open subagent thread
+          打开子 Agent 会话
         </Button>
       ) : null}
 
@@ -436,7 +432,7 @@ export const V2ItemInspector = memo(function V2ItemInspector(props: V2ItemInspec
           </p>
           {support.contextTransfer ? (
             <p>
-              Transfer {support.contextTransfer.type.replaceAll("_", " ")} ·{" "}
+              转移 {support.contextTransfer.type.replaceAll("_", " ")} ·{" "}
               {support.contextTransfer.status}
             </p>
           ) : null}

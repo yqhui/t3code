@@ -50,7 +50,7 @@ export const AUTH_PROBE_TIMEOUT_MS = 10_000;
 
 export const COMPACT_SLASH_COMMAND = {
   name: "compact",
-  description: "Summarize the conversation and reduce context usage",
+  description: "总结对话并减少上下文用量",
 } satisfies ServerProviderSlashCommand;
 
 export interface CommandResult {

@@ -38,13 +38,13 @@ const MAX_HIGHLIGHTED_JSON_LENGTH = 20_000;
 function formatByteSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${bytes} bytes`;
+  return `${bytes} 字节`;
 }
 
 /** Returns the error to show for a file too large to be a theme, else null. */
 export function describeOversizedThemeFile(bytes: number): string | null {
   if (bytes <= MAX_THEME_FILE_BYTES) return null;
-  return `That file is ${formatByteSize(bytes)}. Theme files are only a few KB, so this one was not read (limit ${formatByteSize(MAX_THEME_FILE_BYTES)}).`;
+  return `此文件大小为 ${formatByteSize(bytes)}。主题文件通常只有几 KB，因此未读取此文件（上限 ${formatByteSize(MAX_THEME_FILE_BYTES)}）。`;
 }
 
 function escapeJsonHtml(value: string): string {
@@ -122,7 +122,7 @@ function ThemeJsonEditor({
         </pre>
       )}
       <textarea
-        aria-label="Theme JSON"
+        aria-label="主题 JSON"
         className={cn(
           "relative z-10 block min-h-44 w-full resize-y overflow-auto bg-transparent p-3 font-mono text-xs leading-5 caret-foreground outline-none placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground",
           isPlainText ? "text-foreground" : "text-transparent",
@@ -198,7 +198,7 @@ export function ThemeImportDialog({
       setError(null);
     } catch {
       if (requestId !== importRequestRef.current) return;
-      setError("Could not read that file. Paste the JSON below instead.");
+      setError("无法读取此文件，请改为在下方粘贴 JSON。");
     } finally {
       if (requestId === importRequestRef.current) setIsReading(false);
     }
@@ -217,7 +217,7 @@ export function ThemeImportDialog({
         for (const file of files) {
           const oversized = describeOversizedThemeFile(file.size);
           if (oversized) {
-            failures.push(`${file.name}: too large`);
+            failures.push(`${file.name}：文件过大`);
             continue;
           }
           try {
@@ -228,7 +228,7 @@ export function ThemeImportDialog({
             });
           } catch (cause) {
             failures.push(
-              `${file.name}: ${cause instanceof Error ? cause.message : "not a theme file"}`,
+              `${file.name}: ${cause instanceof Error ? cause.message : "不是主题文件"}`,
             );
           }
         }
@@ -243,9 +243,7 @@ export function ThemeImportDialog({
           try {
             installed.push(installCustomTheme(theme));
           } catch (cause) {
-            failures.push(
-              `${theme.label}: ${cause instanceof Error ? cause.message : "could not install"}`,
-            );
+            failures.push(`${theme.label}: ${cause instanceof Error ? cause.message : "无法安装"}`);
           }
         }
         if (installed.length > 0) onImportedMany(installed, { updated: false });
@@ -340,7 +338,7 @@ export function ThemeImportDialog({
       if (getCustomThemes().some((existing) => existing.id === candidate.id)) continue;
       return candidate;
     }
-    throw new Error(`Too many copies of "${theme.label}".`);
+    throw new Error(`“${theme.label}”的副本过多。`);
   };
 
   const resolveConflicts = useCallback(
@@ -367,7 +365,7 @@ export function ThemeImportDialog({
               : installCustomTheme(versionedCopy(theme, preferredName)),
           );
         } catch (cause) {
-          failures.push(`${theme.label}: ${cause instanceof Error ? cause.message : "failed"}`);
+          failures.push(`${theme.label}: ${cause instanceof Error ? cause.message : "失败"}`);
         }
       }
       if (resolved.length > 0) onImportedMany(resolved, { updated: mode === "update" });
@@ -406,12 +404,12 @@ export function ThemeImportDialog({
         } catch {
           // Storage is failing wholesale; the error below covers it.
         }
-        setError("Theme added, but it could not be selected. Try again.");
+        setError("主题已添加，但无法选中，请重试。");
         return;
       }
       onOpenChange(false);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "That theme file is invalid.");
+      setError(cause instanceof Error ? cause.message : "主题文件无效。");
     }
   }, [json, onImported, onOpenChange]);
 
@@ -425,7 +423,7 @@ export function ThemeImportDialog({
     >
       <DialogPopup className="max-w-3xl overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Add a theme</DialogTitle>
+          <DialogTitle>添加主题</DialogTitle>
         </DialogHeader>
         <DialogPanel>
           <ThemeSearchSection
@@ -439,7 +437,7 @@ export function ThemeImportDialog({
           <div className="flex items-center gap-3" aria-hidden>
             <div className="h-px flex-1 bg-border" />
             <span className="text-muted-foreground text-2xs uppercase tracking-wider">
-              or import a file
+              或导入文件
             </span>
             <div className="h-px flex-1 bg-border" />
           </div>
@@ -471,17 +469,17 @@ export function ThemeImportDialog({
                 type="file"
               />
             );
-            const chooseButton = (label = "Choose files") => (
+            const chooseButton = (label = "选择文件") => (
               <Button disabled={isReading} size="sm" variant="outline" onClick={openFilePicker}>
                 <DownloadIcon />
-                {isReading ? "Reading…" : label}
+                {isReading ? "正在读取…" : label}
               </Button>
             );
             const editorSection = () => (
               <div className="space-y-2">
                 <div className="flex items-baseline justify-between gap-3">
                   <label className="text-sm font-medium" htmlFor="theme-json-editor">
-                    Theme JSON
+                    主题 JSON
                   </label>
                 </div>
                 <ThemeJsonEditor id="theme-json-editor" onChange={setJson} value={json} />
@@ -491,23 +489,23 @@ export function ThemeImportDialog({
               return (
                 <div className="space-y-3">
                   <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
-                    <p className="text-sm font-medium">Already installed</p>
+                    <p className="text-sm font-medium">已安装</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {conflicts.map((theme) => theme.label).join(", ")}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button size="sm" onClick={() => resolveConflicts("update")}>
-                      Update existing
+                      更新已有主题
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => resolveConflicts("copy")}>
-                      Keep both
+                      保留两者
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setConflicts(null)}>
-                      Back
+                      上一步
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>
-                      Cancel
+                      取消
                     </Button>
                   </div>
                 </div>
@@ -523,9 +521,9 @@ export function ThemeImportDialog({
                   {...dropHandlers}
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">Theme file</p>
+                    <p className="text-sm font-medium">主题文件</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {fileName ?? "Drop T3 Code or VS Code .json files"}
+                      {fileName ?? "拖放 T3 Code 或 VS Code 的 .json 文件"}
                     </p>
                   </div>
                   {chooseButton()}
@@ -538,11 +536,11 @@ export function ThemeImportDialog({
                     the dialog also has the search and conflict views. */}
                 <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <Button variant="ghost" onClick={() => onOpenChange(false)}>
-                    Cancel
+                    取消
                   </Button>
                   <Button disabled={!json.trim() || isReading} onClick={handleSubmit}>
                     <PlusIcon />
-                    Add theme
+                    添加主题
                   </Button>
                 </div>
               </div>

@@ -430,7 +430,7 @@ export class PreviewInvalidUrlError extends Schema.TaggedError<PreviewInvalidUrl
 ) {
   override get message() {
     const protocol = this.protocol === undefined ? "" : `: ${this.protocol}`;
-    return `Invalid preview URL (${this.reason}${protocol}; input length ${this.inputLength}).`;
+    return `预览 URL 无效（${this.reason}${protocol}；输入长度为 ${this.inputLength}）。`;
   }
 }
 
@@ -439,7 +439,7 @@ export class PreviewControlRequiredError extends Schema.TaggedError<PreviewContr
   { tabId: Schema.String },
 ) {
   override get message() {
-    return "Take control of the server browser and use its viewer controls.";
+    return "请先接管服务器浏览器，再使用其查看控件。";
   }
 }
 
@@ -448,7 +448,7 @@ export class PreviewClearProfileError extends Schema.TaggedError<PreviewClearPro
   { profileId: Schema.String, cause: Schema.Defect() },
 ) {
   override get message() {
-    return "The environment could not delete this browser profile's data.";
+    return "环境无法删除该浏览器配置文件的数据。";
   }
 }
 

@@ -70,7 +70,7 @@ function toProviderUpdateOutcome(input: {
     const error = squashAtomCommandFailure(input.result);
     return {
       status: "rejected",
-      reason: error instanceof Error ? error : new Error("Provider update failed."),
+      reason: error instanceof Error ? error : new Error("提供商更新失败。"),
     };
   }
 
@@ -133,14 +133,14 @@ function EnvironmentUpdateRow({
     case "unchanged":
       trailing = (
         <Button size="xs" variant="outline" disabled={!canManageProviders} onClick={onUpdate}>
-          Retry
+          重试
         </Button>
       );
       break;
     default:
       trailing = (
         <Button size="xs" variant="outline" disabled={!canManageProviders} onClick={onUpdate}>
-          Update
+          更新
         </Button>
       );
       break;
@@ -152,9 +152,7 @@ function EnvironmentUpdateRow({
         <span className="truncate font-medium text-foreground">{group.label}</span>
         <span className={cn("truncate text-xs", rowToneClass(status.kind))}>{status.text}</span>
         {!canManageProviders ? (
-          <span className="text-xs text-muted-foreground">
-            This connection cannot manage provider accounts.
-          </span>
+          <span className="text-xs text-muted-foreground">此连接无法管理提供商账户。</span>
         ) : null}
       </div>
       <div className="shrink-0">{trailing}</div>
@@ -295,7 +293,7 @@ export function ProviderUpdateEnvironmentRows({
             } catch (error) {
               return {
                 status: "rejected",
-                reason: error instanceof Error ? error : new Error("Provider update failed."),
+                reason: error instanceof Error ? error : new Error("提供商更新失败。"),
               };
             }
           }),
@@ -318,10 +316,7 @@ export function ProviderUpdateEnvironmentRows({
         });
         if (results.length === 0) {
           setErrorByEnvironment((previous) =>
-            new Map(previous).set(
-              environmentId,
-              "This environment isn’t connected — try again once it reconnects.",
-            ),
+            new Map(previous).set(environmentId, "此环境未连接 — 请在重新连接后重试。"),
           );
           return;
         }
@@ -353,7 +348,7 @@ export function ProviderUpdateEnvironmentRows({
           setErrorByEnvironment((previous) =>
             new Map(previous).set(
               environmentId,
-              error instanceof Error ? error.message : "Provider update failed.",
+              error instanceof Error ? error.message : "提供商更新失败。",
             ),
           );
         }

@@ -195,41 +195,37 @@ type DetailTab = "summary" | "guide" | "timeline" | "code";
 
 /** Said as the thing that did not happen, rather than as the operation that returned an error. */
 const ACTION_FAILURE_LABELS: Record<PullRequestAction, string> = {
-  merge: "Could not merge this pull request",
-  ready: "Could not mark this ready for review",
-  draft: "Could not convert this to a draft",
-  close: "Could not close this pull request",
-  reopen: "Could not reopen this pull request",
-  "update-branch": "Could not update this branch",
-  "enable-auto-merge": "Could not turn on auto-merge",
-  "disable-auto-merge": "Could not turn off auto-merge",
-  revert: "Could not open a revert pull request",
-  "approve-workflows": "Could not approve workflows",
+  merge: "无法合并此拉取请求",
+  ready: "无法将其标记为可供审查",
+  draft: "无法将其转换为草稿",
+  close: "无法关闭此拉取请求",
+  reopen: "无法重新打开此拉取请求",
+  "update-branch": "无法更新此分支",
+  "enable-auto-merge": "无法开启自动合并",
+  "disable-auto-merge": "无法关闭自动合并",
+  revert: "无法创建还原拉取请求",
+  "approve-workflows": "无法批准工作流",
 };
 
 /** What to try, for the times the host says only that it refused. */
 const ACTION_FAILURE_HINTS: Record<PullRequestAction, string> = {
-  merge:
-    "The host refused the merge. Check that you have write access, that the checks it requires have passed, and that the branch is not conflicting.",
-  ready: "The host refused it. Check that you have write access to this repository.",
-  draft: "The host refused it. Check that you have write access to this repository.",
-  close: "The host refused it. Check that you have write access, or that you opened it.",
-  reopen:
-    "The host refused it. Check that you have write access, and that the branch still exists.",
+  merge: "托管平台拒绝了合并。请检查你是否有写入权限、其要求的检查是否已通过、分支是否存在冲突。",
+  ready: "托管平台拒绝了此操作。请检查你对此仓库是否有写入权限。",
+  draft: "托管平台拒绝了此操作。请检查你对此仓库是否有写入权限。",
+  close: "托管平台拒绝了此操作。请检查你是否有写入权限，或确认此拉取请求是否由你创建。",
+  reopen: "托管平台拒绝了此操作。请检查你是否有写入权限，并确认分支仍然存在。",
   // Said for the merge commit, which is what an update is unless a rebase was asked for. The
   // rebase has its own reasons to fail and its own sentence below.
   "update-branch":
-    "The host refused it. Check that you have write access to the branch — one from a fork also needs its author to allow edits from maintainers — and that it does not conflict with the base.",
+    "托管平台拒绝了此操作。请检查你对此分支是否有写入权限——来自 fork 的分支还需要其作者允许维护者编辑——并确认它与基准分支没有冲突。",
   // The one refusal that is usually a repository setting rather than anything about this branch:
   // GitHub will not arm an auto-merge at all unless the repository has the feature switched on.
   "enable-auto-merge":
-    "The host refused it. Check that this repository allows auto-merge, that you have write access, and that there is something left for it to wait on.",
-  "disable-auto-merge":
-    "The host refused it. Check that you have write access, and that the merge has not already happened.",
-  revert:
-    "The host refused it. Check that you have write access and that this pull request was merged on the host.",
+    "托管平台拒绝了此操作。请检查此仓库是否允许自动合并、你是否有写入权限，以及是否还有可供等待的检查。",
+  "disable-auto-merge": "托管平台拒绝了此操作。请检查你是否有写入权限，并确认合并没有发生。",
+  revert: "托管平台拒绝了此操作。请检查你是否有写入权限，并确认此拉取请求已在托管平台上合并。",
   "approve-workflows":
-    "The host refused it. Check that you have Actions write access and that these workflow runs are still awaiting approval.",
+    "托管平台拒绝了此操作。请检查你是否有 Actions 写入权限，并确认这些工作流运行仍在等待批准。",
 };
 
 /**
@@ -238,13 +234,13 @@ const ACTION_FAILURE_HINTS: Record<PullRequestAction, string> = {
  * Offering the merge commit only makes sense to somebody who did not already choose it.
  */
 const UPDATE_BRANCH_REBASE_FAILURE_HINT =
-  "The host refused it. A rebase stops at the first commit that does not apply cleanly; updating with a merge commit may still work.";
+  "托管平台拒绝了此操作。变基会在第一个无法干净应用的提交处停止；改用合并提交更新可能仍然可行。";
 
 const TABS: ReadonlyArray<{ value: DetailTab; label: string }> = [
-  { value: "summary", label: "Summary" },
-  { value: "guide", label: "Guide" },
-  { value: "timeline", label: "Timeline" },
-  { value: "code", label: "Code" },
+  { value: "summary", label: "摘要" },
+  { value: "guide", label: "指南" },
+  { value: "timeline", label: "时间线" },
+  { value: "code", label: "代码" },
 ];
 
 // The diff viewer pulls in its worker pool, so load it only when the reader approaches Code.
@@ -355,12 +351,8 @@ function PullRequestBaseFreshnessWarning({
   readonly children?: ReactNode;
 }) {
   const behind =
-    freshness.behindBy === null
-      ? ""
-      : ` by ${freshness.behindBy.toLocaleString()} ${
-          freshness.behindBy === 1 ? "commit" : "commits"
-        }`;
-  const summary = `This branch is out-of-date with ${baseBranch}${behind}.`;
+    freshness.behindBy === null ? "" : ` ${freshness.behindBy.toLocaleString()} 个提交`;
+  const summary = `此分支落后于 ${baseBranch}${behind}。`;
   return (
     <Popover>
       <PopoverTrigger
@@ -383,7 +375,7 @@ function PullRequestBaseFreshnessWarning({
       </PopoverTrigger>
       <PopoverPopup align="start" side="bottom" className="max-w-80" padding="compact">
         <p className="text-xs text-foreground">{summary}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">Changes can be cleanly merged.</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">更改可以干净地合并。</p>
         {/* Each way the host offers and this reader may take, as its own button: a split button
             would need a menu inside a popover, and two buttons say the same thing in one layer. */}
         {freshness.methods.length > 0 ? (
@@ -397,7 +389,7 @@ function PullRequestBaseFreshnessWarning({
                 onClick={() => onUpdate(method)}
               >
                 <PullRequestGlyph.merged aria-hidden className="size-3" />
-                {method === "rebase" ? "Update with rebase" : "Update branch"}
+                {method === "rebase" ? "变基更新" : "更新分支"}
               </Button>
             ))}
           </span>
@@ -771,11 +763,11 @@ export function PullRequestDetailPanel({
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const { copyToClipboard: copyReference } = useCopyToClipboard<string>({
     target: "pull request reference",
-    onCopy: (label) => toastManager.add({ type: "success", title: `${label} copied` }),
+    onCopy: (label) => toastManager.add({ type: "success", title: `${label} 已复制` }),
     onError: (error, label) =>
       toastManager.add({
         type: "error",
-        title: `Failed to copy ${label}`,
+        title: `复制 ${label} 失败`,
         description: error.message,
       }),
   });
@@ -787,7 +779,7 @@ export function PullRequestDetailPanel({
     if (command !== "pullRequest.copyNumber") return;
     event.preventDefault();
     event.stopPropagation();
-    if (!event.repeat) copyReference(`#${reference.number}`, "PR number");
+    if (!event.repeat) copyReference(`#${reference.number}`, "PR 编号");
   });
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => copyFromShortcut(event);
@@ -823,7 +815,7 @@ export function PullRequestDetailPanel({
   const onCheckoutCommandError = useCallback((error: Error) => {
     toastManager.add({
       type: "error",
-      title: "Could not copy checkout command",
+      title: "无法复制检出命令",
       description: error.message,
     });
   }, []);
@@ -1028,7 +1020,7 @@ export function PullRequestDetailPanel({
     }
     // Reverting opens another PR; the current panel has no new state to show.
     if (action === "revert") {
-      toastManager.add({ type: "success", title: "Revert pull request opened" });
+      toastManager.add({ type: "success", title: "已创建还原拉取请求" });
     }
     // A branch update moves the head commit, which leaves the diff atom pointed at a comparison
     // that no longer exists — the same staleness the manual refresh button fixes, so it goes
@@ -1063,7 +1055,7 @@ export function PullRequestDetailPanel({
     });
     if (commentResult._tag === "Failure") {
       setPendingAction(null);
-      toastManager.add({ type: "error", title: "Could not post the comment" });
+      toastManager.add({ type: "error", title: "无法发布评论" });
       return { commentPosted: false };
     }
     const actionSucceeded = await finishAction(action);
@@ -1088,11 +1080,8 @@ export function PullRequestDetailPanel({
       // rewritten is the one thing a failed save must not cost them.
       toastManager.add({
         type: "error",
-        title: "The title could not be saved",
-        description: readableFailure(
-          squashAtomCommandFailure(result),
-          "The host refused the new title.",
-        ),
+        title: "无法保存标题",
+        description: readableFailure(squashAtomCommandFailure(result), "托管平台拒绝了新标题。"),
       });
       return;
     }
@@ -1201,11 +1190,11 @@ export function PullRequestDetailPanel({
       writeTaskToComposer(attachTarget, task);
       toastManager.add({
         type: "success",
-        title: "Added to the composer",
+        title: "已添加到撰写框",
         description:
           task.prompt.length > 0
-            ? "The question is in the composer — read it over, then send."
-            : "The pull request is in the composer — type your question, then send.",
+            ? "问题已在撰写框中——请检查后再发送。"
+            : "拉取请求已在撰写框中——请输入你的问题后发送。",
       });
       return;
     }
@@ -1232,20 +1221,20 @@ export function PullRequestDetailPanel({
     if (opened === null) {
       toastManager.add({
         type: "error",
-        title: "Could not open a thread",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法打开会话",
+        description: "请从项目重试，或先打开一个会话。",
       });
       return;
     }
     toastManager.add({
       type: "success",
-      title: "Asked in a thread",
+      title: "已在会话中提问",
       // "Ask" leaves the composer empty on purpose, so saying the question is in it would send
       // the reader looking for something that is not there. The chips are what landed.
       description:
         task.prompt.length > 0
-          ? "The question is in the composer — read it over, then send."
-          : "The pull request is in the composer — type your question, then send.",
+          ? "问题已在撰写框中——请检查后再发送。"
+          : "拉取请求已在撰写框中——请输入你的问题后发送。",
     });
   };
 
@@ -1265,8 +1254,8 @@ export function PullRequestDetailPanel({
       writeTaskToComposer(attachTarget, task);
       toastManager.add({
         type: "success",
-        title: "Added to the composer",
-        description: "The task is in the composer — read it over, then send.",
+        title: "已添加到撰写框",
+        description: "任务已在撰写框中——请检查后再发送。",
       });
       return;
     }
@@ -1289,7 +1278,7 @@ export function PullRequestDetailPanel({
     // never expires, and an explicit one would survive the update and pin the result on screen.
     const toastId = toastManager.add({
       type: "loading",
-      title: "Preparing the pull request checkout...",
+      title: "正在准备拉取请求检出…",
     });
     // Wherever the reader chose to act: the thread, the checkout it is pointed at and the composer
     // the task lands in are all one server's, and picking another one moves all three.
@@ -1311,8 +1300,8 @@ export function PullRequestDetailPanel({
       // working tree than to prepare a worktree nobody asked for.
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not open a thread for the checkout",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法为检出打开会话",
+        description: "请从项目重试，或先打开一个会话。",
       });
       return;
     }
@@ -1329,7 +1318,7 @@ export function PullRequestDetailPanel({
         prepareThread.error instanceof Error ? prepareThread.error.message : null;
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not prepare the pull request checkout",
+        title: "无法准备拉取请求检出",
         ...(detailMessage ? { description: detailMessage } : {}),
       });
       return;
@@ -1351,8 +1340,8 @@ export function PullRequestDetailPanel({
       // outcome worth stopping for, since it reads as success and is not.
       toastManager.update(toastId, {
         type: "error",
-        title: "Checked out, but the thread stayed where it was",
-        description: `The checkout is ready on \`${prepared.value.branch}\`. Point a thread at it from the branch picker, then ask again.`,
+        title: "已完成检出，但会话未移动",
+        description: `检出已就绪，位于 \`${prepared.value.branch}\`。请在分支选择器中将一个会话指向它，然后再次提问。`,
       });
       return;
     }
@@ -1364,9 +1353,9 @@ export function PullRequestDetailPanel({
     // success, because everything else about the handoff did happen.
     const staleCheckoutToast = {
       type: "warning",
-      title: "Checked out, but not on the latest commits",
+      title: "已完成检出，但不在最新提交上",
       description:
-        "The checkout could not be moved onto the pull request's latest commits, so the code there is older than the pull request. Uncommitted work or local commits keep it where it is.",
+        "无法将检出移动到拉取请求的最新提交，因此其中的代码比拉取请求旧。未提交的工作或本地提交会使其保持原位。",
     } as const;
     if (task === null) {
       toastManager.update(
@@ -1374,11 +1363,11 @@ export function PullRequestDetailPanel({
         prepared.value.isOnPullRequestHead
           ? {
               type: "success",
-              title: mode === "local" ? "Checked out here" : "Checked out",
+              title: mode === "local" ? "已在此处检出" : "已检出",
               description:
                 mode === "local"
-                  ? "This repository is on the pull request's branch, with a thread open on it."
-                  : "The pull request is in its own worktree, with a thread open on it.",
+                  ? "此仓库已切换到拉取请求的分支，并有一个会话在其上打开。"
+                  : "拉取请求已检出到独立的 Worktree，并有一个会话在其上打开。",
             }
           : staleCheckoutToast,
       );
@@ -1390,8 +1379,8 @@ export function PullRequestDetailPanel({
       prepared.value.isOnPullRequestHead
         ? {
             type: "success",
-            title: "Checkout ready",
-            description: "The task is in the composer — read it over, then send.",
+            title: "检出已就绪",
+            description: "任务已在撰写框中——请检查后再发送。",
           }
         : staleCheckoutToast,
     );
@@ -1539,15 +1528,15 @@ export function PullRequestDetailPanel({
     lastSelectedMergeMethod,
   );
   const selectedMergeMethodLabel = PULL_REQUEST_MERGE_METHOD_LABELS[selectedMergeMethod];
-  const pendingAutoMergeLabel = `Auto-merge (${selectedMergeMethodLabel.toLowerCase()})`;
+  const pendingAutoMergeLabel = `自动合并（${selectedMergeMethodLabel}）`;
   const conflicting = detail?.state === "open" && detail.mergeability === "conflicting";
   // Only an outright yes arms it. A host that reports nothing has not said the merge is already
   // spoken for, and an off switch for something that may not be on says the wrong thing twice.
   const autoMergeArmed = detail?.state === "open" && detail.autoMergeEnabled === true;
   const armedMergeMethod = detail?.autoMergeMethod;
   const armedAutoMergeLabel = armedMergeMethod
-    ? `Auto-merge (${PULL_REQUEST_MERGE_METHOD_LABELS[armedMergeMethod].toLowerCase()})`
-    : "Auto-merge";
+    ? `自动合并（${PULL_REQUEST_MERGE_METHOD_LABELS[armedMergeMethod]}）`
+    : "自动合并";
   const workflowApprovalsRequired =
     detail?.state === "open" ? (detail.workflowApprovalsRequired ?? 0) : 0;
   // Out of date with the base, and still cleanly mergeable — the one pairing an update button
@@ -1643,7 +1632,7 @@ export function PullRequestDetailPanel({
     workflowApprovalsRequired > 0 && !checksStale && can("approve-workflows");
   const checksSummary = checksStale
     ? checksState === null
-      ? "No checks reported"
+      ? "未报告任何检查"
       : pullRequestChecksStatePresentation(checksState).label
     : detail
       ? summarizePullRequestChecks(detail.checks)
@@ -1674,11 +1663,11 @@ export function PullRequestDetailPanel({
                   <Button
                     size="xs"
                     variant="outline"
-                    aria-label={handoff?.startsWith("checkout") ? "Checking out..." : "Check out"}
+                    aria-label={handoff?.startsWith("checkout") ? "正在检出…" : "检出"}
                   >
                     <GitBranchIcon aria-hidden className="size-3.5" />
                     <span className="@max-[35rem]/pr-header:hidden">
-                      {handoff?.startsWith("checkout") ? "Checking out..." : "Check out"}
+                      {handoff?.startsWith("checkout") ? "正在检出…" : "检出"}
                     </span>
                     <ChevronDownIcon aria-hidden className="size-3.5 text-muted-foreground" />
                   </Button>
@@ -1686,24 +1675,24 @@ export function PullRequestDetailPanel({
               />
             }
           />
-          <TooltipPopup>Check out this pull request</TooltipPopup>
+          <TooltipPopup>检出此拉取请求</TooltipPopup>
         </Tooltip>
         <MenuPopup align="end" side="bottom">
           <MenuItem disabled={!canPrepareWorktree} onClick={() => startCheckout("worktree")}>
             <GitBranchIcon className="mt-1 size-3.5 shrink-0 self-start" />
             <span className="flex min-w-0 flex-col">
-              <span>In a separate worktree</span>
+              <span>在独立 Worktree 中</span>
               <span className="text-xs text-muted-foreground">
-                Its own folder and thread. Nothing you have open moves.
+                拥有独立的文件夹和会话。你已打开的内容不会移动。
               </span>
             </span>
           </MenuItem>
           <MenuItem disabled={!prepareThread.isAllowed} onClick={() => startCheckout("local")}>
             <FolderGit2Icon className="mt-1 size-3.5 shrink-0 self-start" />
             <span className="flex min-w-0 flex-col">
-              <span>In this repository</span>
+              <span>在此仓库中</span>
               <span className="text-xs text-muted-foreground">
-                Switches the branch you are working in, like `gh pr checkout`.
+                切换你正在工作的分支，类似于 `gh pr checkout`。
               </span>
             </span>
           </MenuItem>
@@ -1729,19 +1718,17 @@ export function PullRequestDetailPanel({
               variant="destructive-outline"
               disabled={handoff !== null || (attachTarget === null && checkoutRoot === null)}
               onClick={startResolveConflicts}
-              aria-label={handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
+              aria-label={handoff === "conflicts" ? "准备中…" : "解决冲突"}
             >
               <PullRequestGlyph.conflicting aria-hidden className="size-3.5" />
               <span className="@max-[30rem]/pr-header:hidden">
-                {handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
+                {handoff === "conflicts" ? "准备中…" : "解决冲突"}
               </span>
             </Button>
           </span>
         }
       />
-      <TooltipPopup side="top">
-        {handoff === "conflicts" ? "Preparing..." : "Resolve conflicts"}
-      </TooltipPopup>
+      <TooltipPopup side="top">{handoff === "conflicts" ? "准备中…" : "解决冲突"}</TooltipPopup>
     </Tooltip>
   );
 
@@ -1815,13 +1802,13 @@ export function PullRequestDetailPanel({
                           variant="ghost-muted"
                           onClick={onBack}
                           className="-ml-1.5"
-                          aria-label="Back to this thread's pull requests"
+                          aria-label="返回此会话的拉取请求"
                         >
                           <ArrowLeftIcon aria-hidden className="size-3.5" />
                         </Button>
                       }
                     />
-                    <TooltipPopup side="top">Back to pull requests</TooltipPopup>
+                    <TooltipPopup side="top">返回拉取请求</TooltipPopup>
                   </Tooltip>
                 ) : null}
                 <Tooltip>
@@ -1843,7 +1830,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {repositoryUrl ? `Open ${detail.repository} repository` : detail.repository}
+                    {repositoryUrl ? `打开 ${detail.repository} 仓库` : detail.repository}
                   </TooltipPopup>
                 </Tooltip>
                 <Tooltip>
@@ -1857,7 +1844,7 @@ export function PullRequestDetailPanel({
                           "inline-flex shrink-0 cursor-pointer items-center gap-0.5 font-medium underline-offset-2 hover:underline",
                           statePresentation.toneClassName,
                         )}
-                        aria-label={`Open pull request #${detail.number} on host`}
+                        aria-label={`在托管平台上打开拉取请求 #${detail.number}`}
                       >
                         #{detail.number}
                         <ExternalLinkIcon aria-hidden className="size-2.5" />
@@ -1891,13 +1878,13 @@ export function PullRequestDetailPanel({
                           tabIndex={condensed ? 0 : -1}
                           onClick={onBack}
                           className="-ml-1.5"
-                          aria-label="Back to this thread's pull requests"
+                          aria-label="返回此会话的拉取请求"
                         >
                           <ArrowLeftIcon aria-hidden className="size-3.5" />
                         </Button>
                       }
                     />
-                    <TooltipPopup side="top">Back to pull requests</TooltipPopup>
+                    <TooltipPopup side="top">返回拉取请求</TooltipPopup>
                   </Tooltip>
                 ) : null}
                 <Tooltip>
@@ -1912,7 +1899,7 @@ export function PullRequestDetailPanel({
                           "inline-flex shrink-0 cursor-pointer items-center gap-0.5 font-medium underline-offset-2 hover:underline",
                           statePresentation.toneClassName,
                         )}
-                        aria-label={`Open pull request #${detail.number} on host`}
+                        aria-label={`在托管平台上打开拉取请求 #${detail.number}`}
                       >
                         #{detail.number}
                         <ExternalLinkIcon aria-hidden className="size-2.5" />
@@ -1940,7 +1927,7 @@ export function PullRequestDetailPanel({
             <TooltipProvider delay={150} closeDelay={150} timeout={400}>
               {!nativeStack && supportsStackActions && nativeStackQuery.error ? (
                 <Button variant="ghost" size="xs" onClick={nativeStackQuery.refresh}>
-                  Retry stack lookup
+                  重试堆叠查询
                 </Button>
               ) : null}
               {nativeStack ? (
@@ -1997,8 +1984,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {armedAutoMergeLabel}: the host will merge this on its own once its requirements
-                    are met
+                    {armedAutoMergeLabel}：满足要求后，托管平台会自动合并
                   </TooltipPopup>
                 </Tooltip>
               ) : null}
@@ -2014,15 +2000,15 @@ export function PullRequestDetailPanel({
                           variant="default"
                           disabled={actionPending}
                           onClick={() => void perform("ready")}
-                          aria-label="Ready for review"
+                          aria-label="可供审查"
                         >
                           <PullRequestGlyph.pullRequest aria-hidden className="size-3.5" />
-                          <span className="@max-[30rem]/pr-header:hidden">Ready for review</span>
+                          <span className="@max-[30rem]/pr-header:hidden">可供审查</span>
                         </Button>
                       </span>
                     }
                   />
-                  <TooltipPopup side="top">Ready for review</TooltipPopup>
+                  <TooltipPopup side="top">可供审查</TooltipPopup>
                 </Tooltip>
               ) : primaryAction === "enable-auto-merge" ? (
                 <Tooltip>
@@ -2039,9 +2025,9 @@ export function PullRequestDetailPanel({
                           )}
                           aria-label={
                             pendingAction === "enable-auto-merge"
-                              ? "Enabling..."
+                              ? "正在启用…"
                               : inlineConfirm.isArmed("enable-auto-merge")
-                                ? "Confirm auto-merge?"
+                                ? "确认自动合并？"
                                 : pendingAutoMergeLabel
                           }
                         >
@@ -2057,9 +2043,9 @@ export function PullRequestDetailPanel({
                               </span>
                               <span className="col-start-1 row-start-1">
                                 {pendingAction === "enable-auto-merge"
-                                  ? "Enabling..."
+                                  ? "正在启用…"
                                   : inlineConfirm.isArmed("enable-auto-merge")
-                                    ? "Confirm auto-merge?"
+                                    ? "确认自动合并？"
                                     : pendingAutoMergeLabel}
                               </span>
                             </span>
@@ -2070,9 +2056,9 @@ export function PullRequestDetailPanel({
                   />
                   <TooltipPopup side="top">
                     {pendingAction === "enable-auto-merge"
-                      ? "Enabling..."
+                      ? "正在启用…"
                       : inlineConfirm.isArmed("enable-auto-merge")
-                        ? "Confirm auto-merge?"
+                        ? "确认自动合并？"
                         : pendingAutoMergeLabel}
                   </TooltipPopup>
                 </Tooltip>
@@ -2092,8 +2078,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup side="top">
-                    {armedAutoMergeLabel}: the host will merge this on its own once its requirements
-                    are met
+                    {armedAutoMergeLabel}：满足要求后，托管平台会自动合并
                   </TooltipPopup>
                 </Tooltip>
               ) : primaryAction === "merge" ? (
@@ -2111,9 +2096,9 @@ export function PullRequestDetailPanel({
                           )}
                           aria-label={
                             pendingAction === "merge"
-                              ? "Merging..."
+                              ? "正在合并…"
                               : inlineConfirm.isArmed("merge")
-                                ? "Confirm merge?"
+                                ? "确认合并？"
                                 : selectedMergeMethodLabel
                           }
                         >
@@ -2129,9 +2114,9 @@ export function PullRequestDetailPanel({
                               </span>
                               <span className="col-start-1 row-start-1">
                                 {pendingAction === "merge"
-                                  ? "Merging..."
+                                  ? "正在合并…"
                                   : inlineConfirm.isArmed("merge")
-                                    ? "Confirm merge?"
+                                    ? "确认合并？"
                                     : selectedMergeMethodLabel}
                               </span>
                             </span>
@@ -2142,9 +2127,9 @@ export function PullRequestDetailPanel({
                   />
                   <TooltipPopup side="top">
                     {pendingAction === "merge"
-                      ? "Merging..."
+                      ? "正在合并…"
                       : inlineConfirm.isArmed("merge")
-                        ? "Confirm merge?"
+                        ? "确认合并？"
                         : selectedMergeMethodLabel}
                   </TooltipPopup>
                 </Tooltip>
@@ -2167,9 +2152,7 @@ export function PullRequestDetailPanel({
                       <MenuTrigger
                         render={
                           <Button
-                            aria-label={
-                              refreshing ? "Refreshing pull request" : "More pull request actions"
-                            }
+                            aria-label={refreshing ? "正在刷新拉取请求" : "更多拉取请求操作"}
                             size="icon-xs"
                             variant="ghost-muted"
                           />
@@ -2187,7 +2170,7 @@ export function PullRequestDetailPanel({
                     }
                   />
                   <TooltipPopup>
-                    {refreshing ? "Refreshing pull request" : "More pull request actions"}
+                    {refreshing ? "正在刷新拉取请求" : "更多拉取请求操作"}
                   </TooltipPopup>
                 </Tooltip>
                 <MenuPopup align="end" side="bottom">
@@ -2204,25 +2187,25 @@ export function PullRequestDetailPanel({
                   />
                   <MenuItem disabled={refreshing} onClick={() => void refreshFromHost()}>
                     <RefreshIcon size="sm" refreshing={refreshing} />
-                    Refresh
+                    刷新
                   </MenuItem>
                   <MenuItem disabled={handoff !== null} onClick={askAboutPullRequest}>
                     <MessageCircleQuestionIcon className="mt-1 size-3.5 shrink-0 self-start" />
                     <span className="flex min-w-0 flex-col">
-                      <span>{handoff === "ask" ? "Opening..." : "Ask a question"}</span>
+                      <span>{handoff === "ask" ? "正在打开…" : "提问"}</span>
                       <span className="text-xs text-muted-foreground">
                         {attachTarget !== null
-                          ? "Adds the pull request to this thread's composer."
-                          : "Opens a thread that knows which pull request you mean."}
+                          ? "将拉取请求添加到此会话的撰写框。"
+                          : "打开一个知道你所指拉取请求的会话。"}
                       </span>
                     </span>
                   </MenuItem>
                   <MenuItem disabled={handoff !== null} onClick={explainPullRequest}>
                     <BookOpenIcon className="mt-1 size-3.5 shrink-0 self-start" />
                     <span className="flex min-w-0 flex-col">
-                      <span>{handoff === "explain" ? "Opening..." : "Explain this PR"}</span>
+                      <span>{handoff === "explain" ? "正在打开…" : "解读此 PR"}</span>
                       <span className="text-xs text-muted-foreground">
-                        A walk through the diff and what to read closely.
+                        带你浏览 Diff 并指出需要细看之处。
                       </span>
                     </span>
                   </MenuItem>
@@ -2231,16 +2214,16 @@ export function PullRequestDetailPanel({
                     onClick={startFixFindings}
                   >
                     <HammerIcon className="size-3.5" />
-                    {handoff === "findings" ? "Preparing..." : handoffLabels.fixFindings}
+                    {handoff === "findings" ? "准备中…" : handoffLabels.fixFindings}
                   </MenuItem>
                   {reviewGuidesEnabled && guideWriter.canWrite ? (
                     <MenuItem disabled={guideWriter.running} onClick={writeGuide}>
                       <SparklesIcon className="size-3.5" />
                       {guideWriter.running
-                        ? "Writing guide..."
+                        ? "正在编写指南…"
                         : guideWriter.data?.guide == null
-                          ? "Write guide"
-                          : "Rewrite guide"}
+                          ? "编写指南"
+                          : "重写指南"}
                     </MenuItem>
                   ) : null}
                   {pickableEnvironments.length > 0 ? (
@@ -2267,15 +2250,13 @@ export function PullRequestDetailPanel({
                           ) : (
                             <PullRequestGlyph.draft className="size-3.5" />
                           )}
-                          {detail.isDraft ? "Ready for review" : "Convert to draft"}
+                          {detail.isDraft ? "可供审查" : "转换为草稿"}
                         </MenuItem>
                       ) : null}
                       {showsMergeNow ? (
                         <MenuItem
                           closeOnClick={inlineConfirm.isArmed("merge")}
-                          aria-label={
-                            inlineConfirm.isArmed("merge") ? "Confirm merge?" : "Merge now"
-                          }
+                          aria-label={inlineConfirm.isArmed("merge") ? "确认合并？" : "立即合并"}
                           disabled={actionPending}
                           {...inlineConfirm.props(
                             "merge",
@@ -2283,7 +2264,7 @@ export function PullRequestDetailPanel({
                           )}
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
-                          {inlineConfirm.isArmed("merge") ? "Confirm merge?" : "Merge now"}
+                          {inlineConfirm.isArmed("merge") ? "确认合并？" : "立即合并"}
                         </MenuItem>
                       ) : null}
                       {/* The same merge, left with the host to carry out once its requirements
@@ -2295,15 +2276,15 @@ export function PullRequestDetailPanel({
                           onClick={() => void perform("disable-auto-merge")}
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
-                          Disable auto-merge
+                          关闭自动合并
                         </MenuItem>
                       ) : showsAutoMerge ? (
                         <MenuItem
                           closeOnClick={inlineConfirm.isArmed("enable-auto-merge")}
                           aria-label={
                             inlineConfirm.isArmed("enable-auto-merge")
-                              ? "Confirm auto-merge?"
-                              : "Enable auto-merge"
+                              ? "确认自动合并？"
+                              : "开启自动合并"
                           }
                           disabled={actionPending}
                           {...inlineConfirm.props(
@@ -2313,8 +2294,8 @@ export function PullRequestDetailPanel({
                         >
                           <PullRequestGlyph.merged className="size-3.5" />
                           {inlineConfirm.isArmed("enable-auto-merge")
-                            ? "Confirm auto-merge?"
-                            : "Enable auto-merge"}
+                            ? "确认自动合并？"
+                            : "开启自动合并"}
                         </MenuItem>
                       ) : null}
                       {/* A preference for the merge action rather than a second action, so it
@@ -2369,16 +2350,16 @@ export function PullRequestDetailPanel({
                     <ArrowUpRightIcon className="size-3.5" />
                     {openOnHostLabel(hostClient)}
                   </MenuItem>
-                  <MenuItem onClick={() => copyReference(detail.url, "PR link")}>
+                  <MenuItem onClick={() => copyReference(detail.url, "PR 链接")}>
                     <LinkIcon className="size-3.5" />
-                    Copy link
+                    复制链接
                     <MenuShortcut>
                       {shortcutLabelForCommand(keybindings, "thread.copyReference")}
                     </MenuShortcut>
                   </MenuItem>
-                  <MenuItem onClick={() => copyReference(`#${reference.number}`, "PR number")}>
+                  <MenuItem onClick={() => copyReference(`#${reference.number}`, "PR 编号")}>
                     <CopyIcon className="size-3.5" />
-                    Copy PR number
+                    复制 PR 编号
                     <MenuShortcut>
                       {shortcutLabelForCommand(keybindings, "pullRequest.copyNumber")}
                     </MenuShortcut>
@@ -2388,15 +2369,13 @@ export function PullRequestDetailPanel({
                       <MenuSeparator />
                       <MenuItem
                         closeOnClick={inlineConfirm.isArmed("close")}
-                        aria-label={
-                          inlineConfirm.isArmed("close") ? "Confirm close?" : "Close pull request"
-                        }
+                        aria-label={inlineConfirm.isArmed("close") ? "确认关闭？" : "关闭拉取请求"}
                         variant="destructive"
                         disabled={actionPending}
                         {...inlineConfirm.props("close", () => void perform("close"))}
                       >
                         <PullRequestGlyph.closed className="size-3.5" />
-                        {inlineConfirm.isArmed("close") ? "Confirm close?" : "Close pull request"}
+                        {inlineConfirm.isArmed("close") ? "确认关闭？" : "关闭拉取请求"}
                       </MenuItem>
                     </>
                   ) : detail.state === "closed" && can("reopen") ? (
@@ -2404,7 +2383,7 @@ export function PullRequestDetailPanel({
                       <MenuSeparator />
                       <MenuItem disabled={actionPending} onClick={() => void perform("reopen")}>
                         <PullRequestGlyph.reopen className="size-3.5" />
-                        Reopen pull request
+                        重新打开拉取请求
                       </MenuItem>
                     </>
                   ) : detail.state === "merged" && can("revert") ? (
@@ -2412,15 +2391,13 @@ export function PullRequestDetailPanel({
                       <MenuSeparator />
                       <MenuItem
                         closeOnClick={inlineConfirm.isArmed("revert")}
-                        aria-label={
-                          inlineConfirm.isArmed("revert") ? "Confirm revert?" : "Revert changes"
-                        }
+                        aria-label={inlineConfirm.isArmed("revert") ? "确认还原？" : "还原更改"}
                         variant={inlineConfirm.isArmed("revert") ? "destructive" : "default"}
                         disabled={actionPending}
                         {...inlineConfirm.props("revert", () => void perform("revert"))}
                       >
                         <RotateCcwIcon className="size-3.5" />
-                        {inlineConfirm.isArmed("revert") ? "Confirm revert?" : "Revert changes"}
+                        {inlineConfirm.isArmed("revert") ? "确认还原？" : "还原更改"}
                       </MenuItem>
                     </>
                   ) : null}
@@ -2429,12 +2406,7 @@ export function PullRequestDetailPanel({
             </TooltipProvider>
           ) : null}
           {onClose ? (
-            <Button
-              size="icon-xs"
-              variant="ghost"
-              aria-label="Collapse pull request panel"
-              onClick={onClose}
-            >
+            <Button size="icon-xs" variant="ghost" aria-label="收起拉取请求面板" onClick={onClose}>
               <PanelRightIcon className="size-3.5" />
             </Button>
           ) : null}
@@ -2486,7 +2458,7 @@ export function PullRequestDetailPanel({
                       >
                         {isStackedPullRequest ? (
                           <PullRequestGlyph.stack
-                            aria-label="Stacked pull request"
+                            aria-label="堆叠拉取请求"
                             className="size-3 shrink-0"
                           />
                         ) : null}
@@ -2501,7 +2473,7 @@ export function PullRequestDetailPanel({
                             <span className="inline-flex min-w-0 max-w-[40%] shrink-0 items-center gap-1">
                               {isStackedPullRequest ? (
                                 <PullRequestGlyph.stack
-                                  aria-label="Stacked pull request"
+                                  aria-label="堆叠拉取请求"
                                   className="size-3 shrink-0"
                                 />
                               ) : null}
@@ -2512,14 +2484,12 @@ export function PullRequestDetailPanel({
                           }
                         />
                         <TooltipPopup side="top">
-                          {isStackedPullRequest
-                            ? `Stacked on ${detail.baseBranch}`
-                            : detail.baseBranch}
+                          {isStackedPullRequest ? `堆叠于 ${detail.baseBranch}` : detail.baseBranch}
                         </TooltipPopup>
                       </Tooltip>
                     )}
                     <ArrowLeftIcon
-                      aria-label="receives changes from"
+                      aria-label="接收来自右侧分支的更改"
                       className="size-3 shrink-0 opacity-60"
                     />
                     <Tooltip>
@@ -2536,9 +2506,7 @@ export function PullRequestDetailPanel({
                   <span className="ml-auto inline-flex shrink-0 items-center justify-end gap-2 text-2xs">
                     <span
                       className="inline-flex items-center gap-1 tabular-nums"
-                      aria-label={`${detail.changedFiles.toLocaleString()} changed ${
-                        detail.changedFiles === 1 ? "file" : "files"
-                      }`}
+                      aria-label={`${detail.changedFiles.toLocaleString()} 个已更改文件`}
                     >
                       <FileDiffIcon aria-hidden className="size-3" />
                       {detail.changedFiles.toLocaleString()}
@@ -2592,7 +2560,7 @@ export function PullRequestDetailPanel({
                       </Tooltip>
                       {canEditPullRequestChangeRequest(detail) ? (
                         <PullRequestEditButton
-                          aria-label="Edit title"
+                          aria-label="编辑标题"
                           onClick={() => setTitleScope({ pullRequestKey, text: detail.title })}
                         />
                       ) : null}
@@ -2606,7 +2574,7 @@ export function PullRequestDetailPanel({
                         size="sm"
                         disabled={titleSaving}
                         value={titleDraft}
-                        aria-label="Pull request title"
+                        aria-label="拉取请求标题"
                         onChange={(event) =>
                           setTitleScope({ pullRequestKey, text: event.target.value })
                         }
@@ -2627,7 +2595,7 @@ export function PullRequestDetailPanel({
                           disabled={titleSaving}
                           onClick={() => setTitleScope(null)}
                         >
-                          Cancel
+                          取消
                         </Button>
                         <Button
                           size="xs"
@@ -2637,7 +2605,7 @@ export function PullRequestDetailPanel({
                           }
                           onClick={() => void saveTitle(titleDraft)}
                         >
-                          {titleSaving ? "Saving..." : "Save"}
+                          {titleSaving ? "正在保存…" : "保存"}
                         </Button>
                       </div>
                     </div>
@@ -2646,15 +2614,15 @@ export function PullRequestDetailPanel({
                 author={
                   <PullRequestActorLabel actor={detail.author} profileUrl={authorProfileUrl} />
                 }
-                updated={<span>updated {formatRelativeTimeLabel(detail.updatedAt)}</span>}
+                updated={<span>更新于 {formatRelativeTimeLabel(detail.updatedAt)}</span>}
                 checkout={
                   checkoutCommand ? (
                     <PullRequestCopyableCode
                       key={checkoutCommand}
                       value={checkoutCommand}
                       target="pull request checkout command"
-                      copyLabel="Copy checkout command"
-                      copiedLabel="Checkout command copied"
+                      copyLabel="复制检出命令"
+                      copiedLabel="已复制检出命令"
                       className="ml-auto font-mono"
                       tooltipSide="bottom"
                       onError={onCheckoutCommandError}
@@ -2675,7 +2643,7 @@ export function PullRequestDetailPanel({
                     >
                       {isStackedPullRequest ? (
                         <PullRequestGlyph.stack
-                          aria-label="Stacked pull request"
+                          aria-label="堆叠拉取请求"
                           className="size-3 shrink-0"
                         />
                       ) : null}
@@ -2690,7 +2658,7 @@ export function PullRequestDetailPanel({
                           <span className="inline-flex min-w-0 max-w-[40%] shrink-0 items-center gap-1">
                             {isStackedPullRequest ? (
                               <PullRequestGlyph.stack
-                                aria-label="Stacked pull request"
+                                aria-label="堆叠拉取请求"
                                 className="size-3 shrink-0"
                               />
                             ) : null}
@@ -2701,9 +2669,7 @@ export function PullRequestDetailPanel({
                         }
                       />
                       <TooltipPopup side="top">
-                        {isStackedPullRequest
-                          ? `Stacked on ${detail.baseBranch}`
-                          : detail.baseBranch}
+                        {isStackedPullRequest ? `堆叠于 ${detail.baseBranch}` : detail.baseBranch}
                       </TooltipPopup>
                     </Tooltip>
                   )
@@ -2713,11 +2679,11 @@ export function PullRequestDetailPanel({
                     key={detail.headBranch}
                     value={detail.headBranch}
                     target="branch name"
-                    copyLabel="Copy pull request branch"
-                    copiedLabel="Branch name copied"
+                    copyLabel="复制拉取请求分支"
+                    copiedLabel="已复制分支名"
                   />
                 }
-                files={`${detail.changedFiles.toLocaleString()} ${detail.changedFiles === 1 ? "file" : "files"}`}
+                files={`${detail.changedFiles.toLocaleString()} 个文件`}
                 diffStat={
                   <PullRequestDiffStat
                     additions={detail.additions}
@@ -2755,26 +2721,26 @@ export function PullRequestDetailPanel({
                           )}
                           aria-label={
                             pendingAction === "approve-workflows"
-                              ? "Approving..."
+                              ? "正在批准…"
                               : inlineConfirm.isArmed("approve-workflows")
-                                ? "Confirm approve?"
-                                : "Approve workflows to run"
+                                ? "确认批准？"
+                                : "批准运行工作流"
                           }
                         >
                           <PlayIcon aria-hidden className="size-3.5" />
                           <span className="inline-grid">
                             <span aria-hidden className="invisible col-start-1 row-start-1">
-                              Approve workflows to run
+                              批准运行工作流
                             </span>
                             <span aria-hidden className="invisible col-start-1 row-start-1">
-                              Confirm approve?
+                              确认批准？
                             </span>
                             <span className="col-start-1 row-start-1">
                               {pendingAction === "approve-workflows"
-                                ? "Approving..."
+                                ? "正在批准…"
                                 : inlineConfirm.isArmed("approve-workflows")
-                                  ? "Confirm approve?"
-                                  : "Approve workflows to run"}
+                                  ? "确认批准？"
+                                  : "批准运行工作流"}
                             </span>
                           </span>
                         </Button>
@@ -2783,16 +2749,16 @@ export function PullRequestDetailPanel({
                   />
                   <TooltipPopup side="top">
                     {pendingAction === "approve-workflows"
-                      ? "Approving..."
+                      ? "正在批准…"
                       : inlineConfirm.isArmed("approve-workflows")
-                        ? "Confirm approve?"
-                        : "Approve workflows to run"}
+                        ? "确认批准？"
+                        : "批准运行工作流"}
                   </TooltipPopup>
                 </Tooltip>
               ) : (
                 <PullRequestChecksStatusLine
                   className="text-muted-foreground"
-                  aria-label={checksSummary ? `Checks: ${checksSummary}` : "Checks"}
+                  aria-label={checksSummary ? `检查：${checksSummary}` : "检查"}
                   icon={
                     checksState !== null ? (
                       <PullRequestChecksPopover
@@ -2820,10 +2786,8 @@ export function PullRequestDetailPanel({
                     className="inline-flex items-center gap-1"
                     aria-label={
                       activityError
-                        ? "Comments unavailable"
-                        : `${detail.commentCount.toLocaleString()} ${
-                            detail.commentCount === 1 ? "comment" : "comments"
-                          }`
+                        ? "评论不可用"
+                        : `${detail.commentCount.toLocaleString()} 条评论`
                     }
                   >
                     <MessageSquareIcon aria-hidden className="size-3" />
@@ -2837,10 +2801,8 @@ export function PullRequestDetailPanel({
                     className="inline-flex items-center gap-1"
                     aria-label={
                       activityError
-                        ? "Commits unavailable"
-                        : `${detail.commits.length.toLocaleString()} ${
-                            detail.commits.length === 1 ? "commit" : "commits"
-                          }`
+                        ? "提交不可用"
+                        : `${detail.commits.length.toLocaleString()} 个提交`
                     }
                   >
                     <GitCommitHorizontalIcon aria-hidden className="size-3" />
@@ -2859,9 +2821,7 @@ export function PullRequestDetailPanel({
                     >
                       <PullRequestReviewOutcomeIcon outcome="approved" className="size-3" />
                       {approvalCount.toLocaleString()}
-                      <span className="sr-only">
-                        {approvalCount === 1 ? "approval" : "approvals"}
-                      </span>
+                      <span className="sr-only">项批准</span>
                     </span>
                   ) : null}
                 </PullRequestMetaLine>
@@ -2869,16 +2829,14 @@ export function PullRequestDetailPanel({
                   size="xs"
                   variant="ghost-muted"
                   aria-label={
-                    timelineOrder === "newest"
-                      ? "Show oldest activity first"
-                      : "Show newest activity first"
+                    timelineOrder === "newest" ? "按最早活动优先显示" : "按最新活动优先显示"
                   }
                   onClick={() =>
                     setTimelineOrder((value) => (value === "newest" ? "oldest" : "newest"))
                   }
                 >
                   <ArrowDownUpIcon aria-hidden className="size-3" />
-                  {timelineOrder === "newest" ? "Newest first" : "Oldest first"}
+                  {timelineOrder === "newest" ? "最新优先" : "最早优先"}
                 </Button>
               </div>
             ) : null}
@@ -2917,9 +2875,8 @@ export function PullRequestDetailPanel({
           <PullRequestsUnavailableState
             {...(isPullRequestNotFound(detailQuery.failure)
               ? {
-                  title: `Pull request #${reference.number} not found`,
-                  error:
-                    "It may be an issue rather than a pull request, or this account can't see it.",
+                  title: `未找到拉取请求 #${reference.number}`,
+                  error: "它可能是 issue 而非拉取请求，或者此账号无权查看。",
                 }
               : { error: detailQuery.error })}
             refreshing={detailQuery.isPending}
@@ -3000,7 +2957,7 @@ export function PullRequestDetailPanel({
             ) : null}
             {mountedTabs.has("code") ? (
               <div className={cn("absolute inset-0", tab !== "code" && "invisible")}>
-                <Suspense fallback={<DiffPanelLoadingState label="Loading pull request diff..." />}>
+                <Suspense fallback={<DiffPanelLoadingState label="正在加载拉取请求 Diff…" />}>
                   <PullRequestCodeTab
                     scrollerRef={scrollerRefs.code}
                     onAddToAgentSelection={addSelectionToAgent}

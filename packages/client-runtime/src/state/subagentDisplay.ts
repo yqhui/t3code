@@ -16,7 +16,7 @@ export function subagentGroupSummary(
     ({ status }) => status === "pending" || status === "running" || status === "waiting",
   );
   return {
-    label: `${active ? "Kicked off" : "Ran"} ${members.length} ${members.length === 1 ? "subagent" : "subagents"}`,
+    label: `${active ? "已启动" : "已运行"} ${members.length} 个子 Agent`,
     active,
     failed: members.some(({ status }) => status === "failed"),
   };
@@ -39,7 +39,10 @@ export function summarizeSubagentStatuses(
   }
   return (Object.keys(counts) as Array<keyof typeof counts>)
     .filter((key) => counts[key] > 0)
-    .map((key) => `${counts[key]} ${key}`)
+    .map(
+      (key) =>
+        `${counts[key]} ${{ working: "运行中", done: "已完成", failed: "已失败", stopped: "已停止", idle: "空闲" }[key]}`,
+    )
     .join(" · ");
 }
 
@@ -80,7 +83,7 @@ export function resolveSubagentMetadata(input: {
     ? catalogModel.shortName || catalogModel.name
     : model
       ? formatModelSlugName(model)
-      : "Not reported";
+      : "未报告";
   const qualifier = catalogModel?.subProvider?.trim();
   const modelLabel = qualifier
     ? reportedLabel

@@ -420,7 +420,7 @@ export class RelayAuthInvalidError extends Schema.TaggedError<RelayAuthInvalidEr
   { httpApiStatus: 401 },
 ) {
   override get message(): string {
-    return `Relay authentication failed: ${this.reason}`;
+    return `中继认证失败：${this.reason}`;
   }
 }
 
@@ -433,7 +433,7 @@ export class RelayEnvironmentLinkProofExpiredError extends Schema.TaggedError<Re
   { httpApiStatus: 401 },
 ) {
   override get message(): string {
-    return "Relay environment link proof expired";
+    return "中继环境链接证明已过期";
   }
 }
 
@@ -447,7 +447,7 @@ export class RelayEnvironmentLinkProofInvalidError extends Schema.TaggedError<Re
   { httpApiStatus: 400 },
 ) {
   override get message(): string {
-    return `Relay environment link proof is invalid: ${this.reason}`;
+    return `中继环境链接证明无效：${this.reason}`;
   }
 }
 
@@ -476,9 +476,7 @@ export class RelayEnvironmentConnectNotAuthorizedError extends Schema.TaggedErro
   { httpApiStatus: 403 },
 ) {
   override get message(): string {
-    return this.reason
-      ? `Relay environment connection is not authorized: ${this.reason}`
-      : "Relay environment connection is not authorized";
+    return this.reason ? `中继环境连接未获授权：${this.reason}` : "中继环境连接未获授权";
   }
 }
 
@@ -492,7 +490,7 @@ export class RelayEnvironmentEndpointUnavailableError extends Schema.TaggedError
   { httpApiStatus: 502 },
 ) {
   override get message(): string {
-    return `Relay environment endpoint is unavailable: ${this.reason}`;
+    return `中继环境端点不可用：${this.reason}`;
   }
 }
 
@@ -505,7 +503,7 @@ export class RelayEnvironmentEndpointTimedOutError extends Schema.TaggedError<Re
   { httpApiStatus: 504 },
 ) {
   override get message(): string {
-    return "Relay environment endpoint request timed out";
+    return "中继环境端点请求超时";
   }
 }
 
@@ -519,7 +517,7 @@ export class RelayEnvironmentLinkFailedError extends Schema.TaggedError<RelayEnv
   { httpApiStatus: 500 },
 ) {
   override get message(): string {
-    return `Relay environment link failed: ${this.reason}`;
+    return `中继环境链接失败：${this.reason}`;
   }
 }
 
@@ -533,7 +531,7 @@ export class RelayEnvironmentLinkUnavailableError extends Schema.TaggedError<Rel
   { httpApiStatus: 503 },
 ) {
   override get message(): string {
-    return `Relay environment link is unavailable: ${this.reason}`;
+    return `中继环境链接不可用：${this.reason}`;
   }
 }
 
@@ -547,7 +545,7 @@ export class RelayEnvironmentLinkLimitExceededError extends Schema.TaggedError<R
   { httpApiStatus: 403 },
 ) {
   override get message(): string {
-    return `Relay managed tunnel limit reached: this account allows at most ${this.maxTunnels} tunnels`;
+    return `已达中继托管隧道上限：此账户最多允许 ${this.maxTunnels} 个隧道`;
   }
 }
 
@@ -560,7 +558,7 @@ export class RelayAgentActivityPublishProofExpiredError extends Schema.TaggedErr
   { httpApiStatus: 401 },
 ) {
   override get message(): string {
-    return "Relay agent activity publish proof expired";
+    return "中继 Agent 活动发布证明已过期";
   }
 }
 
@@ -574,7 +572,7 @@ export class RelayAgentActivityPublishProofInvalidError extends Schema.TaggedErr
   { httpApiStatus: 401 },
 ) {
   override get message(): string {
-    return `Relay agent activity publish proof is invalid: ${this.reason}`;
+    return `中继 Agent 活动发布证明无效：${this.reason}`;
   }
 }
 
@@ -588,7 +586,7 @@ export class RelayInternalError extends Schema.TaggedError<RelayInternalError>()
   { httpApiStatus: 500 },
 ) {
   override get message(): string {
-    return `Relay internal error: ${this.reason}`;
+    return `中继内部错误：${this.reason}`;
   }
 }
 

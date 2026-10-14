@@ -48,15 +48,13 @@ export async function installGnomeCaptureBundle({ bundle, dataHome }: SetupPaths
     return undefined;
   });
   if (existing && (!existing.isDirectory() || existing.isSymbolicLink()))
-    throw new Error(
-      "The extension installation is not a regular directory. Manage it in GNOME Extensions instead.",
-    );
+    throw new Error("已安装的扩展不是常规目录。请改用“GNOME 扩展”应用管理。");
   if (existing) {
     const installed = decodeMetadata(
       await NodeFSP.readFile(NodePath.join(target, "metadata.json"), "utf8"),
     );
     if (installed.version > metadata.version)
-      throw new Error("A newer extension is installed. Update T3 Code instead of replacing it.");
+      throw new Error("已安装更新的扩展。请更新 T3 Code，而不是替换它。");
   }
   const staged = await NodeFSP.mkdtemp(NodePath.join(parent, ".t3-capture-install-"));
   let backup: string | undefined;
@@ -117,17 +115,12 @@ export class GnomeCaptureSetup {
         this.disconnected,
         new Promise<never>((_, reject) => {
           timer = setTimeout(
-            () =>
-              reject(
-                new Error(
-                  "GNOME did not respond. Sign in to a GNOME Wayland session and try again.",
-                ),
-              ),
+            () => reject(new Error("GNOME 未响应。请登录 GNOME Wayland 会话后重试。")),
             5_000,
           );
         }),
       ]);
-      if (!reply) throw new Error("GNOME returned no setup information.");
+      if (!reply) throw new Error("GNOME 未返回设置信息。");
       return reply.body[0] as unknown;
     } finally {
       clearTimeout(timer);
@@ -172,53 +165,51 @@ export class GnomeCaptureSetup {
       if (!bundled["shell-version"].includes(major))
         return {
           status: "unsupported",
-          message: `The bundled extension supports GNOME ${bundled["shell-version"].join(", ")}. This session runs GNOME ${major}.`,
+          message: `随应用附带的扩展支持 GNOME ${bundled["shell-version"].join("、")}，而当前会话运行的是 GNOME ${major}。`,
         };
       if (!info.state && !installed)
         return {
           status: "not-installed",
           message:
-            "Install the bundled extension to capture the active window without a picker. No download or administrator password is needed.",
+            "安装随应用附带的扩展后，无需选择器即可截取活动窗口。不需要下载，也不需要管理员密码。",
         };
       if (installed && (!info.state || (info.version && installed.version > info.version.value)))
         return {
           status: "restart-required",
           message:
-            "Installed. Save your work, sign out of GNOME and sign back in, then return here to enable the extension. Restarting T3 Code alone is not enough.",
+            "已安装。请保存你的工作，注销 GNOME 并重新登录，然后回到这里启用扩展。仅重启 T3 Code 是不够的。",
         };
       if ((installed?.version ?? info.version?.value ?? 0) < bundled.version)
         return {
           status: "update-required",
-          message:
-            "A newer extension is bundled with this app. Install it, then sign out and back in to load the update.",
+          message: "此应用附带更新的扩展。请安装它，然后注销并重新登录以加载更新。",
         };
       if (!properties.UserExtensionsEnabled.value)
         return {
           status: "extensions-disabled",
           message:
-            "GNOME has disabled user extensions. Turn on Extensions in the GNOME Extensions app, then check again. T3 Code will not enable your other extensions for you.",
+            "GNOME 已禁用用户扩展。请在“GNOME 扩展”应用中开启扩展，然后重新检查。T3 Code 不会替你启用其他扩展。",
         };
       if (info.state?.value === 1)
         return {
           status: "enabled",
-          message: "The T3 Code extension is running. Active-window snapshots are available.",
+          message: "T3 Code 扩展正在运行。可以使用活动窗口快照。",
         };
       if (info.state?.value === 3 || info.state?.value === 4)
         return {
           status: "error",
           message:
             info.error?.value ||
-            "GNOME could not load the extension. Check GNOME Extensions for details, or sign out and back in.",
+            "GNOME 无法加载该扩展。详情请查看“GNOME 扩展”应用，或注销并重新登录。",
         };
       return {
         status: "disabled",
-        message:
-          "Enable the T3 Code extension to allow active-window snapshots. You can disable it here at any time.",
+        message: "启用 T3 Code 扩展以使用活动窗口快照。你可以随时在此禁用它。",
       };
     } catch (error) {
       return {
         status: "error",
-        message: error instanceof Error ? error.message : "Could not check GNOME extension setup.",
+        message: error instanceof Error ? error.message : "无法检查 GNOME 扩展安装状态。",
       };
     }
   }
@@ -240,7 +231,6 @@ export class GnomeCaptureSetup {
       signature: "s",
       body: [GNOME_CAPTURE_UUID],
     });
-    if (result !== true)
-      throw new Error("GNOME has not loaded the extension. Sign out and back in, then try again.");
+    if (result !== true) throw new Error("GNOME 尚未加载该扩展。请注销并重新登录后重试。");
   }
 }

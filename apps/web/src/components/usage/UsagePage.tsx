@@ -383,9 +383,9 @@ export function UsagePage() {
       : `${formatDayShort(shownWindow.sinceDay)} to ${formatDayShort(shownWindow.untilDay)}`;
   const topbarContent = (
     <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2 xl:flex">
-      <WorkspaceBreadcrumb ariaLabel="Usage breadcrumb" className="min-w-0">
+      <WorkspaceBreadcrumb ariaLabel="用量导航" className="min-w-0">
         <WorkspaceBreadcrumbItem>
-          <h1>Usage</h1>
+          <h1>用量</h1>
         </WorkspaceBreadcrumbItem>
         <WorkspaceBreadcrumbSeparator />
         <WorkspaceBreadcrumbItem className="min-w-10 shrink">
@@ -417,7 +417,7 @@ export function UsagePage() {
       ) : null}
       <div className="ms-auto hidden min-w-0 items-center justify-end gap-2 xl:flex">
         <ToggleGroup
-          aria-label="Usage metric"
+          aria-label="用量指标"
           variant="segmented"
           value={[metric]}
           onValueChange={(next) => {
@@ -434,7 +434,7 @@ export function UsagePage() {
         {/* The period does not apply to Limits, so it stays in place but
             disabled; unmounting it shifted the metric toggle ~300px. */}
         <ToggleGroup
-          aria-label="Usage period"
+          aria-label="用量时段"
           variant="segmented"
           value={[String(windowDays)]}
           disabled={showingLimits}
@@ -451,7 +451,7 @@ export function UsagePage() {
         </ToggleGroup>
         <Button
           onClick={refreshWindow}
-          aria-label={showingLimits ? "Refresh limits" : "Refresh usage"}
+          aria-label={showingLimits ? "刷新限额" : "刷新用量"}
           aria-busy={isRefreshing}
           disabled={isRefreshing || (!showingLimits && !canReadDiagnostics)}
           size="icon-sm"
@@ -468,7 +468,7 @@ export function UsagePage() {
           }}
         >
           <SelectTrigger
-            aria-label="Usage metric"
+            aria-label="用量指标"
             size="compact"
             variant="ghost"
             className="w-auto min-w-0"
@@ -491,7 +491,7 @@ export function UsagePage() {
           onValueChange={(value) => selectWindow(Number(value))}
         >
           <SelectTrigger
-            aria-label="Usage period"
+            aria-label="用量时段"
             size="compact"
             variant="ghost"
             className="w-auto min-w-0"
@@ -514,7 +514,7 @@ export function UsagePage() {
         </Select>
         <Button
           onClick={refreshWindow}
-          aria-label={showingLimits ? "Refresh limits" : "Refresh usage"}
+          aria-label={showingLimits ? "刷新限额" : "刷新用量"}
           aria-busy={isRefreshing}
           disabled={isRefreshing || (!showingLimits && !canReadDiagnostics)}
           size="icon-sm"
@@ -536,8 +536,8 @@ export function UsagePage() {
             {selectedEnvironments.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {environments.length === 0
-                  ? `Connect an environment to see ${showingLimits ? "limits" : "usage"}.`
-                  : `Select an environment to see ${showingLimits ? "limits" : "usage"}.`}
+                  ? `连接环境以查看${showingLimits ? "限额" : "用量"}。`
+                  : `选择环境以查看${showingLimits ? "限额" : "用量"}。`}
               </p>
             ) : showingLimits ? (
               <UsageLimitsSection
@@ -590,22 +590,22 @@ export function UsagePage() {
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <span>
                           <span className={figureClass(loading.partial)}>
-                            {formatCount(merged.sessions)} sessions
+                            {formatCount(merged.sessions)} 个会话
                           </span>
-                          {metric === "cost" && " · API estimate"}
+                          {metric === "cost" && " · API 估算"}
                         </span>
                         {metric === "cost" && merged.costQuality.unpricedShare > 0 && (
                           <Popover>
                             <PopoverTrigger
                               openOnHover
                               render={<InlineButton tone="muted" />}
-                              aria-label="Unpriced usage details"
+                              aria-label="未定价用量详情"
                             >
                               <InfoIcon className="size-3" aria-hidden />
                             </PopoverTrigger>
                             <PopoverPopup side="top" tooltipStyle>
-                              API estimate excludes{" "}
-                              {formatPercent(merged.costQuality.unpricedShare)} unpriced records.
+                              API 估算不包含 {formatPercent(merged.costQuality.unpricedShare)}{" "}
+                              的未定价记录。
                             </PopoverPopup>
                           </Popover>
                         )}
@@ -619,7 +619,7 @@ export function UsagePage() {
                         presentation.serverConfig?.providers.some(usesChatGptSharing),
                     ) ? (
                       <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                        <span>ChatGPT shared usage</span>
+                        <span>ChatGPT 共享用量</span>
                         <ChatGptUsageButton size="xs" />
                       </div>
                     ) : null}
@@ -698,8 +698,8 @@ export function UsagePage() {
                             )}
                           >
                             {metric === "cost"
-                              ? `${formatPercent(share)} of cost · ${formatTokens(totals?.totalTokens ?? 0)} tokens`
-                              : `${formatPercent(share)} of tokens · ${formatUsd(totals?.costUsd ?? 0)}`}
+                              ? `占费用的 ${formatPercent(share)} · ${formatTokens(totals?.totalTokens ?? 0)} Token`
+                              : `占 Token 的 ${formatPercent(share)} · ${formatUsd(totals?.costUsd ?? 0)}`}
                           </span>
                         </div>
                       );
@@ -708,8 +708,8 @@ export function UsagePage() {
 
                   <div className="flex min-w-0 flex-col gap-3">
                     <h2 className="text-sm font-medium text-foreground">
-                      {shownHourly ? "Hourly" : "Daily"}{" "}
-                      {metric === "tokens" ? "processed tokens" : "cost"}
+                      {shownHourly ? "每小时" : "每日"}{" "}
+                      {metric === "tokens" ? "处理的 Token" : "费用"}
                     </h2>
                     <UsageProviderChart
                       providers={activeProviders}
@@ -727,31 +727,31 @@ export function UsagePage() {
                 </section>
 
                 <section className="flex flex-col gap-2">
-                  <h2 className="text-sm font-medium text-foreground">Totals</h2>
+                  <h2 className="text-sm font-medium text-foreground">总计</h2>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-4 py-1 md:grid-cols-5">
                     <Metric
                       loading={loading.partial}
-                      label="Processed tokens"
+                      label="已处理 Token"
                       value={formatTokens(merged.totalTokens)}
                     />
                     <Metric
                       loading={loading.partial}
-                      label="Cached input"
+                      label="缓存输入"
                       value={formatTokens(merged.cachedInputTokens)}
                     />
                     <Metric
                       loading={loading.partial}
-                      label="Uncached input"
+                      label="未缓存输入"
                       value={formatTokens(merged.uncachedInputTokens)}
                     />
                     <Metric
                       loading={loading.partial}
-                      label="Output"
+                      label="输出"
                       value={formatTokens(merged.outputTokens)}
                     />
                     <Metric
                       loading={loading.partial}
-                      label="Cache savings"
+                      label="缓存节省费用"
                       value={formatUsd(merged.costQuality.cacheSavingsUsd)}
                     />
                   </div>
@@ -766,20 +766,20 @@ export function UsagePage() {
                   >
                     {metric === "tokens" ? (
                       <UsageShareBar
-                        label="Tokens by type"
+                        label="按类型统计 Token"
                         segments={tokenTypeSegments(merged)}
                         format={formatTokens}
                       />
                     ) : (
                       <>
                         <UsageShareBar
-                          label="Cost by type"
+                          label="按类型统计费用"
                           segments={costTypeSegments(merged.categoryCost)}
                           format={formatUsd}
                         />
                         {merged.speedCost.fast + merged.speedCost.ultrafast > 0 ? (
                           <UsageShareBar
-                            label="Cost by speed"
+                            label="按速度统计费用"
                             segments={speedCostSegments(merged.speedCost)}
                             format={formatUsd}
                             aside={<SpeedPremium premiumUsd={merged.speedCost.premium} />}
@@ -792,9 +792,9 @@ export function UsagePage() {
 
                 <section className="flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-3">
-                    <h2 className="text-sm font-medium text-foreground">Breakdown</h2>
+                    <h2 className="text-sm font-medium text-foreground">明细</h2>
                     <ToggleGroup
-                      aria-label="Usage breakdown"
+                      aria-label="用量明细"
                       variant="segmented"
                       value={[breakdown]}
                       onValueChange={(next) => {
@@ -804,8 +804,8 @@ export function UsagePage() {
                     >
                       {(
                         [
-                          { value: "model", label: "Model" },
-                          { value: "time", label: shownHourly ? "Hour" : "Day" },
+                          { value: "model", label: "模型" },
+                          { value: "time", label: shownHourly ? "小时" : "日期" },
                         ] as const
                       ).map((option) => (
                         <Toggle key={option.value} value={option.value}>
@@ -820,17 +820,17 @@ export function UsagePage() {
                       <thead>
                         <tr className="border-b border-border text-right text-xs text-muted-foreground">
                           <th className="py-2 pr-3 text-left font-normal">#</th>
-                          <th className="w-full py-2 text-left font-normal">Model</th>
-                          <th className="py-2 pl-6 font-normal">Cost</th>
-                          <th className="hidden py-2 pl-6 font-normal sm:table-cell">Share</th>
-                          <th className="py-2 pl-6 font-normal">Tokens</th>
+                          <th className="w-full py-2 text-left font-normal">模型</th>
+                          <th className="py-2 pl-6 font-normal">费用</th>
+                          <th className="hidden py-2 pl-6 font-normal sm:table-cell">占比</th>
+                          <th className="py-2 pl-6 font-normal">Token</th>
                         </tr>
                       </thead>
                       <tbody>
                         {breakdownModels.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                              No activity in this window.
+                              此时间窗口内暂无活动。
                             </td>
                           </tr>
                         ) : (
@@ -879,7 +879,7 @@ export function UsagePage() {
                                 </td>
                                 <td className={cn("py-2.5 pl-6 text-foreground", rowFigures)}>
                                   {isModelCostUnknown(model) ? (
-                                    <span className="text-muted-foreground">Unpriced</span>
+                                    <span className="text-muted-foreground">未定价</span>
                                   ) : (
                                     formatUsd(model.costUsd)
                                   )}
@@ -908,14 +908,14 @@ export function UsagePage() {
                       </colgroup>
                       <thead>
                         <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                          <th className="py-2 font-normal">{shownHourly ? "Hour" : "Day"}</th>
+                          <th className="py-2 font-normal">{shownHourly ? "小时" : "日期"}</th>
                           {activeProviders.map((provider) => (
                             <th key={provider} className="py-2 text-right font-normal">
                               {PROVIDER_PRESENTATION[provider].label}
                             </th>
                           ))}
-                          <th className="py-2 text-right font-normal">Total</th>
-                          <th className="py-2 text-right font-normal">Tokens</th>
+                          <th className="py-2 text-right font-normal">总计</th>
+                          <th className="py-2 text-right font-normal">Token</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -925,7 +925,7 @@ export function UsagePage() {
                               colSpan={activeProviders.length + 3}
                               className="py-6 text-center text-muted-foreground"
                             >
-                              No activity in this window.
+                              此时间窗口内暂无活动。
                             </td>
                           </tr>
                         ) : (
@@ -1011,14 +1011,14 @@ export function UsagePage() {
   );
 }
 
-const CURSOR_KEYCHAIN_COPY = "Requires access to your Cursor login in macOS Keychain.";
+const CURSOR_KEYCHAIN_COPY = "需要访问 macOS 钥匙串中的 Cursor 登录信息。";
 
 function CursorEnableButton({
   environmentId,
   label,
   onEnabled,
   tooltip,
-  buttonText = "Enable",
+  buttonText = "启用",
 }: {
   readonly environmentId: EnvironmentId;
   readonly label: string;
@@ -1046,7 +1046,7 @@ function CursorEnableButton({
     <InlineButton
       disabled={pending}
       aria-busy={pending}
-      aria-label={`Enable Cursor usage from ${label}`}
+      aria-label={`启用来自 ${label} 的 Cursor 用量`}
       onClick={() => void enable()}
     >
       {buttonText}
@@ -1057,7 +1057,7 @@ function CursorEnableButton({
       variant="outline"
       disabled={pending}
       aria-busy={pending}
-      aria-label={`Enable Cursor usage from ${label}`}
+      aria-label={`启用来自 ${label} 的 Cursor 用量`}
       onClick={() => void enable()}
     >
       {buttonText}
@@ -1131,7 +1131,7 @@ function CursorEnableLimits({
               key={environment.environmentId}
               environmentId={environment.environmentId}
               label={environment.label}
-              buttonText={environments.length > 1 ? `Enable on ${environment.label}` : "Enable"}
+              buttonText={environments.length > 1 ? `在 ${environment.label} 上启用` : "启用"}
               onEnabled={onEnabled}
               tooltip={false}
             />
@@ -1224,10 +1224,7 @@ function UsageCoverageNotice({
         </span>
       ))}
       {duplicateSources.length > 0 ? (
-        <span>
-          Counted once across environments sharing a transcript directory:{" "}
-          {duplicateSources.join(", ")}
-        </span>
+        <span>共享对话记录目录的环境仅统计一次： {duplicateSources.join(", ")}</span>
       ) : null}
     </div>
   );
@@ -1259,10 +1256,10 @@ function UsageEnvironmentFilter({
 }) {
   const allSelected = selectedEnvironmentIds === null;
   const label = allSelected
-    ? "All environments"
+    ? "所有环境"
     : selectedEnvironments.length === 1
       ? selectedEnvironments[0]!.label
-      : `${selectedEnvironments.length} environments`;
+      : `${selectedEnvironments.length} 个环境`;
   const hasIssue =
     selectedEnvironments.some((environment) => environment.error !== null) ||
     contractMismatches.length > 0;
@@ -1275,7 +1272,7 @@ function UsageEnvironmentFilter({
           {showUsageStatus && hasIssue ? (
             <CircleAlertIcon
               className="size-3.5 text-warning-foreground"
-              aria-label="Some environments could not report usage"
+              aria-label="部分环境无法报告用量"
             />
           ) : (
             <ChevronDownIcon
@@ -1291,7 +1288,7 @@ function UsageEnvironmentFilter({
           closeOnClick={false}
           onCheckedChange={(checked) => onSelectionChange(checked ? null : new Set())}
         >
-          All environments
+          所有环境
         </MenuCheckboxItem>
         <MenuSeparator />
         {environments.map((environment) => {
@@ -1301,22 +1298,22 @@ function UsageEnvironmentFilter({
           const progress = usageEnvironmentProgress(environment, refreshing);
           const status =
             environment.error !== null
-              ? "Unavailable"
+              ? "不可用"
               : environment.summary !== null &&
                   !isCompatibleUsageContractVersion(
                     environment.summary.contractVersion,
                     USAGE_CONTRACT_VERSION,
                   )
-                ? "Update required"
+                ? "需要更新"
                 : !environment.isConnected
-                  ? "Connecting…"
+                  ? "正在连接…"
                   : progress.phase === "loading"
-                    ? "Scanning…"
+                    ? "正在扫描…"
                     : progress.phase === "stale"
-                      ? "Refreshing…"
+                      ? "正在刷新…"
                       : progress.phase === "partway"
                         ? updatingProvidersLabel(progress.providers, providerLabel)
-                        : "Ready";
+                        : "就绪";
           return (
             <MenuCheckboxItem
               key={environment.environmentId}
@@ -1346,11 +1343,11 @@ function UsageEnvironmentFilter({
           );
         })}
         {environments.length === 0 ? (
-          <p className="px-2 py-2 text-xs text-muted-foreground">No environments connected.</p>
+          <p className="px-2 py-2 text-xs text-muted-foreground">暂无已连接的环境。</p>
         ) : null}
         {showUsageStatus && isPartial ? (
           <p className="px-2 py-2 text-xs text-muted-foreground">
-            Totals are partial while selected environments scan.
+            所选环境扫描期间，总计数据尚不完整。
           </p>
         ) : null}
         {showUsageStatus ? (
@@ -1363,7 +1360,7 @@ function UsageEnvironmentFilter({
         <MenuSeparator />
         <MenuItem onClick={onOpenModelPrices}>
           <SlidersHorizontalIcon aria-hidden />
-          Model prices
+          模型价格
         </MenuItem>
       </MenuPopup>
     </Menu>
@@ -1381,12 +1378,12 @@ function UsageProviderFilter({
   const visible = PROVIDER_ORDER.filter((provider) => !hiddenProviders.has(provider));
   const label =
     visible.length === PROVIDER_ORDER.length
-      ? "All providers"
+      ? "所有提供商"
       : visible.length === 0
-        ? "No providers"
+        ? "暂无提供商"
         : visible.length === 1
           ? PROVIDER_PRESENTATION[visible[0]!].label
-          : `${visible.length} providers`;
+          : `${visible.length} 个提供商`;
 
   return (
     <Menu>
@@ -1403,7 +1400,7 @@ function UsageProviderFilter({
           closeOnClick={false}
           onCheckedChange={(checked) => onChange(checked ? [] : PROVIDER_ORDER)}
         >
-          All providers
+          所有提供商
         </MenuCheckboxItem>
         <MenuSeparator />
         {PROVIDER_ORDER.map((provider) => (
@@ -1469,9 +1466,9 @@ function UsageSkeleton() {
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-foreground">Totals</h2>
+        <h2 className="text-sm font-medium text-foreground">总计</h2>
         <MetricSkeletons
-          labels={["Processed tokens", "Cached input", "Uncached input", "Output", "Cache savings"]}
+          labels={["已处理 Token", "缓存输入", "未缓存输入", "输出", "缓存节省费用"]}
         />
       </section>
 
@@ -1485,7 +1482,7 @@ function UsageSkeleton() {
 
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-medium text-foreground">Breakdown</h2>
+          <h2 className="text-sm font-medium text-foreground">明细</h2>
           <Skeleton shape="card" className="h-7 w-28" />
         </div>
         <Skeleton className="h-44" />

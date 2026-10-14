@@ -6,8 +6,8 @@ export type SecretRequestItem = Extract<
 >;
 
 /** Shown under the field: the one promise the card makes about the value. */
-export const SECRET_REQUEST_PRIVACY_NOTE = "Stored securely, never shown to the agent";
-export const SECRET_REQUEST_DEFAULT_PLACEHOLDER = "Paste the secret";
+export const SECRET_REQUEST_PRIVACY_NOTE = "已安全存储，不会展示给 Agent";
+export const SECRET_REQUEST_DEFAULT_PLACEHOLDER = "粘贴密钥";
 
 /** What a secret request card shows: the form while pending, otherwise a one-line outcome. */
 export type SecretRequestDisplay =
@@ -22,22 +22,22 @@ export type SecretRequestDisplay =
 const SAVED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "saved",
-  label: "Saved securely and kept private",
+  label: "已安全保存并保密",
 };
 const DECLINED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "declined",
-  label: "Declined",
+  label: "已拒绝",
 };
 const ENDED_DISPLAY: SecretRequestDisplay = {
   kind: "answered",
   outcome: "ended",
-  label: "Request ended",
+  label: "请求已结束",
 };
 const PENDING_DISPLAY: SecretRequestDisplay = { kind: "pending" };
 const PENDING_ELSEWHERE_DISPLAY: SecretRequestDisplay = {
   kind: "pending-elsewhere",
-  label: "Waiting for an answer in the original thread",
+  label: "在原会话中等待回答",
 };
 
 /**
@@ -97,5 +97,5 @@ export function secretRequestFailureMessage(failure: unknown): string {
   ) {
     return failure.message;
   }
-  return "Could not answer the request. Try again.";
+  return "无法应答该请求，请重试。";
 }

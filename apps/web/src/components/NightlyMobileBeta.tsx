@@ -60,13 +60,13 @@ export function NightlyMobileBetaNotice() {
     if (!IS_NIGHTLY_BUILD || noticeShown || isNoticeDismissed()) return;
     noticeShown = true;
     const toastId = toastManager.add({
-      title: "Nightly needs the beta mobile app",
+      title: "Nightly 需要测试版移动应用",
       description:
-        "Nightly uses the new orchestrator. The App Store and Google Play versions of T3 Code cannot connect to it.",
+        "Nightly 使用新的编排器。App Store 和 Google Play 上的 T3 Code 无法连接到此版本。",
       timeout: 0,
       onClose: dismissNotice,
       actionProps: {
-        children: "Get the beta app",
+        children: "获取测试版应用",
         onClick: () => {
           toastManager.close(toastId);
           void navigate({ to: "/settings/general", hash: ROW_ID });
@@ -96,7 +96,7 @@ function BetaLinkQr({ url, label }: { url: string; label: string }) {
         <QRCodeSvg value={url} size={128} level="M" marginSize={1} title={label} />
       </div>
       <Button size="xs" variant="outline" onClick={() => copyToClipboard(url)}>
-        {isCopied ? "Copied" : "Copy link"}
+        {isCopied ? "已复制" : "复制链接"}
       </Button>
     </div>
   );
@@ -107,8 +107,8 @@ export function NightlyMobileBetaRow() {
   return (
     <SettingsRow
       id={ROW_ID}
-      title="Mobile app"
-      description="Nightly needs the beta app. The App Store and Google Play versions cannot connect."
+      title="移动应用"
+      description="Nightly 需要测试版应用。App Store 和 Google Play 版本无法连接。"
       control={
         <div className="flex items-center gap-2">
           <Popover>
@@ -119,10 +119,10 @@ export function NightlyMobileBetaRow() {
             <PopoverPopup align="end">
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <PopoverTitle>TestFlight beta</PopoverTitle>
-                  <p className="text-xs text-muted-foreground">Scan with your iPhone camera.</p>
+                  <PopoverTitle>TestFlight 测试版</PopoverTitle>
+                  <p className="text-xs text-muted-foreground">使用 iPhone 相机扫描。</p>
                 </div>
-                <BetaLinkQr url={IOS_TESTFLIGHT_URL} label="TestFlight beta link" />
+                <BetaLinkQr url={IOS_TESTFLIGHT_URL} label="TestFlight 测试版链接" />
               </div>
             </PopoverPopup>
           </Popover>
@@ -134,12 +134,12 @@ export function NightlyMobileBetaRow() {
             <PopoverPopup align="end">
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">
-                  <PopoverTitle>Android beta APK</PopoverTitle>
+                  <PopoverTitle>Android 测试版 APK</PopoverTitle>
                   <p className="max-w-56 text-xs text-muted-foreground">
-                    Scan with your phone, then download and install the APK.
+                    使用手机扫描，然后下载并安装 APK。
                   </p>
                 </div>
-                <BetaLinkQr url={ANDROID_APK_RELEASE_URL} label="Android beta APK link" />
+                <BetaLinkQr url={ANDROID_APK_RELEASE_URL} label="Android 测试版 APK 链接" />
               </div>
             </PopoverPopup>
           </Popover>

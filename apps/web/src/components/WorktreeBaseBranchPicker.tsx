@@ -66,9 +66,9 @@ export function WorktreeBaseBranchPicker({
   const statusText =
     branches.error ??
     (branches.isPending && branches.data === null
-      ? "Loading refs..."
+      ? "正在加载引用…"
       : branches.isFetchingNextPage
-        ? "Loading more refs..."
+        ? "正在加载更多引用…"
         : hasNextPage
           ? `Showing ${branches.refs.length} of ${branches.data?.totalCount} refs`
           : null);

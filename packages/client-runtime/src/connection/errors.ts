@@ -13,14 +13,14 @@ import {
 export function profileMissingError(connectionId: string): ConnectionBlockedError {
   return new ConnectionBlockedError({
     reason: "configuration",
-    detail: `Connection profile ${connectionId} is unavailable.`,
+    detail: `连接配置 ${connectionId} 不可用。`,
   });
 }
 
 export function credentialMissingError(connectionId: string): ConnectionBlockedError {
   return new ConnectionBlockedError({
     reason: "authentication",
-    detail: `Connection credential ${connectionId} is unavailable.`,
+    detail: `连接凭证 ${connectionId} 不可用。`,
   });
 }
 
@@ -30,7 +30,7 @@ export function environmentMismatchError(input: {
 }): ConnectionBlockedError {
   return new ConnectionBlockedError({
     reason: "configuration",
-    detail: `Connected environment ${input.actual} does not match ${input.expected}.`,
+    detail: `所连环境 ${input.actual} 与 ${input.expected} 不一致。`,
   });
 }
 
@@ -135,20 +135,20 @@ export function mapRemoteEnvironmentError(
     case "EnvironmentAuthInvalidError":
       return new ConnectionBlockedError({
         reason: "authentication",
-        detail: "The environment credential is invalid.",
+        detail: "环境凭证无效。",
         traceId: error.traceId,
       });
     case "EnvironmentScopeRequiredError":
     case "EnvironmentOperationForbiddenError":
       return new ConnectionBlockedError({
         reason: "permission",
-        detail: "The environment credential does not grant the required access.",
+        detail: "环境凭证未授予所需的访问权限。",
         traceId: error.traceId,
       });
     case "EnvironmentRequestInvalidError":
       return new ConnectionBlockedError({
         reason: "configuration",
-        detail: "The environment rejected the authentication request.",
+        detail: "环境拒绝了该认证请求。",
         traceId: error.traceId,
       });
     case "EnvironmentResourceNotFoundError":
@@ -157,7 +157,7 @@ export function mapRemoteEnvironmentError(
       // snapshot). Treat it as a configuration issue with the endpoint.
       return new ConnectionBlockedError({
         reason: "configuration",
-        detail: "The environment endpoint could not be found.",
+        detail: "找不到环境端点。",
         traceId: error.traceId,
       });
     case "RemoteEnvironmentAuthTimeoutError":
@@ -173,7 +173,7 @@ export function mapRemoteEnvironmentError(
     case "EnvironmentInternalError":
       return new ConnectionTransientError({
         reason: "remote-unavailable",
-        detail: "The environment could not authorize the connection.",
+        detail: "环境无法授权该连接。",
         traceId: error.traceId,
       });
     case "RemoteEnvironmentAuthInvalidJsonError":
@@ -198,7 +198,7 @@ export function mapRemoteDpopEnvironmentError(
   if (error._tag === "EnvironmentAuthInvalidError" && error.reason === "invalid_credential") {
     return new ConnectionBlockedError({
       reason: "authentication",
-      detail: dpopFailureMessage("The environment credential is invalid.", error.dpopFailureReason),
+      detail: dpopFailureMessage("环境凭证无效。", error.dpopFailureReason),
       traceId: error.traceId,
     });
   }

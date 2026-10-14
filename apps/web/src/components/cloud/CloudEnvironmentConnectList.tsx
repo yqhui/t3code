@@ -165,11 +165,11 @@ export function CloudEnvironmentConnectRows({
       toastManager.add({
         type: "success",
         title: savedWithoutRelay.has(environment.environmentId)
-          ? "T3 Connect route added"
-          : "Environment added",
+          ? "已添加 T3 Connect 路由"
+          : "环境已添加",
         description: savedWithoutRelay.has(environment.environmentId)
-          ? `${environment.label} falls back to T3 Connect when its other routes are unreachable.`
-          : `Connecting to ${environment.label} through T3 Connect.`,
+          ? `${environment.label} 将在其他路由不可达时回退到 T3 Connect。`
+          : `正在通过 T3 Connect 连接 ${environment.label}。`,
       });
       return true;
     }
@@ -177,18 +177,17 @@ export function CloudEnvironmentConnectRows({
       return false;
     }
     const cause = squashAtomCommandFailure(result);
-    const message =
-      cause instanceof Error ? cause.message : "Could not connect the T3 Connect environment.";
+    const message = cause instanceof Error ? cause.message : "无法连接该 T3 Connect 环境。";
     const traceId = findErrorTraceId(cause);
     console.error("[t3-connect] Could not connect environment", { message, traceId, cause });
     toastManager.add({
       type: "error",
-      title: "Could not connect environment",
+      title: "无法连接环境",
       description: message,
       data: traceId
         ? {
             secondaryActionProps: {
-              children: "Copy trace ID",
+              children: "复制追踪 ID",
               onClick: () => void navigator.clipboard?.writeText(traceId),
             },
           }
@@ -294,14 +293,12 @@ export function CloudEnvironmentConnectRows({
     // A failed or offline discovery is not "no environments" — misreporting it
     // as empty would read as the user's devices having disappeared.
     const discoveryProblem = environmentsState.offline
-      ? "You appear to be offline."
+      ? "你似乎已离线。"
       : (Option.getOrNull(environmentsState.error)?.message ?? null);
     if (discoveryProblem !== null && !environmentsState.refreshing) {
       return (
         <div className={ITEM_ROW_CLASSNAME}>
-          <p className="text-sm font-medium text-destructive">
-            Could not load T3 Connect environments
-          </p>
+          <p className="text-sm font-medium text-destructive">无法加载 T3 Connect 环境</p>
           <p className="mt-1 text-xs text-muted-foreground">{discoveryProblem}</p>
           <Button
             size="sm"
@@ -309,7 +306,7 @@ export function CloudEnvironmentConnectRows({
             className="mt-3"
             onClick={() => void refreshRelayEnvironments()}
           >
-            Try again
+            重试
           </Button>
         </div>
       );
@@ -364,23 +361,23 @@ export function CloudEnvironmentConnectRows({
             ? "bg-warning"
             : "bg-muted-foreground/35";
     const notAdded = savedWithoutRelay.has(environment.environmentId)
-      ? "Saved without T3 Connect"
-      : "Not added";
+      ? "未通过 T3 Connect 保存"
+      : "未添加";
     const statusText =
       unsupported && !savedEnvironment
-        ? `T3 Connect · ${notAdded} · Client not supported`
+        ? `T3 Connect · ${notAdded} · 客户端不受支持`
         : offlineReason !== null
           ? offlineReason
           : savedConnection
             ? savedConnection.statusText
             : availability === "online"
-              ? `T3 Connect · ${notAdded} · Relay online`
+              ? `T3 Connect · ${notAdded} · 中继在线`
               : availability === "offline"
-                ? `T3 Connect · ${notAdded} · Relay offline`
+                ? `T3 Connect · ${notAdded} · 中继离线`
                 : availability === "checking"
-                  ? `T3 Connect · ${notAdded} · Checking relay status…`
+                  ? `T3 Connect · ${notAdded} · 正在检查中继状态…`
                   : (Option.getOrNull(error)?.message ??
-                    `T3 Connect · ${notAdded} · Relay status unavailable`);
+                    `T3 Connect · ${notAdded} · 中继状态不可用`);
     if (selection) {
       return (
         <label
@@ -414,15 +411,15 @@ export function CloudEnvironmentConnectRows({
               )}
             >
               {connectingEnvironmentIds.has(environment.environmentId)
-                ? "Connecting…"
+                ? "正在连接…"
                 : (savedConnection?.buttonLabel ??
                   (availability === "online"
-                    ? "Available"
+                    ? "可用"
                     : availability === "offline"
-                      ? "Offline"
+                      ? "离线"
                       : availability === "error"
-                        ? "Unavailable"
-                        : "Checking…"))}
+                        ? "不可用"
+                        : "正在检查…"))}
             </TooltipTrigger>
             <TooltipPopup>{unsupportedDetail ?? statusText}</TooltipPopup>
           </Tooltip>
@@ -450,12 +447,12 @@ export function CloudEnvironmentConnectRows({
                       : savedConnection
                         ? savedConnection.statusText
                         : availability === "online"
-                          ? "Relay online"
+                          ? "中继在线"
                           : availability === "offline"
-                            ? "Relay offline"
+                            ? "中继离线"
                             : availability === "checking"
-                              ? "Checking relay status"
-                              : (Option.getOrNull(error)?.message ?? "Relay status unavailable")
+                              ? "正在检查中继状态"
+                              : (Option.getOrNull(error)?.message ?? "中继状态不可用")
                 }
               />
               <EnvironmentMachineIcon
@@ -482,10 +479,10 @@ export function CloudEnvironmentConnectRows({
             <Tooltip>
               <TooltipTrigger render={<span className="inline-flex" tabIndex={0} />}>
                 <Button size="sm" disabled>
-                  Add
+                  添加
                 </Button>
               </TooltipTrigger>
-              <TooltipPopup>{unsupportedDetail ?? "Client not supported"}</TooltipPopup>
+              <TooltipPopup>{unsupportedDetail ?? "客户端不受支持"}</TooltipPopup>
             </Tooltip>
           ) : savedConnection ? (
             <Button size="sm" variant="outline" disabled>
@@ -498,10 +495,10 @@ export function CloudEnvironmentConnectRows({
               onClick={() => void connectEnvironment(environment)}
             >
               {connectingEnvironmentIds.has(environment.environmentId)
-                ? "Adding…"
+                ? "正在添加…"
                 : savedWithoutRelay.has(environment.environmentId)
-                  ? "Add route"
-                  : "Add"}
+                  ? "添加路由"
+                  : "添加"}
             </Button>
           )}
         </div>

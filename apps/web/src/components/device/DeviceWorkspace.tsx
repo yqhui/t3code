@@ -64,9 +64,7 @@ export function DeviceWorkspace(props: {
         if (!controller.signal.aborted) {
           if (cause instanceof DeviceScreenshotError && cause.status === 401)
             refreshDeviceHubAccess(props.environmentId);
-          setScreenshotError(
-            cause instanceof Error ? cause.message : "Screenshot capture failed. Try again.",
-          );
+          setScreenshotError(cause instanceof Error ? cause.message : "截图失败，请重试。");
         }
       })
       .finally(() => {

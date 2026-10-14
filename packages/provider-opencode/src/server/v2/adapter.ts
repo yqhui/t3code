@@ -542,8 +542,8 @@ const declinedNote = (action: string, resources: ReadonlyArray<string>) =>
 /** The session-wide choice for a request whose `save` patterns OpenCode would remember. */
 const sessionGrantLabel = (action: string, save: ReadonlyArray<string>) =>
   save.every((pattern) => pattern === "*")
-    ? `Allow every ${action} request this session`
-    : `Allow ${save.join(", ")} this session`;
+    ? `本会话内允许所有 ${action} 请求`
+    : `本会话内允许 ${save.join(", ")}`;
 
 const text = (value: string | undefined, fallback: string) => value?.trim() || fallback;
 
@@ -2105,8 +2105,8 @@ export const make = Effect.fn("OpenCode2Adapter.make")(function* (instanceId: Pr
           // "Always" in OpenCode saves a grant for the whole project, so the
           // session-wide choice is T3's own rule on this session instead.
           options: [
-            { decision: "cancel", label: "Cancel" },
-            { decision: "decline", label: "Decline" },
+            { decision: "cancel", label: "取消" },
+            { decision: "decline", label: "拒绝" },
             ...(save.length > 0
               ? [
                   {
@@ -2115,7 +2115,7 @@ export const make = Effect.fn("OpenCode2Adapter.make")(function* (instanceId: Pr
                   },
                 ]
               : []),
-            { decision: "accept", label: "Approve" },
+            { decision: "accept", label: "批准" },
           ],
         },
       );

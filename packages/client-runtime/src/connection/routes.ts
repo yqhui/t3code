@@ -185,9 +185,9 @@ export function connectionRouteLabel(route: ConnectionRoute): string {
     case "relay":
       return "T3 Connect";
     case "loopback":
-      return "This device";
+      return "本机";
     case "lan":
-      return "LAN";
+      return "局域网";
     case "tailnet":
       return "Tailscale";
     case "vpn":
@@ -199,7 +199,7 @@ export function connectionRouteLabel(route: ConnectionRoute): string {
         : "SSH";
     }
     case "public":
-      return routeHostname(route) ?? "Remote link";
+      return routeHostname(route) ?? "远程链接";
   }
 }
 

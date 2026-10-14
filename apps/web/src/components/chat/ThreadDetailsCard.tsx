@@ -158,7 +158,7 @@ export function ThreadDetailsCard({
       {placement ? (
         inlineOpen ? (
           <aside
-            aria-label="Thread details"
+            aria-label="会话详情"
             // Slides down to make room for the find bar, but returns in the same frame
             // the bar closes: a floating preview below moves up at once and would
             // otherwise overlap the card mid-slide.

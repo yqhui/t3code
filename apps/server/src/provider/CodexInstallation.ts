@@ -196,10 +196,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
   ) {
     const info = yield* fs.stat(file);
     if (info.type !== "File" || Number(info.size) > 8192)
-      return yield* installationError(
-        "resolve",
-        "The managed Codex installation record is invalid. Reinstall Codex.",
-      );
+      return yield* installationError("resolve", "托管的 Codex 安装记录无效。请重新安装 Codex。");
     return yield* Schema.decodeUnknownEffect(Schema.fromJsonString(schema))(
       yield* fs.readFileString(file),
     );
@@ -215,10 +212,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       manifest.target !== target ||
       manifest.entrypoint !== `bin/${executableName}`
     )
-      return yield* installationError(
-        "verify",
-        "The downloaded Codex package does not match the expected release.",
-      );
+      return yield* installationError("verify", "下载的 Codex 软件包与预期的发布版本不符。");
     for (const name of [
       `bin/${executableName}`,
       `bin/codex-code-mode-host${platform === "win32" ? ".exe" : ""}`,
@@ -230,10 +224,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
         Number(info.size) === 0 ||
         (platform !== "win32" && (info.mode & 0o111) === 0)
       )
-        return yield* installationError(
-          "verify",
-          "The managed Codex package is incomplete. Reinstall Codex.",
-        );
+        return yield* installationError("verify", "托管的 Codex 软件包不完整。请重新安装 Codex。");
     }
     return {
       executablePath: path.join(directory, "bin", executableName),
@@ -252,10 +243,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       InstalledRelease,
     );
     if (record.version !== version)
-      return yield* installationError(
-        "resolve",
-        "The managed Codex installation record has the wrong version.",
-      );
+      return yield* installationError("resolve", "托管的 Codex 安装记录版本不正确。");
     return yield* fromDirectory(directory, version, record.target);
   });
   const compatibility = Effect.fn("CodexInstallation.compatibility")(function* (version: string) {
@@ -277,13 +265,11 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       if (advisory?.status !== "supported")
         return yield* installationError(
           "resolve",
-          advisory?.message ?? "Update the managed Codex installation to continue.",
+          advisory?.message ?? "请更新托管的 Codex 安装以继续。",
         );
       return executable;
     },
-    Effect.mapError(
-      wrapFailure("resolve", "Codex is not installed in T3 Code. Install it to continue."),
-    ),
+    Effect.mapError(wrapFailure("resolve", "T3 Code 中尚未安装 Codex。请先安装再继续。")),
   );
   const acquire = Effect.fn("CodexInstallation.acquire")(function* () {
     return yield* Effect.acquireRelease(
@@ -321,10 +307,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       { concurrency: "unbounded" },
     );
     if (exitCode !== 0)
-      return yield* installationError(
-        "verify",
-        "Could not unpack or start the downloaded Codex package.",
-      );
+      return yield* installationError("verify", "无法解压或启动下载的 Codex 软件包。");
     return output;
   }, Effect.scoped);
   const localCache = new Map<string, { fingerprint: string; executable: CodexExecutable | null }>();
@@ -405,12 +388,9 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       function* (executable: CodexExecutable, version: string) {
         const output = yield* runCommand(executable.executablePath, ["--version"]);
         if (output.trim() !== `codex-cli ${version}`)
-          return yield* installationError(
-            "verify",
-            "The downloaded Codex executable has the wrong version.",
-          );
+          return yield* installationError("verify", "下载的 Codex 可执行文件版本不正确。");
       },
-      Effect.mapError(wrapFailure("verify", "The downloaded Codex runtime could not start.")),
+      Effect.mapError(wrapFailure("verify", "下载的 Codex 运行时无法启动。")),
     );
   const install = Effect.fn("CodexInstallation.install")(
     function* (release: CodexReleaseAsset) {
@@ -456,7 +436,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
         if (record.sha256 !== release.sha256 || record.target !== release.target)
           return yield* installationError(
             "verify",
-            "The existing managed Codex release differs from the official package. Remove it and reinstall.",
+            "既有的托管 Codex 发布与官方软件包不一致。请将其移除后重新安装。",
           );
         yield* validate(existing, release.version).pipe(
           Effect.scoped,
@@ -483,10 +463,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           Effect.gen(function* () {
             downloadedBytes += chunk.byteLength;
             if (downloadedBytes > release.archiveBytes)
-              return yield* installationError(
-                "download",
-                "The Codex download exceeded the expected release size.",
-              );
+              return yield* installationError("download", "Codex 下载内容超过了预期的发布大小。");
             hash.update(chunk);
             const now = yield* Clock.currentTimeMillis;
             if (now - lastProgressAt >= 250 || downloadedBytes === release.archiveBytes) {
@@ -501,7 +478,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       if (downloadedBytes !== release.archiveBytes || hash.digest("hex") !== release.sha256)
         return yield* installationError(
           "download",
-          "The Codex download failed its size or SHA-256 check. Nothing was installed.",
+          "Codex 下载未通过大小或 SHA-256 校验。未安装任何内容。",
         );
       yield* SubscriptionRef.update(
         state,
@@ -509,7 +486,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           ({
             ...current,
             phase: "extracting",
-            message: "Extracting Codex.",
+            message: "正在解压 Codex。",
           }) satisfies ProviderInstallState,
       );
       const entries = (yield* runCommand("tar", ["-tzf", archivePath])).trim().split("\n");
@@ -528,7 +505,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           );
         })
       )
-        return yield* installationError("extract", "The Codex archive contains unsafe entries.");
+        return yield* installationError("extract", "Codex 压缩包包含不安全的条目。");
       yield* runCommand("tar", ["-xzf", archivePath, "-C", runtime]);
       yield* SubscriptionRef.update(
         state,
@@ -536,7 +513,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           ({
             ...current,
             phase: "verifying",
-            message: "Checking Codex.",
+            message: "正在检查 Codex。",
           }) satisfies ProviderInstallState,
       );
       const executable = yield* fromDirectory(runtime, release.version, release.target);
@@ -557,12 +534,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       yield* activate();
     },
     Effect.scoped,
-    Effect.mapError(
-      wrapFailure(
-        "install",
-        "Could not install Codex. Check disk space and directory access, then try again.",
-      ),
-    ),
+    Effect.mapError(wrapFailure("install", "无法安装 Codex。请检查磁盘空间和目录访问权限后重试。")),
   );
   const start = gate
     .withPermit(
@@ -573,7 +545,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
         if (!asset) {
           return yield* installationError(
             "start",
-            `OpenAI does not publish a Codex runtime for ${platform}-${arch}. Use a supported remote environment or a custom executable.`,
+            `OpenAI 未发布适用于 ${platform}-${arch} 的 Codex 运行时。请使用受支持的远程环境或自定义可执行文件。`,
           );
         }
         const operationId = yield* crypto.randomUUIDv4;
@@ -586,7 +558,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           version: asset.version,
           installedVersion: current.installedVersion,
           canRemove: current.canRemove,
-          message: "Downloading Codex.",
+          message: "正在下载 Codex。",
         };
         yield* SubscriptionRef.set(state, next);
         const work = install(asset).pipe(
@@ -601,10 +573,10 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
                     ...value,
                     phase: cancelled ? "cancelled" : "failed",
                     message: cancelled
-                      ? "Installation cancelled. The previous runtime is unchanged."
+                      ? "安装已取消。原有运行时未受影响。"
                       : Option.isSome(error)
                         ? error.value.detail
-                        : "Could not finish the Codex installation. Check disk space and directory access.",
+                        : "无法完成 Codex 安装。请检查磁盘空间和目录访问权限。",
                   } satisfies ProviderInstallState;
                 })
               : Effect.void,
@@ -621,7 +593,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
         return next;
       }).pipe(Effect.uninterruptible),
     )
-    .pipe(Effect.mapError(wrapFailure("start", "Could not start the Codex installation.")));
+    .pipe(Effect.mapError(wrapFailure("start", "无法启动 Codex 安装。")));
 
   const cancel = Effect.fn("CodexInstallation.cancel")(function* (operationId: string) {
     return yield* gate.withPermit(
@@ -630,7 +602,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
         if (current.operationId !== operationId) {
           return yield* installationError(
             "cancel",
-            "This installation is no longer current. Refresh its status before cancelling.",
+            "此安装已不再是当前操作。请在取消前刷新其状态。",
           );
         }
         if (running?.operationId === operationId && isRunning(current)) {
@@ -648,7 +620,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           if (isRunning(yield* SubscriptionRef.get(state)) || leases > 0) {
             return yield* installationError(
               "remove",
-              "Stop Codex sessions and sign-in flows before removing its managed runtime.",
+              "请先停止 Codex 会话和登录流程，再移除其托管运行时。",
             );
           }
           const realManaged = yield* fs.realPath(managedDirectory).pipe(Effect.option);
@@ -659,7 +631,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
               if (candidate.startsWith(`${realManaged.value}${path.sep}`))
                 return yield* installationError(
                   "remove",
-                  "A provider instance uses a custom path inside managed Codex. Clear that path before removing it.",
+                  "某个提供商实例正在使用托管 Codex 内的自定义路径。请先清除该路径再进行移除。",
                 );
             }
           }
@@ -684,10 +656,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
       );
     },
     Effect.mapError(
-      wrapFailure(
-        "remove",
-        "Could not remove the managed Codex runtime. Check for open processes and try again.",
-      ),
+      wrapFailure("remove", "无法移除托管的 Codex 运行时。请检查是否有正在运行的进程后重试。"),
     ),
   );
 
@@ -716,7 +685,7 @@ export const makeCodexInstallation = Effect.fn("makeCodexInstallation")(function
           ({
             ...current,
             phase: "failed",
-            message: "The managed Codex runtime is incomplete. Remove it and reinstall.",
+            message: "托管的 Codex 运行时不完整。请将其移除后重新安装。",
           }) satisfies ProviderInstallState,
       ),
     ),

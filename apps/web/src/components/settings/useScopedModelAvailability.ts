@@ -47,7 +47,7 @@ export function useScopedModelDisabledReason(
           entry.driverKind !== sourceEntry?.driverKind ||
           !options?.some((option) => option.slug === model && !option.isUnavailable)
         ) {
-          return `This model is unavailable on ${environment?.label ?? "a selected environment"}. Select that environment to choose its model separately.`;
+          return `此模型在 ${environment?.label ?? "某个选定环境"} 上不可用。请选择该环境并单独设置模型。`;
         }
       }
       return null;

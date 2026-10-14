@@ -16,7 +16,7 @@ export function resolveUsageAccess(input: {
     return {
       canReadDiagnostics: false,
       isPending: false,
-      error: "Could not check this connection's access to diagnostics and usage.",
+      error: "无法检查此连接访问诊断和用量的权限。",
     };
   }
   if (input.session === null) {
@@ -29,7 +29,7 @@ export function resolveUsageAccess(input: {
     return {
       canReadDiagnostics: false,
       isPending,
-      error: isPending ? null : "This environment is not connected.",
+      error: isPending ? null : "此环境未连接。",
     };
   }
   const canReadDiagnostics = sessionGrantsScope(input.session, AuthDiagnosticsReadScope);

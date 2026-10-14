@@ -28,22 +28,20 @@ export function feedbackBannerItem(
           size="xs"
           variant="ghost"
           onClick={() => {
-            void writeTextToClipboard(submission.feedbackId, "Codex feedback thread ID").catch(
+            void writeTextToClipboard(submission.feedbackId, "Codex 反馈会话 ID").catch(
               (error: unknown) => {
                 toastManager.add({
                   type: "error",
-                  title: "Could not copy thread ID",
-                  description: error instanceof Error ? error.message : "An error occurred.",
+                  title: "无法复制会话 ID",
+                  description: error instanceof Error ? error.message : "发生错误。",
                 });
               },
             );
           }}
         >
-          Copy ID
+          复制 ID
         </Button>
       ) : undefined,
-    ...(submission.status !== "uploading"
-      ? { dismissLabel: "Dismiss feedback notice", onDismiss }
-      : {}),
+    ...(submission.status !== "uploading" ? { dismissLabel: "关闭反馈通知", onDismiss } : {}),
   };
 }

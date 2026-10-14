@@ -55,7 +55,7 @@ export class DesktopBackendPortUnavailableError extends Schema.TaggedError<Deskt
   },
 ) {
   override get message(): string {
-    return `No desktop backend port is available on hosts ${this.hosts.join(", ")} between ${this.startPort} and ${this.maxPort}.`;
+    return `主机 ${this.hosts.join("、")} 上 ${this.startPort} 至 ${this.maxPort} 之间没有可用的桌面后端端口。`;
   }
 }
 
@@ -64,7 +64,7 @@ export class DesktopDevelopmentBackendPortRequiredError extends Schema.TaggedErr
   {},
 ) {
   override get message(): string {
-    return "T3CODE_PORT is required in desktop development.";
+    return "桌面开发模式下必须设置 T3CODE_PORT。";
   }
 }
 
@@ -135,10 +135,7 @@ const handleFatalStartupError = Effect.fn("desktop.startup.handleFatalStartupErr
   });
   const wasQuitting = yield* Ref.getAndSet(state.quitting, true);
   if (!wasQuitting) {
-    yield* electronDialog.showErrorBox(
-      "T3 Code failed to start",
-      `Stage: ${stage}\n${message}${detail}`,
-    );
+    yield* electronDialog.showErrorBox("T3 Code 启动失败", `阶段：${stage}\n${message}${detail}`);
   }
   yield* shutdown.request;
   yield* electronApp.quit;

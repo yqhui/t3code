@@ -17,10 +17,10 @@ export function LegacyThreadMigrationToast() {
       }
       toastIdRef.current = toastManager.add({
         type: "loading",
-        title: "Restoring your threads…",
-        description: `Migrating ${migration.totalThreadCount.toLocaleString()} ${
-          migration.totalThreadCount === 1 ? "thread" : "threads"
-        } from the previous version. You can keep working while this finishes.`,
+        title: "正在恢复会话…",
+        description: `正在从上一版本迁移 ${migration.totalThreadCount.toLocaleString()} ${
+          migration.totalThreadCount === 1 ? "个会话" : "个会话"
+        }。迁移期间可以继续工作。`,
         timeout: 0,
       });
       return;

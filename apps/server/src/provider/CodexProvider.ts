@@ -88,21 +88,21 @@ export interface CodexAppServerProviderSnapshot {
 }
 
 const REASONING_EFFORT_LABELS: Readonly<Record<string, string>> = {
-  none: "None",
-  minimal: "Minimal",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  xhigh: "Extra High",
-  max: "Max",
-  ultra: "Ultra",
+  none: "无",
+  minimal: "最低",
+  low: "低",
+  medium: "中",
+  high: "高",
+  xhigh: "极高",
+  max: "最高",
+  ultra: "超高",
 };
 
 const DEFAULT_SERVICE_TIER_ID = "default";
 
 /** Shorter copy for tiers whose catalog description wraps in the traits menu. */
 const SERVICE_TIER_DESCRIPTIONS: Readonly<Record<string, string>> = {
-  ultrafast: "Even faster, more expensive",
+  ultrafast: "速度更快，费用更高",
 };
 
 function reasoningEffortLabel(reasoningEffort: string): string {
@@ -111,7 +111,7 @@ function reasoningEffortLabel(reasoningEffort: string): string {
 
 function codexAccountAuthLabel(account: CodexSchema.V2GetAccountResponse["account"]) {
   if (!account) return undefined;
-  if (account.type === "apiKey") return "OpenAI API Key";
+  if (account.type === "apiKey") return "OpenAI API 密钥";
   if (account.type === "amazonBedrock") return "Amazon Bedrock";
   if (account.type !== "chatgpt") return undefined;
   return codexPlanLabel(account.planType);
@@ -121,34 +121,34 @@ function codexAccountAuthLabel(account: CodexSchema.V2GetAccountResponse["accoun
 export function codexPlanLabel(planType: string | null | undefined): string | undefined {
   switch (planType) {
     case "free":
-      return "ChatGPT Free Subscription";
+      return "ChatGPT Free 订阅";
     case "go":
-      return "ChatGPT Go Subscription";
+      return "ChatGPT Go 订阅";
     case "plus":
-      return "ChatGPT Plus Subscription";
+      return "ChatGPT Plus 订阅";
     case "pro":
-      return "ChatGPT Pro 20x Subscription";
+      return "ChatGPT Pro 20x 订阅";
     case "prolite":
-      return "ChatGPT Pro 5x Subscription";
+      return "ChatGPT Pro 5x 订阅";
     case "promax":
-      return "ChatGPT Pro Max Subscription";
+      return "ChatGPT Pro Max 订阅";
     case "team":
-      return "ChatGPT Team Subscription";
+      return "ChatGPT Team 订阅";
     case "self_serve_business_prolite":
     case "self_serve_business_usage_based":
     case "business":
-      return "ChatGPT Business Subscription";
+      return "ChatGPT Business 订阅";
     case "ent26":
     case "enterprise_cbp_automation":
     case "enterprise_cbp_usage_based":
     case "enterprise":
-      return "ChatGPT Enterprise Subscription";
+      return "ChatGPT Enterprise 订阅";
     case "edu":
     case "edu_plus":
     case "edu_pro":
-      return "ChatGPT Edu Subscription";
+      return "ChatGPT Edu 订阅";
     case "unknown":
-      return "ChatGPT Subscription";
+      return "ChatGPT 订阅";
     default:
       return undefined;
   }
@@ -195,7 +195,7 @@ export function mapCodexModelCapabilities(
   if (reasoningOptions.length > 0) {
     optionDescriptors.push({
       id: "reasoningEffort",
-      label: "Reasoning",
+      label: "推理强度",
       type: "select",
       options: reasoningOptions,
       ...(defaultReasoning ? { currentValue: defaultReasoning } : {}),
@@ -204,12 +204,12 @@ export function mapCodexModelCapabilities(
   if (serviceTiers.length > 0) {
     optionDescriptors.push({
       id: "serviceTier",
-      label: "Service Tier",
+      label: "服务档位",
       type: "select",
       options: [
         {
           id: DEFAULT_SERVICE_TIER_ID,
-          label: "Standard",
+          label: "标准",
           ...(defaultServiceTier === DEFAULT_SERVICE_TIER_ID ? { isDefault: true } : {}),
         },
         ...serviceTiers.map((tier) => {
@@ -524,7 +524,7 @@ const probeCodexAppServerProvider = Effect.fn("probeCodexAppServerProvider")(fun
             Effect.timeoutOption(Duration.millis(RATE_LIMITS_PROBE_TIMEOUT_MS)),
             Effect.map(
               Option.getOrElse((): CodexRateLimitsProbe => ({
-                failure: "Codex did not answer the usage request.",
+                failure: "Codex 未响应查询用量的请求。",
               })),
             ),
             Effect.catch((error) =>
@@ -582,7 +582,7 @@ const makePendingCodexProvider = (
           version: null,
           status: "warning",
           auth: { status: "unknown" },
-          message: "Codex is disabled in T3 Code settings.",
+          message: "Codex 已在 T3 Code 设置中禁用。",
         },
       });
     }
@@ -598,7 +598,7 @@ const makePendingCodexProvider = (
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Codex provider status has not been checked in this session yet.",
+        message: "此会话尚未检查 Codex 提供商状态。",
       },
     });
   });
@@ -630,7 +630,7 @@ function accountProbeStatus({ account, rateLimits }: CodexAppServerProviderSnaps
     return {
       status: "error",
       auth: { status: "unauthenticated" },
-      message: "Codex CLI is not authenticated. Run `codex login` and try again.",
+      message: "Codex CLI 尚未认证。请运行 `codex login` 后重试。",
     };
   }
 
@@ -675,7 +675,7 @@ export const checkCodexProviderStatus = Effect.fn("checkCodexProviderStatus")(fu
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Codex is disabled in T3 Code settings.",
+        message: "Codex 已在 T3 Code 设置中禁用。",
       },
     });
   }
@@ -709,11 +709,11 @@ export const checkCodexProviderStatus = Effect.fn("checkCodexProviderStatus")(fu
         status: "error",
         auth: { status: "unknown" },
         message: installed
-          ? `Codex app-server provider probe failed: ${error.message}.`
-          : `Could not start Codex CLI (\`${codexSettings.binaryPath}\`). Check Settings → Providers → Codex → Binary path on the server.` +
+          ? `Codex app-server 提供商检查失败：${error.message}。`
+          : `无法启动 Codex CLI（\`${codexSettings.binaryPath}\`）。请检查服务器上的“设置 → 提供商 → Codex → 可执行文件路径”。` +
             (codexSettings.binaryPath === "codex"
-              ? " Installing ChatGPT or Codex desktop may not add codex to PATH."
-              : " Make sure the configured executable exists and can be run."),
+              ? " 安装 ChatGPT 或 Codex 桌面端不一定会将 codex 加入 PATH。"
+              : " 请确认所配置的可执行文件存在且可以运行。"),
       },
     });
   }
@@ -730,7 +730,7 @@ export const checkCodexProviderStatus = Effect.fn("checkCodexProviderStatus")(fu
         version: null,
         status: "error",
         auth: { status: "unknown" },
-        message: "Timed out while checking Codex app-server provider status.",
+        message: "检查 Codex app-server 提供商状态超时。",
       },
     });
   }
@@ -765,13 +765,13 @@ export const checkCodexProviderStatus = Effect.fn("checkCodexProviderStatus")(fu
       COMPACT_SLASH_COMMAND,
       {
         name: "goal",
-        description: "Set a goal Codex keeps working toward until it is done",
-        input: { hint: "Objective, or pause, resume, clear" },
+        description: "设置一个目标，让 Codex 持续工作直至完成",
+        input: { hint: "输入目标，或 pause、resume、clear" },
       },
       {
         name: "feedback",
-        description: "Send this thread and Codex logs to OpenAI",
-        input: { hint: "Describe the issue (optional)" },
+        description: "向 OpenAI 发送此会话及 Codex 日志",
+        input: { hint: "描述问题（可选）" },
       },
     ],
     probe: {

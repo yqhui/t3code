@@ -244,8 +244,8 @@ export const layer = Layer.effect(
             { reason },
           );
           yield* electronDialog.showErrorBox(
-            "WSL backend is still unavailable",
-            `${reason}\n\nT3 Code will use the Windows backend for this launch and retry WSL the next time the app starts.`,
+            "WSL 后端仍不可用",
+            `${reason}\n\nT3 Code 本次启动将使用 Windows 后端，并在下次启动应用时重试 WSL。`,
           );
           yield* appSettings.applyWslWindowsFallbackInMemory;
           return true;
@@ -255,8 +255,8 @@ export const layer = Layer.effect(
           reason,
         });
         yield* electronDialog.showErrorBox(
-          "WSL backend couldn't start",
-          `${reason}\n\nFalling back to the Windows backend so T3 Code can open. Re-enable the WSL backend from Settings > Connections once the WSL distro is fixed.`,
+          "无法启动 WSL 后端",
+          `${reason}\n\n正在回退到 Windows 后端，以便 T3 Code 能够打开。WSL 发行版修复后，请在“设置 > 连接”中重新启用 WSL 后端。`,
         );
         // Fully disable the WSL backend — both flags, matching the "Switch to
         // Windows" recovery path — so the manager's next restart re-resolves the

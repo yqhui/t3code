@@ -45,10 +45,36 @@ type ProviderOptions = ReadonlyArray<ProviderOptionSelection>;
 
 const SAVED_OPTION_LABELS: Readonly<Record<string, string>> = {
   agent: "Agent",
-  effort: "Effort",
-  reasoningEffort: "Reasoning effort",
-  variant: "Reasoning",
+  effort: "强度",
+  reasoningEffort: "推理强度",
+  variant: "推理",
 };
+
+function traitDisplayLabel(label: string): string {
+  return (
+    (
+      {
+        Fast: "快速",
+        Ultrafast: "极速",
+        Standard: "标准",
+        Low: "低",
+        Medium: "中",
+        High: "高",
+        Minimal: "最低",
+        Max: "最高",
+        None: "无",
+        Default: "默认",
+        Auto: "自动",
+        Enabled: "已启用",
+        Disabled: "已禁用",
+        Thinking: "思考",
+        "Fast mode": "快速模式",
+        "Reasoning effort": "推理强度",
+        "Context window": "上下文窗口",
+      } as Readonly<Record<string, string>>
+    )[label] ?? label
+  );
+}
 
 function savedOptionLabel(id: string): string {
   return (
@@ -95,7 +121,7 @@ const ULTRATHINK_PROMPT_PREFIX = "Ultrathink:\n";
 function DefaultBadge() {
   return (
     <Badge variant="outline" size="sm" className="min-w-0">
-      Default
+      默认
     </Badge>
   );
 }
@@ -379,9 +405,11 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
               {index > 0 ? <MenuDivider /> : null}
               <MenuGroup>
                 <div className="px-2 pt-1.5 pb-1 font-medium text-muted-foreground text-xs">
-                  {descriptor.label}
+                  {traitDisplayLabel(descriptor.label)}
                 </div>
-                <div className="px-2 pb-1.5 text-muted-foreground/80 text-xs">{value}</div>
+                <div className="px-2 pb-1.5 text-muted-foreground/80 text-xs">
+                  {typeof value === "string" ? traitDisplayLabel(value) : value}
+                </div>
               </MenuGroup>
             </div>
           );
@@ -403,12 +431,11 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
             {index > 0 ? <MenuDivider /> : null}
             <MenuGroup>
               <div className="px-2 pt-1.5 pb-1 font-medium text-muted-foreground text-xs">
-                {descriptor.label}
+                {traitDisplayLabel(descriptor.label)}
               </div>
               {ultrathinkInBodyText && descriptor.id === primarySelectDescriptor?.id ? (
                 <div className="px-2 pb-1.5 text-muted-foreground/80 text-xs">
-                  Your prompt contains &quot;ultrathink&quot; in the text. Remove it to change this
-                  option.
+                  你的 Prompt 文本中包含 “ultrathink”。请移除后再更改此选项。
                 </div>
               ) : null}
               <MenuRadioGroup
@@ -428,7 +455,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                     <span className="flex w-full min-w-0 flex-col">
                       <span className="flex w-full min-w-0 items-center justify-between gap-3">
                         <span className="min-w-0 truncate">
-                          {option.label}
+                          {traitDisplayLabel(option.label)}
                           {option.isDefault ? (
                             <>
                               {" "}
@@ -458,7 +485,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
             {index > 0 || selectDescriptors.length > 0 ? <MenuDivider /> : null}
             <MenuGroup>
               <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">
-                {descriptor.label}
+                {traitDisplayLabel(descriptor.label)}
               </div>
               <MenuRadioGroup
                 value={selectedValue}
@@ -471,7 +498,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                 {(["on", "off"] as const).map((value) => (
                   <MenuRadioItem key={value} value={value} hideIndicator closeOnClick>
                     <span className="flex w-full min-w-0 items-center justify-between gap-3">
-                      <span>{value === "on" ? "On" : "Off"}</span>
+                      <span>{value === "on" ? "开启" : "关闭"}</span>
                     </span>
                   </MenuRadioItem>
                 ))}
@@ -499,8 +526,8 @@ export function buildTraitsTriggerDisplay(input: {
   const labels: Array<string> = [];
   for (const descriptor of input.descriptors) {
     if (descriptor.id === "fastMode" && descriptor.type === "boolean") {
-      speedLabel = descriptor.currentValue === true ? "Fast" : null;
-      fastModeFallbackLabel = speedLabel ?? "Normal";
+      speedLabel = descriptor.currentValue === true ? "快速" : null;
+      fastModeFallbackLabel = speedLabel ?? "标准";
       continue;
     }
     if (
@@ -518,12 +545,13 @@ export function buildTraitsTriggerDisplay(input: {
       ) {
         speedLabel =
           ultrafastTier && currentValue === ultrafastTier.id
-            ? "Ultrafast"
+            ? "极速"
             : fastTier && currentValue === fastTier.id
-              ? "Fast"
+              ? "快速"
               : null;
-        fastModeFallbackLabel =
-          descriptor.options.find(({ id }) => id === currentValue)?.label ?? "Normal";
+        fastModeFallbackLabel = traitDisplayLabel(
+          descriptor.options.find(({ id }) => id === currentValue)?.label ?? "标准",
+        );
         continue;
       }
     }
@@ -531,7 +559,7 @@ export function buildTraitsTriggerDisplay(input: {
       input.ultrathinkPromptControlled && descriptor.id === input.primarySelectDescriptorId
         ? "Ultrathink"
         : descriptor.type === "boolean"
-          ? `${descriptor.label} ${descriptor.currentValue === true ? "On" : "Off"}`
+          ? `${traitDisplayLabel(descriptor.label)} ${descriptor.currentValue === true ? "开启" : "关闭"}`
           : getProviderOptionCurrentLabel(
               descriptor,
               input.modelSelection,
@@ -546,7 +574,7 @@ export function buildTraitsTriggerDisplay(input: {
       ) {
         reasoningLabelIndex = labels.length;
       }
-      labels.push(label);
+      labels.push(traitDisplayLabel(label));
     }
   }
 

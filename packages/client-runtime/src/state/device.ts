@@ -73,27 +73,27 @@ export function createDeviceEnvironmentAtoms<R, E>(
 
 /** Unknown inventory is distinct from a completed check that found no install. */
 export function deviceToolVersionLabels(tools: DeviceToolVersions | undefined) {
-  if (!tools) return ["Device tool versions have not been checked."];
+  if (!tools) return ["尚未检查设备工具版本。"];
   return (
     [
-      ["Device hub", tools.hub],
-      ["Agent tools", tools.agent],
+      ["Device Hub", tools.hub],
+      ["Agent 工具", tools.agent],
     ] as const
   ).map(([name, tool]) => {
-    const installed = tool.installedVersions.length ? tool.installedVersions.join(", ") : "none";
-    return `${name}: installed ${installed}; required ${tool.requiredVersion}${tool.runningVersion ? `; running ${tool.runningVersion}` : ""}.`;
+    const installed = tool.installedVersions.length ? tool.installedVersions.join(", ") : "无";
+    return `${name}：已安装 ${installed}；需要 ${tool.requiredVersion}${tool.runningVersion ? `；正在运行 ${tool.runningVersion}` : ""}。`;
   });
 }
 
 export function deviceToolUpdatePolicy(tools: DeviceToolVersions | undefined) {
-  if (!tools) return "Versions have not been checked. Reconnect the host and check versions.";
+  if (!tools) return "尚未检查版本。请重新连接主机并检查版本。";
   const outdated = [tools.hub, tools.agent].filter(
     (tool) =>
       tool.installedVersions.length > 0 && !tool.installedVersions.includes(tool.requiredVersion),
   );
   return outdated.length > 0
-    ? "Update pending. Required tools will install automatically when next used. The host needs network access; an older install is not used as a fallback."
-    : "Required tools are installed automatically when needed. Checking versions does not install or start anything.";
+    ? "更新待生效。所需工具将在下次使用时自动安装。主机需要网络连接；不会回退使用旧版本。"
+    : "所需工具会在需要时自动安装。检查版本不会安装或启动任何内容。";
 }
 export const deviceToolUpdateOwnership =
-  "This environment's T3 server chooses device tool versions for itself and its SSH hosts. Update that server to receive newer tool versions; updating only your browser or mobile app does not update a remote server.";
+  "此环境的 T3 服务器会为其自身及其 SSH 主机选择设备工具版本。更新该服务器才能获得更新的工具版本；仅更新浏览器或移动应用不会更新远程服务器。";

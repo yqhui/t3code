@@ -85,11 +85,9 @@ function formatDurationMicros(value: number): string {
 }
 
 function formatSampleInterval(valueMs: number): string {
-  if (valueMs < 1_000) return `${Math.max(0, Math.round(valueMs))} ms`;
+  if (valueMs < 1_000) return `${Math.max(0, Math.round(valueMs))} 毫秒`;
   const seconds = valueMs / 1_000;
-  return `${seconds.toLocaleString(undefined, { maximumFractionDigits: 1 })} ${
-    seconds === 1 ? "second" : "seconds"
-  }`;
+  return `${seconds.toLocaleString(undefined, { maximumFractionDigits: 1 })} 秒`;
 }
 
 function processIdentityKey(process: ResourceTelemetryProcess): string {
@@ -110,25 +108,25 @@ function formatProcessName(process: Pick<ResourceTelemetryProcess, "command" | "
 function categoryLabel(category: ResourceTelemetryProcessCategory): string {
   switch (category) {
     case "server":
-      return "Server";
+      return "服务器";
     case "server-child":
-      return "Backend child";
+      return "后端子进程";
     case "provider-root":
-      return "Provider";
+      return "提供商";
     case "terminal-root":
-      return "Terminal";
+      return "终端";
     case "electron-main":
-      return "Electron main";
+      return "Electron 主进程";
     case "electron-renderer":
-      return "Renderer";
+      return "渲染进程";
     case "electron-gpu":
       return "GPU";
     case "electron-utility":
-      return "Electron utility";
+      return "Electron 工具进程";
     case "resource-monitor":
-      return "Monitor";
+      return "监控器";
     case "unknown-t3":
-      return "T3 process";
+      return "T3 进程";
   }
 }
 
@@ -142,13 +140,13 @@ function categoryDotClass(category: ResourceTelemetryProcessCategory): string {
 function ioSemanticsLabel(semantics: ResourceTelemetryIoSemantics): string {
   switch (semantics) {
     case "storage":
-      return "Storage bytes";
+      return "存储字节";
     case "logical":
-      return "Logical bytes";
+      return "逻辑字节";
     case "all-io":
-      return "All I/O bytes";
+      return "全部 I/O 字节";
     case "unavailable":
-      return "Unavailable";
+      return "不可用";
   }
 }
 
@@ -158,7 +156,7 @@ function booleanStateLabel(
 ): string {
   if (value === "true") return labels.true;
   if (value === "false") return labels.false;
-  return "Unknown";
+  return "未知";
 }
 
 function sourceStatusTone(status: ResourceTelemetrySourceStatus): "default" | "warning" | "danger" {
@@ -209,15 +207,15 @@ function SourceStatusBadge({
 function LastSampleLabel({ sampledAt }: { sampledAt: DateTime.Utc | null }) {
   useRelativeTimeTick();
   if (!sampledAt) {
-    return <span className="text-2xs text-muted-foreground/55">Waiting for sample</span>;
+    return <span className="text-2xs text-muted-foreground/55">等待采样</span>;
   }
   const relative = formatRelativeTime(DateTime.formatIso(sampledAt));
   if (!relative) {
-    return <span className="text-2xs text-muted-foreground/55">Waiting for sample</span>;
+    return <span className="text-2xs text-muted-foreground/55">等待采样</span>;
   }
   return (
     <span className="text-2xs text-muted-foreground/60">
-      Updated <span className="font-mono tabular-nums">{relative.value}</span>
+      已更新 <span className="font-mono tabular-nums">{relative.value}</span>
       {relative.suffix ? ` ${relative.suffix}` : ""}
     </span>
   );
@@ -277,14 +275,14 @@ function AggregateCard({
           {label}
         </div>
         <div className="rounded-md bg-muted/55 px-1.5 py-0.5 font-mono text-3xs tabular-nums text-muted-foreground/70">
-          {aggregate.processCount} {aggregate.processCount === 1 ? "process" : "processes"}
+          {aggregate.processCount} 个进程
         </div>
       </div>
       <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-2.5">
         <MetricPair label="CPU" value={`${aggregate.currentCpuPercent.toFixed(1)}%`} />
-        <MetricPair label="Memory" value={formatBytes(aggregate.currentRssBytes)} />
-        <MetricPair label="Read" value={formatRate(aggregate.ioReadBytesPerSecond)} />
-        <MetricPair label="Write" value={formatRate(aggregate.ioWriteBytesPerSecond)} />
+        <MetricPair label="内存" value={formatBytes(aggregate.currentRssBytes)} />
+        <MetricPair label="读取" value={formatRate(aggregate.ioReadBytesPerSecond)} />
+        <MetricPair label="写入" value={formatRate(aggregate.ioWriteBytesPerSecond)} />
       </div>
     </div>
   );
@@ -313,9 +311,9 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         <div className="text-sm font-medium text-foreground">{label}</div>
         <div className="mt-1 text-2xs leading-relaxed text-muted-foreground/65">
           {expectedInBrowser
-            ? "Available when this page runs inside the desktop app."
+            ? "在此页面运行于桌面应用内时可用。"
             : Option.match(health.lastError, {
-                onNone: () => "No reported errors",
+                onNone: () => "无已报告的错误",
                 onSome: (error) => error,
               })}
         </div>
@@ -326,7 +324,7 @@ function HealthSource({ label, health }: { label: string; health: ResourceTeleme
         presentation={
           expectedInBrowser
             ? {
-                label: "Desktop only",
+                label: "仅桌面端",
                 tone: "neutral",
               }
             : undefined
@@ -369,7 +367,7 @@ function HistoryWindowSelector({
 }) {
   return (
     <ToggleGroup
-      aria-label="Resource history period"
+      aria-label="资源历史时间范围"
       variant="segmented"
       value={[String(selectedWindowMs)]}
       onValueChange={(next) => {
@@ -398,13 +396,13 @@ function ResourceHistoryChart({
     <div className="border-t border-border/60 px-4 py-4 sm:px-5">
       <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-3xs text-muted-foreground/65">
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-1.5 w-3 rounded-full bg-foreground/70" /> CPU average
+          <span className="h-1.5 w-3 rounded-full bg-foreground/70" /> CPU 平均
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-1.5 w-3 rounded-full bg-info/70" /> I/O reads
+          <span className="h-1.5 w-3 rounded-full bg-info/70" /> I/O 读取
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-1.5 w-3 rounded-full bg-warning/80" /> I/O writes
+          <span className="h-1.5 w-3 rounded-full bg-warning/80" /> I/O 写入
         </span>
       </div>
       <div className="flex h-32 items-end gap-1 overflow-hidden rounded-lg border border-border/40 bg-muted/8 px-2 pt-3 pb-2">
@@ -446,10 +444,10 @@ function ResourceHistoryChart({
               />
               <TooltipPopup side="top" className="text-left">
                 <div className="space-y-0.5">
-                  <div>CPU avg {bucket.avgCpuPercent.toFixed(1)}%</div>
-                  <div>CPU peak {bucket.maxCpuPercent.toFixed(1)}%</div>
-                  <div>Read {formatBytes(bucket.ioReadBytes)}</div>
-                  <div>Write {formatBytes(bucket.ioWriteBytes)}</div>
+                  <div>CPU 平均 {bucket.avgCpuPercent.toFixed(1)}%</div>
+                  <div>CPU 峰值 {bucket.maxCpuPercent.toFixed(1)}%</div>
+                  <div>读取 {formatBytes(bucket.ioReadBytes)}</div>
+                  <div>写入 {formatBytes(bucket.ioWriteBytes)}</div>
                 </div>
               </TooltipPopup>
             </Tooltip>
@@ -481,7 +479,7 @@ function ProcessTreeName({
           size="icon-micro"
           variant="ghost-muted"
           onClick={() => onToggle(process)}
-          aria-label={collapsed ? `Expand ${name}` : `Collapse ${name}`}
+          aria-label={collapsed ? `展开 ${name}` : `折叠 ${name}`}
         >
           <MorphIcon className="size-3.5" icon={collapsed ? ChevronRight : ChevronDown} />
         </Button>
@@ -585,24 +583,24 @@ function ProcessTable({
           </colgroup>
           <thead className="sticky top-0 z-10 border-b border-border/60 bg-card text-3xs uppercase tracking-widest text-muted-foreground/65">
             <tr>
-              <th className="px-4 py-2 font-semibold sm:pl-5">Process</th>
-              <th className="px-3 py-2 font-semibold">Category</th>
+              <th className="px-4 py-2 font-semibold sm:pl-5">进程</th>
+              <th className="px-3 py-2 font-semibold">类别</th>
               <th className="px-3 py-2 text-right font-semibold">CPU</th>
-              <th className="px-3 py-2 text-right font-semibold">CPU Time</th>
-              <th className="px-3 py-2 text-right font-semibold">Memory</th>
-              <th className="px-3 py-2 text-right font-semibold">Read/s</th>
-              <th className="px-3 py-2 text-right font-semibold">Write/s</th>
-              <th className="px-3 py-2 text-right font-semibold">Read Total</th>
-              <th className="px-3 py-2 text-right font-semibold">Write Total</th>
+              <th className="px-3 py-2 text-right font-semibold">CPU 时间</th>
+              <th className="px-3 py-2 text-right font-semibold">内存</th>
+              <th className="px-3 py-2 text-right font-semibold">读取/s</th>
+              <th className="px-3 py-2 text-right font-semibold">写入/s</th>
+              <th className="px-3 py-2 text-right font-semibold">读取总量</th>
+              <th className="px-3 py-2 text-right font-semibold">写入总量</th>
               <th className="px-3 py-2 text-right font-semibold">PID</th>
-              <th className="px-2 py-2 text-right font-semibold sm:pr-4">Kill</th>
+              <th className="px-2 py-2 text-right font-semibold sm:pr-4">终止</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {visible.length === 0 ? (
               <tr>
                 <td colSpan={11} className="px-4 py-5 text-xs text-muted-foreground sm:px-5">
-                  Waiting for the native process monitor.
+                  正在等待原生进程监控器。
                 </td>
               </tr>
             ) : null}
@@ -689,14 +687,14 @@ function HistoryProcessTable({
           </colgroup>
           <thead className="sticky top-0 z-10 border-b border-border/60 bg-card text-3xs uppercase tracking-widest text-muted-foreground/65">
             <tr>
-              <th className="px-4 py-2 font-semibold sm:pl-5">Process</th>
-              <th className="px-3 py-2 font-semibold">Category</th>
-              <th className="px-3 py-2 text-right font-semibold">CPU Time</th>
-              <th className="px-3 py-2 text-right font-semibold">Peak CPU</th>
-              <th className="px-3 py-2 text-right font-semibold">Peak Mem</th>
-              <th className="px-3 py-2 text-right font-semibold">Read</th>
-              <th className="px-3 py-2 text-right font-semibold">Write</th>
-              <th className="px-3 py-2 text-right font-semibold">Samples</th>
+              <th className="px-4 py-2 font-semibold sm:pl-5">进程</th>
+              <th className="px-3 py-2 font-semibold">类别</th>
+              <th className="px-3 py-2 text-right font-semibold">CPU 时间</th>
+              <th className="px-3 py-2 text-right font-semibold">CPU 峰值</th>
+              <th className="px-3 py-2 text-right font-semibold">内存峰值</th>
+              <th className="px-3 py-2 text-right font-semibold">读取</th>
+              <th className="px-3 py-2 text-right font-semibold">写入</th>
+              <th className="px-3 py-2 text-right font-semibold">采样数</th>
               <th className="px-3 py-2 text-right font-semibold sm:pr-5">PID</th>
             </tr>
           </thead>
@@ -704,7 +702,7 @@ function HistoryProcessTable({
             {processes.length === 0 ? (
               <tr>
                 <td colSpan={9} className="px-4 py-5 text-xs text-muted-foreground sm:px-5">
-                  No retained process samples in this window.
+                  此时间窗口内没有保留的进程采样。
                 </td>
               </tr>
             ) : null}
@@ -771,19 +769,19 @@ function AttributionTable({ entries }: { entries: ReadonlyArray<ResourceAttribut
         </colgroup>
         <thead className="border-b border-border/60 text-3xs uppercase tracking-widest text-muted-foreground/65">
           <tr>
-            <th className="px-4 py-2 font-semibold sm:pl-5">Component</th>
-            <th className="px-3 py-2 font-semibold">Operation</th>
-            <th className="px-3 py-2 text-right font-semibold">Logical Read</th>
-            <th className="px-3 py-2 text-right font-semibold">Logical Write</th>
-            <th className="px-3 py-2 text-right font-semibold">Count</th>
-            <th className="px-3 py-2 text-right font-semibold sm:pr-5">Time</th>
+            <th className="px-4 py-2 font-semibold sm:pl-5">组件</th>
+            <th className="px-3 py-2 font-semibold">操作</th>
+            <th className="px-3 py-2 text-right font-semibold">逻辑读取</th>
+            <th className="px-3 py-2 text-right font-semibold">逻辑写入</th>
+            <th className="px-3 py-2 text-right font-semibold">次数</th>
+            <th className="px-3 py-2 text-right font-semibold sm:pr-5">耗时</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border/50">
           {entries.length === 0 ? (
             <tr>
               <td colSpan={6} className="px-4 py-5 text-xs text-muted-foreground sm:px-5">
-                No instrumented application I/O has been recorded yet.
+                尚未记录到应用级 I/O。
               </td>
             </tr>
           ) : null}
@@ -869,15 +867,15 @@ export function ResourceTelemetryDiagnostics({
         let confirmed = false;
         try {
           confirmed = await ensureLocalApi().dialogs.confirm(
-            `Send SIGKILL to process ${process.identity.pid}? This cannot be handled by the process.`,
+            `是否向进程 ${process.identity.pid} 发送 SIGKILL？进程无法捕获处理此信号。`,
             { variant: "destructive" },
           );
         } catch (error) {
           clearSignaling();
           toastManager.add({
             type: "error",
-            title: "Could not confirm signal",
-            description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
+            title: "无法确认信号",
+            description: error instanceof Error ? error.message : `发送 ${signal} 失败。`,
           });
           return;
         }
@@ -909,18 +907,18 @@ export function ResourceTelemetryDiagnostics({
           if (result.value.signaled) return;
           toastManager.add({
             type: "error",
-            title: `Could not send ${signal}`,
+            title: `无法发送 ${signal}`,
             description: Option.getOrElse(
               result.value.message,
-              () => `Failed to send ${signal} to process ${process.identity.pid}.`,
+              () => `向进程 ${process.identity.pid} 发送 ${signal} 失败。`,
             ),
           });
         })
         .catch((error: unknown) => {
           toastManager.add({
             type: "error",
-            title: `Could not send ${signal}`,
-            description: error instanceof Error ? error.message : `Failed to send ${signal}.`,
+            title: `无法发送 ${signal}`,
+            description: error instanceof Error ? error.message : `发送 ${signal} 失败。`,
           });
         })
         .finally(() => {
@@ -942,9 +940,8 @@ export function ResourceTelemetryDiagnostics({
       .catch((error: unknown) => {
         toastManager.add({
           type: "error",
-          title: "Could not restart resource monitor",
-          description:
-            error instanceof Error ? error.message : "The resource monitor retry failed.",
+          title: "无法重启资源监控器",
+          description: error instanceof Error ? error.message : "资源监控器重试失败。",
         });
       })
       .finally(() => {
@@ -968,12 +965,12 @@ export function ResourceTelemetryDiagnostics({
   return (
     <>
       <SettingsSection
-        title="Resource monitor"
+        title="资源监控器"
         icon={<ActivityIcon className="size-4 text-muted-foreground" />}
         headerAction={
           <div className="flex items-center gap-2">
             {snapshot ? (
-              <SourceStatusBadge label="Native" status={snapshot.health.native.status} />
+              <SourceStatusBadge label="原生" status={snapshot.health.native.status} />
             ) : null}
             <LastSampleLabel sampledAt={snapshot?.readAt ?? null} />
             <Tooltip>
@@ -984,13 +981,13 @@ export function ResourceTelemetryDiagnostics({
                     variant="ghost"
                     disabled={telemetry.isPending}
                     onClick={telemetry.refresh}
-                    aria-label="Refresh resource telemetry"
+                    aria-label="刷新资源遥测"
                   >
                     <RefreshIcon size="xs" refreshing={telemetry.isPending} />
                   </Button>
                 }
               />
-              <TooltipPopup side="top">Refresh telemetry snapshot</TooltipPopup>
+              <TooltipPopup side="top">刷新遥测快照</TooltipPopup>
             </Tooltip>
           </div>
         }
@@ -999,52 +996,49 @@ export function ResourceTelemetryDiagnostics({
           <div className="flex flex-col gap-3 border-b border-border/60 bg-linear-to-r from-muted/45 via-muted/20 to-transparent px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div>
               <div className="text-3xs font-semibold uppercase tracking-widest text-muted-foreground/70">
-                T3 system footprint
+                T3 系统占用
               </div>
               <p className="mt-1 max-w-xl text-xs leading-relaxed text-muted-foreground">
-                Live native counters for the server, providers, terminals, desktop processes, and
-                the monitor itself.
+                服务器、提供商、终端、桌面进程以及监控器本身的实时原生计数。
               </p>
             </div>
             <div className="flex items-center gap-2 text-3xs text-muted-foreground/65">
               <span className="size-1.5 rounded-full bg-success" />
-              Sampling every {snapshot ? formatSampleInterval(snapshot.sampleIntervalMs) : "..."}
+              采样间隔 {snapshot ? formatSampleInterval(snapshot.sampleIntervalMs) : "..."}
             </div>
           </div>
           <div className="grid grid-cols-2 divide-x divide-y divide-border/55 md:grid-cols-3">
             <IconStat
               icon={<CpuIcon className="size-3.5" />}
-              label="Current CPU"
+              label="当前 CPU"
               value={allT3 ? `${allT3.currentCpuPercent.toFixed(1)}%` : "..."}
-              detail={allT3 ? `${formatCpuTime(allT3.cpuTimeMs)} observed CPU time` : undefined}
+              detail={allT3 ? `累计 CPU 时间 ${formatCpuTime(allT3.cpuTimeMs)}` : undefined}
             />
             <IconStat
               icon={<MemoryStickIcon className="size-3.5" />}
-              label="Resident memory"
+              label="常驻内存"
               value={allT3 ? formatBytes(allT3.currentRssBytes) : "..."}
-              detail={
-                allT3 ? `${formatBytes(allT3.peakRssBytes)} combined process peaks` : undefined
-              }
+              detail={allT3 ? `各进程峰值合计 ${formatBytes(allT3.peakRssBytes)}` : undefined}
             />
             <IconStat
               icon={<ActivityIcon className="size-3.5" />}
-              label="Process count"
+              label="进程数"
               value={allT3 ? String(allT3.processCount) : "..."}
               detail={
-                allT3 ? `${allT3.processStarts} starts · ${allT3.processExits} exits` : undefined
+                allT3 ? `启动 ${allT3.processStarts} 次 · 退出 ${allT3.processExits} 次` : undefined
               }
             />
             <IconStat
               icon={<HardDriveIcon className="size-3.5" />}
-              label="Read throughput"
+              label="读取吞吐"
               value={allT3 ? formatRate(allT3.ioReadBytesPerSecond) : "..."}
-              detail={allT3 ? `${formatBytes(allT3.ioReadBytes)} observed` : undefined}
+              detail={allT3 ? `已观测 ${formatBytes(allT3.ioReadBytes)}` : undefined}
             />
             <IconStat
               icon={<DatabaseIcon className="size-3.5" />}
-              label="Write throughput"
+              label="写入吞吐"
               value={allT3 ? formatRate(allT3.ioWriteBytesPerSecond) : "..."}
-              detail={allT3 ? `${formatBytes(allT3.ioWriteBytes)} observed` : undefined}
+              detail={allT3 ? `已观测 ${formatBytes(allT3.ioWriteBytes)}` : undefined}
               tone={
                 allT3 && allT3.ioWriteBytesPerSecond >= 10 * 1_024 * 1_024
                   ? "danger"
@@ -1055,11 +1049,11 @@ export function ResourceTelemetryDiagnostics({
             />
             <IconStat
               icon={<GaugeIcon className="size-3.5" />}
-              label="CPU speed limit"
+              label="CPU 速度限制"
               value={
-                snapshot ? (speedLimit === null ? "Unknown" : `${speedLimit.toFixed(0)}%`) : "..."
+                snapshot ? (speedLimit === null ? "未知" : `${speedLimit.toFixed(0)}%`) : "..."
               }
-              detail={snapshot ? `${snapshot.power.thermalState} thermal state` : undefined}
+              detail={snapshot ? `热状态 ${snapshot.power.thermalState}` : undefined}
               tone={speedLimit !== null && speedLimit < 80 ? "warning" : "default"}
             />
           </div>
@@ -1072,17 +1066,17 @@ export function ResourceTelemetryDiagnostics({
           {snapshot ? (
             <div className="grid border-t border-border/60 bg-muted/10 md:grid-cols-3">
               <AggregateCard
-                label="Backend + agents"
+                label="后端 + Agent"
                 accentClass="bg-success/80"
                 aggregate={snapshot.groups.backend}
               />
               <AggregateCard
-                label="Desktop"
+                label="桌面端"
                 accentClass="bg-info/80"
                 aggregate={snapshot.groups.electron}
               />
               <AggregateCard
-                label="Monitor overhead"
+                label="监控器开销"
                 accentClass="bg-warning/80"
                 aggregate={snapshot.groups.monitor}
               />
@@ -1092,13 +1086,13 @@ export function ResourceTelemetryDiagnostics({
       </SettingsSection>
 
       <SettingsSection
-        title="Host & collection"
+        title="主机与采集"
         icon={<GaugeIcon className="size-4 text-muted-foreground" />}
         headerAction={
           collectorNeedsRetry ? (
             <Button size="xs" variant="outline" disabled={isRetrying} onClick={retryCollector}>
               <RefreshIcon size="xs" refreshing={isRetrying} />
-              Retry monitor
+              重试监控器
             </Button>
           ) : null
         }
@@ -1109,29 +1103,29 @@ export function ResourceTelemetryDiagnostics({
               <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
                 <BatteryIcon className="size-3.5" />
               </span>
-              Host state
+              主机状态
             </div>
             {hasHostPowerSignal && snapshot ? (
               <>
                 <DetailRow
-                  label="Power source"
+                  label="电源"
                   value={booleanStateLabel(snapshot.power.onBattery, {
-                    true: "Battery",
-                    false: "External power",
+                    true: "电池",
+                    false: "外部电源",
                   })}
                 />
                 <DetailRow
-                  label="Low power mode"
+                  label="低电量模式"
                   value={booleanStateLabel(snapshot.power.lowPowerMode, {
-                    true: "Enabled",
-                    false: "Disabled",
+                    true: "已启用",
+                    false: "已禁用",
                   })}
                 />
                 <DetailRow
-                  label="Idle"
+                  label="空闲"
                   value={`${booleanStateLabel(snapshot.power.idle, {
-                    true: "Idle",
-                    false: "Active",
+                    true: "空闲",
+                    false: "活跃",
                   })}${
                     snapshot.power.idleSeconds === null
                       ? ""
@@ -1139,18 +1133,18 @@ export function ResourceTelemetryDiagnostics({
                   }`}
                 />
                 <DetailRow
-                  label="Session"
+                  label="会话"
                   value={
                     snapshot.power.suspended
-                      ? "Suspended"
+                      ? "已休眠"
                       : booleanStateLabel(snapshot.power.locked, {
-                          true: "Locked",
-                          false: "Unlocked",
+                          true: "已锁定",
+                          false: "已解锁",
                         })
                   }
                 />
                 <DetailRow
-                  label="Thermal"
+                  label="温度"
                   value={snapshot.power.thermalState}
                   valueClassName={
                     snapshot.power.thermalState === "serious" ||
@@ -1162,12 +1156,9 @@ export function ResourceTelemetryDiagnostics({
               </>
             ) : (
               <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-4 py-5">
-                <div className="text-sm font-medium text-foreground">
-                  Desktop host signals not connected
-                </div>
+                <div className="text-sm font-medium text-foreground">桌面主机信号未连接</div>
                 <p className="mt-1.5 max-w-sm text-2xs leading-relaxed text-muted-foreground/70">
-                  Power, idle, lock, and thermal state are supplied by the desktop host. Process
-                  telemetry remains fully active in this browser session.
+                  电源、空闲、锁定和热状态由桌面主机提供。进程遥测在此浏览器会话中仍完全可用。
                 </p>
               </div>
             )}
@@ -1177,22 +1168,22 @@ export function ResourceTelemetryDiagnostics({
               <span className="flex size-6 items-center justify-center rounded-md bg-muted/60">
                 <GaugeIcon className="size-3.5" />
               </span>
-              Collection health
+              采集健康状态
             </div>
             {snapshot ? (
               <>
-                <HealthSource label="Native process monitor" health={snapshot.health.native} />
-                <HealthSource label="Electron main process" health={snapshot.health.desktop} />
+                <HealthSource label="原生进程监控器" health={snapshot.health.native} />
+                <HealthSource label="Electron 主进程" health={snapshot.health.desktop} />
                 <DetailRow
-                  label="Collection time"
+                  label="采集耗时"
                   value={formatDurationMicros(snapshot.health.collectionDurationMicros)}
                 />
                 <DetailRow
-                  label="Process scan"
-                  value={`${snapshot.health.retainedProcessCount}/${snapshot.health.scannedProcessCount} retained`}
+                  label="进程扫描"
+                  value={`已保留 ${snapshot.health.retainedProcessCount}/${snapshot.health.scannedProcessCount}`}
                 />
                 <DetailRow
-                  label="Inaccessible"
+                  label="无法访问"
                   value={String(snapshot.health.inaccessibleProcessCount)}
                   valueClassName={
                     snapshot.health.inaccessibleProcessCount > 0
@@ -1201,9 +1192,9 @@ export function ResourceTelemetryDiagnostics({
                   }
                 />
                 <DetailRow
-                  label="Sidecar"
+                  label="辅助进程"
                   value={Option.match(snapshot.health.sidecarVersion, {
-                    onNone: () => "Unavailable",
+                    onNone: () => "不可用",
                     onSome: (version) =>
                       `${version}${Option.match(snapshot.health.sidecarPid, {
                         onNone: () => "",
@@ -1211,19 +1202,17 @@ export function ResourceTelemetryDiagnostics({
                       })}`,
                   })}
                 />
-                <DetailRow label="Restarts" value={String(snapshot.health.restartCount)} />
+                <DetailRow label="重启次数" value={String(snapshot.health.restartCount)} />
               </>
             ) : (
-              <div className="py-4 text-xs text-muted-foreground">
-                Waiting for collector health.
-              </div>
+              <div className="py-4 text-xs text-muted-foreground">正在等待采集器健康状态。</div>
             )}
           </div>
         </div>
       </SettingsSection>
 
       <SettingsSection
-        title="Resource timeline"
+        title="资源时间线"
         icon={<HardDriveIcon className="size-4 text-muted-foreground" />}
         headerAction={
           <div className="flex items-center gap-2">
@@ -1233,7 +1222,7 @@ export function ResourceTelemetryDiagnostics({
               variant="ghost"
               disabled={history.isPending}
               onClick={history.refresh}
-              aria-label="Refresh resource history"
+              aria-label="刷新资源历史"
             >
               <RefreshIcon size="xs" refreshing={history.isPending} />
             </Button>
@@ -1253,12 +1242,12 @@ export function ResourceTelemetryDiagnostics({
       </SettingsSection>
 
       <SettingsSection
-        title="Live process tree"
+        title="实时进程树"
         icon={<CpuIcon className="size-4 text-muted-foreground" />}
         headerAction={
           snapshot ? (
             <span className="text-3xs text-muted-foreground/55">
-              Identity: <span className="font-mono">PID + start time</span>
+              标识：<span className="font-mono">PID + 启动时间</span>
             </span>
           ) : null
         }
@@ -1274,17 +1263,16 @@ export function ResourceTelemetryDiagnostics({
       </SettingsSection>
 
       <SettingsSection
-        title="Instrumented application I/O"
+        title="应用级 I/O"
         icon={<DatabaseIcon className="size-4 text-muted-foreground" />}
         headerAction={
-          <span className="text-3xs text-muted-foreground/55">Logical bytes by operation</span>
+          <span className="text-3xs text-muted-foreground/55">按操作统计的逻辑字节</span>
         }
       >
         <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-xs/5">
           <div className="bg-muted/15 px-4 py-3 text-2xs leading-relaxed text-muted-foreground sm:px-5">
-            Native counters identify which process is reading or writing. These application-level
-            counters identify known T3 operations so process spikes can be correlated with specific
-            persistence and logging paths.
+            原生计数标识哪个进程在读或写。这些应用级计数标识已知的 T3
+            操作，以便将进程峰值与具体的持久化和日志路径关联起来。
           </div>
           <AttributionTable entries={snapshot?.attribution.entries ?? []} />
         </div>

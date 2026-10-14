@@ -60,11 +60,7 @@ export async function handleDesktopAppActivationRequest(
 ): Promise<DesktopAppActivationResponse> {
   const target = dependencies.getTarget();
   if (target === null) {
-    return failure(
-      request.requestId,
-      "environment-unavailable",
-      "The desktop app's primary local environment is not connected.",
-    );
+    return failure(request.requestId, "environment-unavailable", "桌面应用的主本地环境未连接。");
   }
 
   const requestPlatform = desktopPlatformToEnvironmentOs(request.platform);
@@ -72,7 +68,7 @@ export async function handleDesktopAppActivationRequest(
     return failure(
       request.requestId,
       "platform-mismatch",
-      `The command path is for ${requestPlatform}, but the desktop app's primary environment uses ${target.platform}. Cross-platform path mapping is not supported.`,
+      `命令路径属于 ${requestPlatform}，但桌面应用的主环境使用 ${target.platform}。不支持跨平台路径映射。`,
     );
   }
 
@@ -85,7 +81,7 @@ export async function handleDesktopAppActivationRequest(
       return failure(
         request.requestId,
         "project-create-failed",
-        errorMessage(error, "T3 Code could not add the project."),
+        errorMessage(error, "T3 Code 无法添加该项目。"),
       );
     }
   }
@@ -96,11 +92,7 @@ export async function handleDesktopAppActivationRequest(
       projectId,
     });
     if (opened === null) {
-      return failure(
-        request.requestId,
-        "thread-open-failed",
-        "T3 Code could not open a new thread for the project.",
-      );
+      return failure(request.requestId, "thread-open-failed", "T3 Code 无法为该项目新建会话。");
     }
     return {
       version: 1,
@@ -113,7 +105,7 @@ export async function handleDesktopAppActivationRequest(
     return failure(
       request.requestId,
       "thread-open-failed",
-      errorMessage(error, "T3 Code could not open a new thread for the project."),
+      errorMessage(error, "T3 Code 无法为该项目新建会话。"),
     );
   }
 }

@@ -6,10 +6,10 @@ const mobileClientUpdatedAtFormatter = new Intl.DateTimeFormat(undefined, {
 });
 
 const NOTIFICATION_PREFERENCES = [
-  ["notifyOnApproval", "approvals"],
-  ["notifyOnInput", "input requests"],
-  ["notifyOnCompletion", "completions"],
-  ["notifyOnFailure", "failures"],
+  ["notifyOnApproval", "批准请求"],
+  ["notifyOnInput", "输入请求"],
+  ["notifyOnCompletion", "完成通知"],
+  ["notifyOnFailure", "失败通知"],
 ] as const satisfies ReadonlyArray<
   readonly [keyof RelayClientDeviceRecord["notifications"], string]
 >;
@@ -26,20 +26,20 @@ export function mobileClientPlatformLabel(device: RelayClientDeviceRecord): stri
 
 export function mobileClientNotificationDetail(device: RelayClientDeviceRecord): string {
   if (!device.notifications.enabled) {
-    return "Push notifications are disabled on this device.";
+    return "此设备已禁用推送通知。";
   }
 
   const enabledPreferences = NOTIFICATION_PREFERENCES.flatMap(([preference, label]) =>
     device.notifications[preference] ? [label] : [],
   );
   return enabledPreferences.length > 0
-    ? `Alerts enabled for ${enabledPreferences.join(", ")}.`
-    : "Push notifications are enabled, but no alert types are selected.";
+    ? `已启用以下提醒：${enabledPreferences.join("、")}。`
+    : "推送通知已启用，但未选择任何提醒类型。";
 }
 
 export function mobileClientUpdatedAtLabel(updatedAt: string): string {
   const date = new Date(updatedAt);
   return Number.isNaN(date.getTime())
-    ? "Update time unavailable"
-    : `Updated ${mobileClientUpdatedAtFormatter.format(date)}`;
+    ? "更新时间不可用"
+    : `更新于 ${mobileClientUpdatedAtFormatter.format(date)}`;
 }

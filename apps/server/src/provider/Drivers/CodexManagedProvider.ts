@@ -74,7 +74,7 @@ export const makeManagedCodexProvider = Effect.fn("makeManagedCodexProvider")(fu
         ...base,
         installed: false,
         models: [],
-        message: "Set up Codex to get started.",
+        message: "请先设置 Codex。",
         auth: { status: "unauthenticated" as const },
       };
     const saved = yield* runtime.auth.read.pipe(Effect.orElseSucceed(() => Option.none()));
@@ -85,7 +85,7 @@ export const makeManagedCodexProvider = Effect.fn("makeManagedCodexProvider")(fu
         version: executable.value.version,
         models: [],
         message:
-          "Signed in with ChatGPT, but token sharing is disabled. Sign in again and enable token sharing, or use another provider.",
+          "已通过 ChatGPT 登录，但 Token 共享未启用。请重新登录并启用 Token 共享，或使用其他提供商。",
         auth: {
           status: "unauthenticated" as const,
           label: "ChatGPT",
@@ -98,7 +98,7 @@ export const makeManagedCodexProvider = Effect.fn("makeManagedCodexProvider")(fu
         installed: true,
         version: executable.value.version,
         models: [],
-        message: "Sign in with ChatGPT to use Codex.",
+        message: "请通过 ChatGPT 登录以使用 Codex。",
         auth: { status: "unauthenticated" as const },
       };
     const usageLimits = {
@@ -106,10 +106,9 @@ export const makeManagedCodexProvider = Effect.fn("makeManagedCodexProvider")(fu
       windows: [],
       unavailable: {
         reason: "unsupported" as const,
-        message:
-          "ChatGPT tracks subscription usage across connected apps. Open Usage settings with the account you connected to Codex.",
+        message: "ChatGPT 会统计已连接应用的订阅用量。请使用连接 Codex 的账户打开用量设置。",
       },
-      externalUsage: { label: "ChatGPT usage", url: "https://chatgpt.com/#settings/Usage" },
+      externalUsage: { label: "ChatGPT 用量", url: "https://chatgpt.com/#settings/Usage" },
     };
     const managedAuth = {
       subscriptionSharing: true,
@@ -188,7 +187,7 @@ export const makeManagedCodexProvider = Effect.fn("makeManagedCodexProvider")(fu
             ...(Option.isSome(current) && current.value.scopes.includes("chatgpt.tokens.use.direct")
               ? { usageLimits }
               : {}),
-            message: "Could not check Codex right now. Retry, or reconnect in provider settings.",
+            message: "暂时无法检查 Codex。请重试，或在提供商设置中重新连接。",
           })),
         ),
       ),

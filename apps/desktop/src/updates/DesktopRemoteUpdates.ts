@@ -121,7 +121,7 @@ export const listen: Effect.Effect<
             prepared.value.status === "committing" &&
             state.errorContext === "install"
           ) {
-            const reason = state.message ?? "The desktop app failed to install the update.";
+            const reason = state.message ?? "桌面应用安装更新失败。";
             if (yield* recordPreparedFailure(prepared.value.requestId, reason)) {
               yield* publishReport(state, { outcome: "failed", reason }, prepared.value.requestId);
             }
@@ -170,7 +170,7 @@ export const listen: Effect.Effect<
             yield* updates.getState,
             {
               outcome: "failed",
-              reason: "A prepared desktop update is already in progress.",
+              reason: "已有准备就绪的桌面更新正在进行。",
             },
             request.requestId,
           );
@@ -240,7 +240,7 @@ export const listen: Effect.Effect<
                     state,
                     {
                       outcome: "failed",
-                      reason: "The desktop app lost the downloaded update.",
+                      reason: "桌面应用丢失了已下载的更新。",
                     },
                     request.requestId,
                   );
@@ -394,7 +394,7 @@ export const listen: Effect.Effect<
           yield* updates.getState,
           {
             outcome: "failed",
-            reason: "This desktop update is no longer prepared.",
+            reason: "此桌面更新已不再处于准备就绪状态。",
           },
           commit.requestId,
         );
@@ -405,7 +405,7 @@ export const listen: Effect.Effect<
           current,
           {
             outcome: "failed",
-            reason: claim.prepared.failureReason ?? "The desktop app failed to install the update.",
+            reason: claim.prepared.failureReason ?? "桌面应用安装更新失败。",
           },
           commit.requestId,
         );
@@ -416,7 +416,7 @@ export const listen: Effect.Effect<
       }
       yield* Ref.set(activeRequestIdRef, Option.some(commit.requestId));
       if (current.downloadedVersion !== claim.prepared.downloadedVersion) {
-        const reason = "This desktop update is no longer prepared.";
+        const reason = "此桌面更新已不再处于准备就绪状态。";
         if (yield* recordPreparedFailure(commit.requestId, reason)) {
           yield* publishReport(current, { outcome: "failed", reason }, commit.requestId);
         }
@@ -439,7 +439,7 @@ export const listen: Effect.Effect<
         return;
       }
       if (!result.accepted || result.failed) {
-        const reason = result.state.message ?? "The desktop app could not start the install.";
+        const reason = result.state.message ?? "桌面应用无法开始安装。";
         if (yield* recordPreparedFailure(commit.requestId, reason)) {
           yield* publishReport(result.state, { outcome: "failed", reason }, commit.requestId);
         }

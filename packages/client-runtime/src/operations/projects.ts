@@ -140,7 +140,7 @@ export function sortAddProjectProviderSources(
 const READY: AddProjectRemoteSourceReadinessEntry = { ready: true, hint: null };
 const UNAVAILABLE: AddProjectRemoteSourceReadinessEntry = {
   ready: false,
-  hint: "Provider status unavailable. Open Source Control settings and rescan.",
+  hint: "提供商状态不可用，请打开源代码管理设置并重新扫描。",
 };
 
 export function buildAddProjectRemoteSourceReadiness(
@@ -159,7 +159,7 @@ export function buildAddProjectRemoteSourceReadiness(
         ready: false,
         hint:
           Option.getOrNull(provider.auth.detail) ??
-          `${provider.label} is not authenticated. Open Source Control settings for setup guidance.`,
+          `${provider.label} 尚未认证，请打开源代码管理设置查看配置指引。`,
       };
     }
     return READY;
@@ -301,16 +301,16 @@ export function resolveAddProjectPath(input: {
 }): { readonly ok: true; readonly path: string } | { readonly ok: false; readonly error: string } {
   const rawPath = input.rawPath.trim();
   if (rawPath.length === 0) {
-    return { ok: false, error: "Enter a project path." };
+    return { ok: false, error: "请输入项目路径。" };
   }
   if (isUnsupportedWindowsProjectPath(rawPath, input.platform)) {
-    return { ok: false, error: "Windows-style paths are only supported on Windows environments." };
+    return { ok: false, error: "Windows 风格的路径仅在 Windows 环境中受支持。" };
   }
   if (isExplicitRelativeProjectPath(rawPath) && !input.currentProjectCwd) {
-    return { ok: false, error: "Relative paths require an active project in this environment." };
+    return { ok: false, error: "使用相对路径需要此环境中存在进行中的项目。" };
   }
   const path = resolveProjectPathForDispatch(rawPath, input.currentProjectCwd);
-  return path.length === 0 ? { ok: false, error: "Enter a project path." } : { ok: true, path };
+  return path.length === 0 ? { ok: false, error: "请输入项目路径。" } : { ok: true, path };
 }
 
 export function findExistingAddProject(input: {

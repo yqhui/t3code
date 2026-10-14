@@ -49,7 +49,7 @@ export function nextRemoteDesktopUpdateStep(
     return {
       action: "done",
       outcome: "failed",
-      reason: disabledReason ?? "Automatic updates are disabled on this machine.",
+      reason: disabledReason ?? "此设备已禁用自动更新。",
     };
   }
   // Mirror installDownloadedUpdate's own admission rule exactly, so the run
@@ -68,7 +68,7 @@ export function nextRemoteDesktopUpdateStep(
       return {
         action: "done",
         outcome: "failed",
-        reason: state.message ?? "The desktop app failed to download the update.",
+        reason: state.message ?? "桌面应用下载更新失败。",
       };
     }
     return { action: "download" };
@@ -89,7 +89,7 @@ export function nextRemoteDesktopUpdateStep(
     return {
       action: "done",
       outcome: "failed",
-      reason: state.message ?? "The desktop app update failed.",
+      reason: state.message ?? "桌面应用更新失败。",
     };
   }
   // status === "idle"
@@ -97,7 +97,7 @@ export function nextRemoteDesktopUpdateStep(
     return {
       action: "done",
       outcome: "failed",
-      reason: "The desktop app did not report an update result.",
+      reason: "桌面应用未报告更新结果。",
     };
   }
   return { action: "check" };

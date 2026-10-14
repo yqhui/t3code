@@ -6,7 +6,7 @@ export class DeviceScreenshotError extends Error {
   readonly status: number;
 
   constructor(status: number) {
-    super(`Screenshot capture failed (${status}). Try again.`);
+    super(`截图失败（${status}），请重试。`);
     this.status = status;
   }
 }
@@ -25,6 +25,6 @@ export async function captureDeviceScreenshot(target: DeviceStreamTarget, signal
   });
   if (!response.ok) throw new DeviceScreenshotError(response.status);
   const image = await response.blob();
-  if (!image.size) throw new Error("The device returned an empty screenshot. Try again.");
+  if (!image.size) throw new Error("设备返回了空截图，请重试。");
   return image;
 }

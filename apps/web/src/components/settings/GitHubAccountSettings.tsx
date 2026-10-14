@@ -82,8 +82,8 @@ export function GitHubAccountSettings({
   if (groups.length === 0) {
     return (
       <p className="text-xs text-muted-foreground">
-        Sign in with <code className="rounded bg-muted px-1 py-px text-2xs">gh auth login</code> on
-        the server host, then rescan to choose accounts here.
+        请使用 <code className="rounded bg-muted px-1 py-px text-2xs">gh auth login</code>{" "}
+        在服务器主机上登录，然后重新扫描以在此选择账户。
       </p>
     );
   }
@@ -92,14 +92,14 @@ export function GitHubAccountSettings({
     <div className="grid gap-4">
       <div className="flex items-center justify-between gap-3">
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
-          Choose which <code className="rounded bg-muted px-1 py-px text-2xs">gh</code> login each
-          GitHub host uses, or turn a host off.
+          选择各 GitHub 主机使用的 <code className="rounded bg-muted px-1 py-px text-2xs">gh</code>{" "}
+          登录，或关闭某个主机。
         </p>
         <Button
           size="icon-xs"
           variant="ghost-muted"
           onClick={() => setRevealed((current) => !current)}
-          aria-label={revealed ? "Hide GitHub accounts" : "Reveal GitHub accounts"}
+          aria-label={revealed ? "隐藏 GitHub 账户" : "显示 GitHub 账户"}
           aria-pressed={revealed}
         >
           {revealed ? <EyeOffIcon /> : <EyeIcon />}
@@ -118,7 +118,7 @@ export function GitHubAccountSettings({
                 <span className="text-xs font-medium text-foreground">{group.host}</span>
                 {group.selectable.length === 1 && group.selectable[0] !== undefined ? (
                   <p className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-                    <span>Signed in as</span>
+                    <span>已登录为</span>
                     <RedactedLogin revealed={revealed} account={group.selectable[0]} />
                   </p>
                 ) : null}
@@ -126,13 +126,13 @@ export function GitHubAccountSettings({
               <Switch
                 checked={enabled}
                 disabled={saving}
-                aria-label={`Use GitHub on ${group.host}`}
+                aria-label={`在 ${group.host} 上使用 GitHub`}
                 onCheckedChange={(checked) => void save(group.host, { enabled: checked })}
               />
             </div>
             {group.selectable.length > 1 ? (
               <div className="flex items-center justify-between gap-3">
-                <span className="text-xs text-muted-foreground">Account</span>
+                <span className="text-xs text-muted-foreground">账户</span>
                 <div className="w-64 max-w-full">
                   <Select
                     value={pinned}
@@ -144,12 +144,12 @@ export function GitHubAccountSettings({
                       });
                     }}
                   >
-                    <SelectTrigger size="sm" aria-label={`GitHub account for ${group.host}`}>
+                    <SelectTrigger size="sm" aria-label={`${group.host} 的 GitHub 账户`}>
                       <SelectValue>
                         {(value: string) =>
                           value === ACTIVE_ACCOUNT ? (
                             <span className="flex min-w-0 items-center gap-1">
-                              Active gh account
+                              当前 gh 账户
                               {group.activeAccount ? (
                                 <>
                                   (
@@ -170,7 +170,7 @@ export function GitHubAccountSettings({
                     <SelectPopup align="end" alignItemWithTrigger={false}>
                       <SelectItem value={ACTIVE_ACCOUNT}>
                         <span className="flex min-w-0 items-center gap-1">
-                          Active gh account
+                          当前 gh 账户
                           {group.activeAccount ? (
                             <>
                               (<RedactedLogin revealed={revealed} account={group.activeAccount} />)
@@ -183,7 +183,7 @@ export function GitHubAccountSettings({
                           <RedactedLogin
                             revealed={revealed}
                             account={account}
-                            label={`Account ${index + 1}`}
+                            label={`账户 ${index + 1}`}
                           />
                         </SelectItem>
                       ))}
@@ -194,16 +194,14 @@ export function GitHubAccountSettings({
             ) : null}
             {stalePin ? (
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs text-warning">
-                  The chosen login is no longer signed in, so the active gh login is used.
-                </p>
+                <p className="text-xs text-warning">所选账户已登出，因此使用当前 gh 登录。</p>
                 <Button
                   size="xs"
                   variant="outline"
                   disabled={saving}
                   onClick={() => void save(group.host, { account: null })}
                 >
-                  Use active login
+                  使用当前登录
                 </Button>
               </div>
             ) : null}
@@ -213,13 +211,13 @@ export function GitHubAccountSettings({
                 className="flex min-w-0 flex-wrap items-center gap-1 text-xs text-muted-foreground/70"
               >
                 <RedactedLogin revealed={revealed} account={entry.account} />
-                <span>can't be used: {entry.error ?? "gh reports this login as invalid."}</span>
+                <span>无法使用：{entry.error ?? "gh 报告此登录无效。"}</span>
               </p>
             ))}
             {group.environmentVariable ? (
               <p className="text-xs text-warning">
-                {group.environmentVariable} is set on the server, so it overrides the account chosen
-                here until it is unset.
+                {group.environmentVariable}{" "}
+                已在服务器上设置，因此会覆盖此处选择的账户，直到取消设置。
               </p>
             ) : null}
           </div>

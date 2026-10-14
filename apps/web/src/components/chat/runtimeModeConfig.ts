@@ -6,23 +6,23 @@ export const runtimeModeConfig: Record<
   { label: string; description: string; icon: LucideIcon }
 > = {
   "approval-required": {
-    label: "Supervised",
-    description: "Ask before commands and file changes.",
+    label: "受监督",
+    description: "执行命令和更改文件前先询问。",
     icon: LockIcon,
   },
   "auto-accept-edits": {
-    label: "Auto-accept edits",
-    description: "Auto-approve edits, ask before other actions.",
+    label: "自动接受编辑",
+    description: "自动批准编辑，其他操作前先询问。",
     icon: PenLineIcon,
   },
   auto: {
-    label: "Auto",
-    description: "Supported providers approve routine actions; others still ask.",
+    label: "自动",
+    description: "受支持的提供商会批准常规操作，其余仍会询问。",
     icon: SparklesIcon,
   },
   "full-access": {
-    label: "Full access",
-    description: "Allow commands and edits without prompts.",
+    label: "完全访问",
+    description: "允许执行命令和编辑，无需确认。",
     icon: LockOpenIcon,
   },
 };

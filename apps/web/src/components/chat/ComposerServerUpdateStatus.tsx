@@ -24,14 +24,14 @@ export function ComposerServerUpdateIcon({
 /** One text line, clipped at the end so the error detail never squeezes its title. */
 export function ComposerServerUpdateStatus({
   state,
-  serverLabel = "server",
+  serverLabel = "服务器",
 }: {
   readonly state: Exclude<ServerUpdateState, { status: "idle" }>;
   readonly serverLabel?: string;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const triggerId = useId();
-  const title = `${state.status === "failed" ? "Could not update" : "Updating"} ${serverLabel}`;
+  const title = `${state.status === "failed" ? "无法更新" : "正在更新"} ${serverLabel}`;
   const detail = state.status === "failed" ? state.message : serverUpdateStageLabel(state.stage);
   return (
     <span

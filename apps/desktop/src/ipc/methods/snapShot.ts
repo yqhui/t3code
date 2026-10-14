@@ -118,7 +118,7 @@ export const previewSnapShotConfig = DesktopIpc.makeIpcMethod({
         defaultPath: Option.fromUndefinedOr(state.shortcutConfigPath),
         filters: [
           {
-            name: "Desktop config",
+            name: "桌面配置文件",
             extensions: state.linuxBackend === "niri" ? ["kdl"] : ["conf", "lua"],
           },
         ],

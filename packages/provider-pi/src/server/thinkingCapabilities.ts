@@ -12,13 +12,13 @@ const PI_THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh", 
 export type PiThinkingLevel = (typeof PI_THINKING_LEVELS)[number];
 
 const PI_THINKING_LEVEL_LABELS: Record<PiThinkingLevel, string> = {
-  off: "Off",
-  minimal: "Minimal",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  xhigh: "Extra High",
-  max: "Max",
+  off: "关闭",
+  minimal: "最低",
+  low: "低",
+  medium: "中",
+  high: "高",
+  xhigh: "极高",
+  max: "最高",
 };
 
 export const EMPTY_PI_MODEL_CAPABILITIES: ModelCapabilities = createModelCapabilities({
@@ -36,7 +36,7 @@ export function thinkingCapabilitiesForPiModel(
     optionDescriptors: [
       {
         id: "thinking",
-        label: "Thinking",
+        label: "思考",
         type: "select",
         options: levels.map((level): ProviderOptionChoice => ({
           id: level,

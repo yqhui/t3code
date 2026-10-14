@@ -41,9 +41,9 @@ import { UsageLimitsPooled } from "./UsageLimitsPooled";
 import { PROVIDER_PRESENTATION } from "./usageProviders";
 
 const PACE: Record<LimitPace, { readonly label: string; readonly icon: typeof GaugeIcon }> = {
-  ahead: { label: "Ahead of pace: spending faster than the window elapses", icon: TrendingUpIcon },
-  on: { label: "On pace with the window", icon: GaugeIcon },
-  under: { label: "Under pace: headroom left for the rest of the window", icon: TrendingDownIcon },
+  ahead: { label: "超出进度：用量消耗快于时间窗口流逝", icon: TrendingUpIcon },
+  on: { label: "用量消耗与时间窗口进度一致", icon: GaugeIcon },
+  under: { label: "低于进度：时间窗口剩余部分仍有额度", icon: TrendingDownIcon },
 };
 
 /** The series colour the cost chart uses for this driver, so the two views read as one. */
@@ -104,9 +104,9 @@ function WindowBar({
   const resetsAt = window.resetsAt
     ? formatUpcomingTimestamp(window.resetsAt, timestampFormat, now)
     : null;
-  const summary = `${window.label}: ${remaining}% left${
-    timeLeft === null ? "" : `, ${timeLeft}% of the window left`
-  }${resetsIn ? `, ${resetsIn}` : ""}`;
+  const summary = `${window.label}：剩余 ${remaining}%${
+    timeLeft === null ? "" : `，时间窗口剩余 ${timeLeft}%`
+  }${resetsIn ? `，${resetsIn}` : ""}`;
 
   return (
     <Tooltip>
@@ -138,14 +138,14 @@ function WindowBar({
       <TooltipPopup side="top">
         <div className="flex flex-col gap-0.5">
           <span className="text-foreground">
-            {remaining}% left{timeLeft !== null ? ` · ${timeLeft}% of the window left` : ""}
+            剩余 {remaining}%{timeLeft !== null ? ` · 时间窗口剩余 ${timeLeft}%` : ""}
           </span>
           {timeLeft !== null ? (
-            <span className="text-muted-foreground">The line is where even spending would be.</span>
+            <span className="text-muted-foreground">此线表示均匀消耗额度时的位置。</span>
           ) : null}
           {resetsAt ? (
             <span className="text-muted-foreground">
-              Resets {resetsAt}
+              重置时间 {resetsAt}
               {resetsIn ? ` · ${resetsIn}` : ""}
             </span>
           ) : null}
@@ -187,7 +187,7 @@ export function LimitWindows({
             <span className="flex min-w-0 items-center gap-2 text-xs">
               <span className="truncate text-muted-foreground">{window.label}</span>
               <span className="ms-auto shrink-0 font-medium text-foreground tabular-nums">
-                {remainingPercent(window)}% left
+                剩余 {remainingPercent(window)}%
               </span>
             </span>
             <WindowBar color={color} window={window} now={now} />
@@ -203,10 +203,10 @@ export function LimitWindows({
 }
 
 const OUTCOME_TEXT: Record<ProviderConsumeResetCreditOutcome, string> = {
-  reset: "Reset applied. Your windows have cleared.",
-  nothingToReset: "Nothing to reset right now.",
-  noCredit: "No reset credit left.",
-  alreadyRedeemed: "That credit was already redeemed.",
+  reset: "已重置。当前时间窗口的用量已清零。",
+  nothingToReset: "目前没有可重置的用量。",
+  noCredit: "已无可用的重置次数。",
+  alreadyRedeemed: "该重置次数已使用。",
 };
 
 /** Everything a redeem needs: where to send it and what to say afterwards. */
@@ -234,7 +234,7 @@ export function useResetCredit(
     setStatus(
       "error" in result.cause && result.cause.error instanceof Error
         ? result.cause.error.message
-        : "Could not use the reset credit.",
+        : "无法使用重置次数。",
     );
   };
 
@@ -262,16 +262,15 @@ export function ResetCreditDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogPopup>
         <AlertDialogHeader>
-          <AlertDialogTitle>Use a reset credit?</AlertDialogTitle>
+          <AlertDialogTitle>使用一次重置？</AlertDialogTitle>
           <AlertDialogDescription>
-            This redeems one credit on your account and clears the current rate-limit windows. It
-            cannot be undone.
+            这会消耗账户的一次重置机会，并清零当前限额时间窗口的用量。 此操作无法撤销。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
           <Button disabled={disabled} onClick={onConfirm}>
-            Use credit
+            使用重置次数
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>
@@ -288,11 +287,11 @@ export function resetCreditsSummary(
   const expiresIn = credits.nextExpiresAt
     ? formatDuration(Date.parse(credits.nextExpiresAt) - now)
     : null;
-  if (credits.availableCount === 0) return "No reset credits banked";
+  if (credits.availableCount === 0) return "暂无可用的重置次数";
   if (compact)
-    return `${credits.availableCount} banked${expiresIn ? ` · expires in ${expiresIn}` : ""}`;
-  return `${credits.availableCount} ${credits.availableCount === 1 ? "reset credit" : "reset credits"} banked${
-    expiresIn ? ` · next expires in ${expiresIn}` : ""
+    return `已积攒 ${credits.availableCount} 次${expiresIn ? ` · ${expiresIn} 后到期` : ""}`;
+  return `已积攒 ${credits.availableCount} ${credits.availableCount === 1 ? "次重置" : "次重置"}${
+    expiresIn ? ` · 下一次将在 ${expiresIn} 后到期` : ""
   }`;
 }
 
@@ -325,7 +324,7 @@ export function ResetCredits({
             if (readEnvironmentScope(environmentId, AuthProvidersManageScope)) setConfirming(true);
           }}
         >
-          {busy ? "Using…" : "Use reset"}
+          {busy ? "正在使用…" : "使用重置"}
         </Button>
       ) : null}
       {status ? <span className="text-foreground">{status}</span> : null}

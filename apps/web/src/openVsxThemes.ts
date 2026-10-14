@@ -176,7 +176,7 @@ function manifestLicenseMatches(manifest: Record<string, unknown>, license: stri
 
 function extensionFromDetail(value: unknown): OpenVsxThemeExtension | null {
   if (!isRecord(value) || !isRecord(value.files)) {
-    throw new Error("Open VSX returned malformed theme details.");
+    throw new Error("Open VSX 返回了格式错误的主题详情。");
   }
   const namespace = typeof value.namespace === "string" ? value.namespace.trim() : "";
   const extensionName = typeof value.name === "string" ? value.name.trim() : "";
@@ -188,7 +188,7 @@ function extensionFromDetail(value: unknown): OpenVsxThemeExtension | null {
   const sha256Url = trustedOpenVsxUrl(value.files.sha256);
   const vsixUrl = trustedOpenVsxUrl(value.files.download);
   if (!namespace || !extensionName || !version || !manifestUrl || !sha256Url || !vsixUrl) {
-    throw new Error("Open VSX returned malformed theme details.");
+    throw new Error("Open VSX 返回了格式错误的主题详情。");
   }
   if (!SUPPORTED_LICENSES.has(license)) return null;
   const id = `${namespace}.${extensionName}`;
@@ -228,7 +228,7 @@ async function withSearchTimeout<T>(
     return await operation(controller.signal);
   } catch (cause) {
     if (controller.signal.aborted && !parentSignal?.aborted) {
-      throw new Error("Open VSX took too long to respond.", { cause });
+      throw new Error("Open VSX 响应超时。", { cause });
     }
     throw cause;
   } finally {
@@ -253,20 +253,20 @@ export async function searchOpenVsxThemes(
   url.searchParams.set("size", "16");
   const value = await withSearchTimeout(async (requestSignal) => {
     const response = await fetch(url, { signal: requestSignal });
-    if (!response.ok) throw new Error("Open VSX search is unavailable right now.");
+    if (!response.ok) throw new Error("Open VSX 搜索目前不可用。");
     const searchBytes = await readCappedResponse(
       response,
       MAX_SEARCH_BYTES,
-      "Open VSX returned an unexpectedly large response.",
+      "Open VSX 返回了超出预期的过大响应。",
     );
     try {
       return JSON.parse(new TextDecoder().decode(searchBytes)) as unknown;
     } catch {
-      throw new Error("Open VSX returned an unreadable response.");
+      throw new Error("Open VSX 返回了无法读取的响应。");
     }
   }, signal);
   if (!isRecord(value) || !Array.isArray(value.extensions)) {
-    throw new Error("Open VSX returned an unreadable search response.");
+    throw new Error("Open VSX 返回了无法读取的搜索响应。");
   }
   const identities = value.extensions.flatMap((candidate): Array<[string, string]> => {
     if (!isRecord(candidate)) return [];
@@ -279,11 +279,11 @@ export async function searchOpenVsxThemes(
       withSearchTimeout(async (requestSignal) => {
         const detailUrl = `https://open-vsx.org/api/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`;
         const detailResponse = await fetch(detailUrl, { signal: requestSignal });
-        if (!detailResponse.ok) throw new Error("Open VSX theme details are unavailable.");
+        if (!detailResponse.ok) throw new Error("Open VSX 主题详情不可用。");
         const detailBytes = await readCappedResponse(
           detailResponse,
           MAX_DETAIL_BYTES,
-          "Open VSX returned an unexpectedly large detail response.",
+          "Open VSX 返回了超出预期的过大详情响应。",
         );
         try {
           const extension = extensionFromDetail(JSON.parse(new TextDecoder().decode(detailBytes)));
@@ -301,18 +301,15 @@ export async function searchOpenVsxThemes(
           const manifestBytes = await readCappedResponse(
             manifestResponse,
             MAX_MANIFEST_BYTES,
-            "Open VSX returned an unexpectedly large manifest.",
+            "Open VSX 返回了超出预期的过大清单。",
           );
-          const manifest = parseJsoncObject(
-            new TextDecoder().decode(manifestBytes),
-            "Extension manifest",
-          );
+          const manifest = parseJsoncObject(new TextDecoder().decode(manifestBytes), "扩展清单");
           return themeContributions(manifest).length > 0 &&
             manifestLicenseMatches(manifest, extension.license)
             ? extension
             : null;
         } catch {
-          throw new Error("Open VSX returned unreadable theme details.");
+          throw new Error("Open VSX 返回了无法读取的主题详情。");
         }
       }, signal),
     ),
@@ -320,7 +317,7 @@ export async function searchOpenVsxThemes(
   if (signal?.aborted) throw new DOMException("The operation was aborted.", "AbortError");
   const completedDetails = details.filter((result) => result.status === "fulfilled");
   if (identities.length > 0 && completedDetails.length === 0) {
-    throw new Error("Open VSX theme details are unavailable right now.");
+    throw new Error("Open VSX 主题详情目前不可用。");
   }
   return completedDetails.flatMap((result) => (result.value ? [result.value] : [])).slice(0, 8);
 }
@@ -328,7 +325,7 @@ export async function searchOpenVsxThemes(
 function parseJsoncObject(source: string, description: string): Record<string, unknown> {
   const errors: ParseError[] = [];
   const value: unknown = parse(source, errors, { allowTrailingComma: true });
-  if (errors.length > 0 || !isRecord(value)) throw new Error(`${description} is not valid JSON.`);
+  if (errors.length > 0 || !isRecord(value)) throw new Error(`${description} 不是有效的 JSON。`);
   return value;
 }
 
@@ -358,7 +355,7 @@ function normalizePackagePath(path: string, relativeTo = "extension/"): string {
     path.startsWith("/") ||
     /^[a-zA-Z]:/.test(path)
   ) {
-    throw new Error("Theme path is not a safe relative package path.");
+    throw new Error("主题路径不是安全的相对包路径。");
   }
   const normalizedInput = path.replaceAll("\\", "/");
   const baseSegments = relativeTo.split("/").slice(0, -1);
@@ -366,7 +363,7 @@ function normalizePackagePath(path: string, relativeTo = "extension/"): string {
   for (const segment of normalizedInput.split("/")) {
     if (!segment || segment === ".") continue;
     if (segment === "..") {
-      if (segments.length <= 1) throw new Error("Theme path escapes the extension package.");
+      if (segments.length <= 1) throw new Error("主题路径超出了扩展包范围。");
       segments.pop();
       continue;
     }
@@ -476,12 +473,12 @@ async function readZipText(
 ): Promise<string> {
   signal?.throwIfAborted();
   const file = zip.file(path) as InspectableZipObject | null;
-  if (!file) throw new Error(`${description} is missing from the extension package.`);
+  if (!file) throw new Error(`${description} 不在扩展包中。`);
   if (typeof file._data?.uncompressedSize !== "number" || !file.internalStream) {
-    throw new Error(`${description} has unreadable size metadata.`);
+    throw new Error(`${description} 的大小元数据无法读取。`);
   }
   if (file._data.uncompressedSize > MAX_THEME_BYTES) {
-    throw new Error(`${description} is too large.`);
+    throw new Error(`${description} 过大。`);
   }
 
   return new Promise((resolve, reject) => {
@@ -542,13 +539,13 @@ async function loadThemeObject(
   signal?: AbortSignal,
 ): Promise<Record<string, unknown>> {
   signal?.throwIfAborted();
-  if (ancestors.size >= MAX_INCLUDE_DEPTH) throw new Error("Theme includes are nested too deeply.");
-  if (ancestors.has(path)) throw new Error("Theme includes contain a cycle.");
+  if (ancestors.size >= MAX_INCLUDE_DEPTH) throw new Error("主题 include 嵌套过深。");
+  if (ancestors.has(path)) throw new Error("主题 include 存在循环引用。");
   const cached = cache.get(path);
   if (cached) return cached;
   budget.files += 1;
   if (budget.files > MAX_RESOLVED_THEME_FILES) {
-    throw new Error("That extension references too many theme files.");
+    throw new Error("该扩展引用的主题文件过多。");
   }
 
   const value = sanitizeThemeObject(
@@ -617,12 +614,8 @@ async function readCappedResponse(
 
 async function fetchPackage(url: string, signal?: AbortSignal): Promise<Uint8Array> {
   const response = await fetch(url, signal ? { signal } : {});
-  if (!response.ok) throw new Error("That Open VSX theme could not be downloaded.");
-  return readCappedResponse(
-    response,
-    MAX_VSIX_BYTES,
-    "That theme extension is too large to import safely.",
-  );
+  if (!response.ok) throw new Error("无法下载该 Open VSX 主题。");
+  return readCappedResponse(response, MAX_VSIX_BYTES, "该主题扩展过大，无法安全导入。");
 }
 
 export async function importOpenVsxThemeExtension(
@@ -630,44 +623,38 @@ export async function importOpenVsxThemeExtension(
   signal?: AbortSignal,
 ): Promise<ReadonlyArray<ThemeDefinition>> {
   const manifestResponse = await fetch(extension.manifestUrl, signal ? { signal } : {});
-  if (!manifestResponse.ok) throw new Error("That Open VSX extension has no readable manifest.");
+  if (!manifestResponse.ok) throw new Error("该 Open VSX 扩展没有可读取的清单。");
   const manifestBytes = await readCappedResponse(
     manifestResponse,
     MAX_MANIFEST_BYTES,
-    "That Open VSX extension manifest is too large.",
+    "该 Open VSX 扩展清单过大。",
   );
-  const manifest = parseJsoncObject(new TextDecoder().decode(manifestBytes), "Extension manifest");
+  const manifest = parseJsoncObject(new TextDecoder().decode(manifestBytes), "扩展清单");
   const advertisedContributions = themeContributions(manifest);
   if (advertisedContributions.length === 0) {
-    throw new Error("That extension does not contain color themes.");
+    throw new Error("该扩展不包含颜色主题。");
   }
   if (advertisedContributions.length > MAX_THEMES_PER_EXTENSION) {
-    throw new Error("That extension contains too many color themes to import safely.");
+    throw new Error("该扩展包含的颜色主题过多，无法安全导入。");
   }
 
   const packageBytes = await fetchPackage(extension.vsixUrl, signal);
   signal?.throwIfAborted();
   const checksumResponse = await fetch(extension.sha256Url, signal ? { signal } : {});
-  if (!checksumResponse.ok) throw new Error("That Open VSX theme has no readable checksum.");
+  if (!checksumResponse.ok) throw new Error("该 Open VSX 主题没有可读取的校验和。");
   const expectedChecksum = new TextDecoder()
-    .decode(
-      await readCappedResponse(
-        checksumResponse,
-        256,
-        "That Open VSX checksum response is invalid.",
-      ),
-    )
+    .decode(await readCappedResponse(checksumResponse, 256, "该 Open VSX 校验和响应无效。"))
     .trim()
     .split(/\s+/)[0];
   if (!expectedChecksum || !/^[a-f\d]{64}$/i.test(expectedChecksum)) {
-    throw new Error("That Open VSX theme has an invalid checksum.");
+    throw new Error("该 Open VSX 主题的校验和无效。");
   }
   signal?.throwIfAborted();
   const actualChecksum = [...sha256(packageBytes)]
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
   if (actualChecksum.toLowerCase() !== expectedChecksum.toLowerCase()) {
-    throw new Error("That Open VSX theme failed its integrity check.");
+    throw new Error("该 Open VSX 主题未通过完整性校验。");
   }
   signal?.throwIfAborted();
   let zip: JSZip;
@@ -679,12 +666,12 @@ export async function importOpenVsxThemeExtension(
   } catch (cause) {
     if (signal?.aborted) signal.throwIfAborted();
     if (cause instanceof Error && cause.message.startsWith("That extension package")) throw cause;
-    throw new Error("That Open VSX extension package could not be opened.", { cause });
+    throw new Error("无法打开该 Open VSX 扩展包。", { cause });
   }
 
   const packagedManifest = parseJsoncObject(
-    await readZipText(zip, "extension/package.json", "Extension manifest", signal),
-    "Extension manifest",
+    await readZipText(zip, "extension/package.json", "扩展清单", signal),
+    "扩展清单",
   );
   if (
     typeof packagedManifest.publisher !== "string" ||
@@ -702,7 +689,7 @@ export async function importOpenVsxThemeExtension(
   const contributions = themeContributions(packagedManifest);
   if (contributions.length === 0) throw new Error("That extension does not contain color themes.");
   if (contributions.length > MAX_THEMES_PER_EXTENSION) {
-    throw new Error("That extension contains too many color themes to import safely.");
+    throw new Error("该扩展包含的颜色主题过多，无法安全导入。");
   }
 
   const parsed: Array<{ theme: ThemeDefinition; sourceName: string; sourcePath: string }> = [];
@@ -747,10 +734,10 @@ export async function importOpenVsxThemeExtension(
     }
   }
   if (failures.length > 0) {
-    throw new Error("One or more color themes in that extension could not be imported safely.");
+    throw new Error("该扩展中有一个或多个颜色主题无法安全导入。");
   }
   if (parsed.length === 0) {
-    throw new Error("That extension has no compatible color themes.");
+    throw new Error("该扩展没有兼容的颜色主题。");
   }
   const extensionId = extension.id.toLowerCase();
   const sourcePathCounts = new Map<string, number>();

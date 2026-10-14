@@ -29,7 +29,7 @@ export const LOCAL_DEVICE_HOST_ID = "local" as DeviceHostId;
 export const SshDeviceHostConfig = Schema.Struct({
   id: DeviceHostId.check(
     Schema.isPattern(/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/),
-    Schema.makeFilter((id) => id !== "local" || "The local host id is reserved."),
+    Schema.makeFilter((id) => id !== "local" || "本地主机 id 为保留值。"),
   ),
   label: TrimmedNonEmptyString,
   target: TrimmedNonEmptyString.check(Schema.isPattern(/^[^\s-][^\s]*$/)),
@@ -41,8 +41,7 @@ export type SshDeviceHostConfig = typeof SshDeviceHostConfig.Type;
 export const SshDeviceHostConfigs = Schema.Array(SshDeviceHostConfig).check(
   Schema.makeFilter(
     (hosts) =>
-      new Set(hosts.map((host) => host.id)).size === hosts.length ||
-      "Device host ids must be unique.",
+      new Set(hosts.map((host) => host.id)).size === hosts.length || "设备主机 id 必须唯一。",
   ),
 );
 
@@ -369,7 +368,7 @@ export class DeviceHostUnavailableError extends Schema.TaggedError<DeviceHostUna
   },
 ) {
   override get message(): string {
-    return `Device host ${this.hostId} is unavailable: ${this.reason}`;
+    return `设备主机 ${this.hostId} 不可用：${this.reason}`;
   }
 }
 
@@ -382,7 +381,7 @@ export class DevicePlatformUnavailableError extends Schema.TaggedError<DevicePla
   },
 ) {
   override get message(): string {
-    return `${this.platform} devices are unavailable on host ${this.hostId}: ${this.reason}`;
+    return `主机 ${this.hostId} 上的 ${this.platform} 设备不可用：${this.reason}`;
   }
 }
 
@@ -394,7 +393,7 @@ export class DeviceNotFoundError extends Schema.TaggedError<DeviceNotFoundError>
   },
 ) {
   override get message(): string {
-    return `Device ${this.deviceId} was not found on host ${this.hostId}.`;
+    return `在主机 ${this.hostId} 上未找到设备 ${this.deviceId}。`;
   }
 }
 
@@ -406,12 +405,11 @@ export class DeviceBootError extends Schema.TaggedError<DeviceBootError>()("Devi
 }) {
   override get message(): string {
     const explanation = {
-      disk_space: "There is not enough free disk space on the environment server.",
-      timeout: "The device did not become ready in time.",
-      launch_failed:
-        "The simulator or emulator could not start. Check its configuration on the environment server.",
+      disk_space: "环境服务器上没有足够的可用磁盘空间。",
+      timeout: "设备未在规定时间内就绪。",
+      launch_failed: "模拟器无法启动。请在环境服务器上检查其配置。",
     }[this.reason];
-    return `Device ${this.deviceId} failed to boot: ${explanation}`;
+    return `设备 ${this.deviceId} 启动失败：${explanation}`;
   }
 }
 
@@ -432,13 +430,13 @@ export class DeviceOperationError extends Schema.TaggedError<DeviceOperationErro
 ) {
   override get message(): string {
     const explanation = {
-      command_failed: `The device command failed${this.exitCode === undefined ? "" : ` (exit code ${this.exitCode})`}.`,
-      request_failed: "Could not communicate with device support. Try refreshing devices.",
-      invalid_payload: "The device request could not be encoded.",
-      settings_failed: "Could not read or save device settings.",
-      hub_rejected: "The device hub could not complete the request.",
+      command_failed: `设备命令失败${this.exitCode === undefined ? "" : `（退出码 ${this.exitCode}）`}。`,
+      request_failed: "无法与设备支持服务通信。请尝试刷新设备。",
+      invalid_payload: "无法编码设备请求。",
+      settings_failed: "无法读取或保存设备设置。",
+      hub_rejected: "设备 hub 无法完成该请求。",
     }[this.reason];
-    return `Device ${this.operation} failed: ${explanation}`;
+    return `设备操作 ${this.operation} 失败：${explanation}`;
   }
 }
 
@@ -452,8 +450,8 @@ export class DeviceActionUnavailableError extends Schema.TaggedError<DeviceActio
 ) {
   override get message(): string {
     return this.reason === "helper_missing"
-      ? `Device ${this.operation} requires a helper missing from this install. Set up device support again.`
-      : `Device ${this.operation} is not supported on ${this.platform}.`;
+      ? `设备操作 ${this.operation} 需要的辅助程序在本安装中缺失。请重新设置设备支持。`
+      : `${this.platform} 不支持设备操作 ${this.operation}。`;
   }
 }
 
@@ -573,11 +571,11 @@ export const DeviceToolError = Schema.Union([
 export type DeviceToolError = typeof DeviceToolError.Type;
 
 export function deviceToolInstallMessage(name: string, tool: DeviceToolVersion | undefined) {
-  if (!tool) return `Installing ${name}…`;
+  if (!tool) return `正在安装 ${name}…`;
   const previous =
     tool.runningVersion ??
     [...tool.installedVersions].sort((a, b) => a.localeCompare(b, "en", { numeric: true })).at(-1);
   return previous && !tool.installedVersions.includes(tool.requiredVersion)
-    ? `Updating ${name} from ${previous} to ${tool.requiredVersion}…`
-    : `Installing ${name} ${tool.requiredVersion}…`;
+    ? `正在将 ${name} 从 ${previous} 更新到 ${tool.requiredVersion}…`
+    : `正在安装 ${name} ${tool.requiredVersion}…`;
 }

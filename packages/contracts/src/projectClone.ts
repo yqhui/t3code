@@ -90,15 +90,15 @@ export type ProjectCloneActionResult = typeof ProjectCloneActionResult.Type;
 function projectCloneStageLabel(stage: ProjectCloneStage): string {
   switch (stage) {
     case "connecting":
-      return "Connecting";
+      return "正在连接";
     case "counting":
-      return "Counting objects";
+      return "正在统计对象";
     case "receiving":
-      return "Receiving objects";
+      return "正在接收对象";
     case "resolving":
-      return "Resolving deltas";
+      return "正在解析增量";
     case "checkout":
-      return "Checking out files";
+      return "正在检出文件";
   }
 }
 

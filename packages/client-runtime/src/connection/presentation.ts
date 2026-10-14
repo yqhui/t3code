@@ -60,29 +60,25 @@ export function presentConnectionState(
 export function connectionStatusText(connection: EnvironmentConnectionPresentation): string {
   switch (connection.phase) {
     case "available":
-      return "Available";
+      return "可用";
     case "offline":
-      return "Offline";
+      return "离线";
     case "connecting":
-      return "Connecting...";
+      return "正在连接…";
     case "reconnecting":
-      return connection.error
-        ? `Failed to connect. Reconnecting... Reason: ${connection.error}`
-        : "Reconnecting...";
+      return connection.error ? `连接失败，正在重连…原因：${connection.error}` : "正在重连…";
     case "connected":
-      return "Connected";
+      return "已连接";
     case "unsupported":
-      return "Client not supported";
+      return "客户端不受支持";
     case "error":
-      return connection.error
-        ? `Connection failed. Reason: ${connection.error}`
-        : "Connection failed";
+      return connection.error ? `连接失败。原因：${connection.error}` : "连接失败";
   }
 }
 
 export function connectionStatusTitle(connection: EnvironmentConnectionPresentation): string {
   if (connection.phase === "reconnecting" && connection.error) {
-    return "Failed to connect. Reconnecting...";
+    return "连接失败，正在重连…";
   }
   return connectionStatusText({ ...connection, error: null });
 }

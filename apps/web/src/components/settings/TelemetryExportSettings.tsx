@@ -14,9 +14,9 @@ import { SettingsSection } from "./settingsLayout";
 import { SettingsScopeNotice } from "./SettingsScopeNotice";
 
 const SIGNALS = [
-  { key: "otlpTracesUrl", label: "Traces", signal: "traces" },
-  { key: "otlpMetricsUrl", label: "Metrics", signal: "metrics" },
-  { key: "otlpLogsUrl", label: "Logs", signal: "logs" },
+  { key: "otlpTracesUrl", label: "追踪", signal: "traces" },
+  { key: "otlpMetricsUrl", label: "指标", signal: "metrics" },
+  { key: "otlpLogsUrl", label: "日志", signal: "logs" },
 ] as const;
 
 type SignalKey = (typeof SIGNALS)[number]["key"];
@@ -27,17 +27,17 @@ type EndpointCheck = { readonly url: string; readonly result: OtlpEndpointCheckR
 const isHttpUrl = (url: string) => /^https?:\/\/./i.test(url);
 
 function endpointStatus(url: string, check: EndpointCheck | undefined) {
-  if (url === "") return { label: "Off", dot: "bg-muted-foreground/40" };
-  if (check?.url !== url) return { label: "Not checked", dot: "bg-muted-foreground/40" };
+  if (url === "") return { label: "关闭", dot: "bg-muted-foreground/40" };
+  if (check?.url !== url) return { label: "未检查", dot: "bg-muted-foreground/40" };
   const { result } = check;
-  if (result === null) return { label: "Checking…", dot: "bg-warning" };
+  if (result === null) return { label: "正在检查…", dot: "bg-warning" };
   switch (result._tag) {
     case "Accepted":
-      return { label: `Connected · ${Math.round(result.latencyMs)} ms`, dot: "bg-success" };
+      return { label: `已连接 · ${Math.round(result.latencyMs)} ms`, dot: "bg-success" };
     case "Rejected":
-      return { label: `Rejected · HTTP ${result.status}`, dot: "bg-destructive" };
+      return { label: `已拒绝 · HTTP ${result.status}`, dot: "bg-destructive" };
     case "Unreachable":
-      return { label: result.timedOut ? "Timed out" : "Unreachable", dot: "bg-destructive" };
+      return { label: result.timedOut ? "已超时" : "无法连接", dot: "bg-destructive" };
   }
 }
 
@@ -45,9 +45,9 @@ export function TelemetryExportSettings() {
   const { environment, scope } = useSettingsScope();
   if (scope.kind !== "environment" || !environment) {
     return (
-      <SettingsSection title="OpenTelemetry export" id="telemetry-export">
+      <SettingsSection title="OpenTelemetry 导出" id="telemetry-export">
         <SettingsScopeNotice target="environment">
-          Choose one environment to configure its telemetry exports.
+          请选择一个环境以配置其遥测导出。
         </SettingsScopeNotice>
       </SettingsSection>
     );
@@ -118,7 +118,7 @@ function TelemetryExportForm() {
   }, [canCheck]);
 
   return (
-    <SettingsSection title="OpenTelemetry export" id="telemetry-export">
+    <SettingsSection title="OpenTelemetry 导出" id="telemetry-export">
       <form
         className="grid gap-4 px-4 py-4 sm:px-5"
         onSubmit={async (event) => {
@@ -139,7 +139,7 @@ function TelemetryExportForm() {
             });
             if (result._tag === "Success") {
               setDraft({});
-              setMessage("Saved. Restart the server to apply.");
+              setMessage("已保存。重启服务器后生效。");
             }
           } finally {
             setSaving(false);
@@ -147,13 +147,11 @@ function TelemetryExportForm() {
         }}
       >
         <p className="text-xs text-muted-foreground">
-          Send traces, metrics, and logs to an OTLP HTTP receiver. Restart the server to apply.
-          Environment variables override these settings.
+          将追踪、指标和日志发送到 OTLP HTTP 接收端。重启服务器后生效。环境变量会覆盖这些设置。
         </p>
         {!canEdit && (
           <p className="text-xs text-muted-foreground">
-            This connection lacks permission to change settings on{" "}
-            {environment?.label ?? "the selected environment"}.
+            此连接无权更改以下环境的设置： {environment?.label ?? "选定环境"}.
           </p>
         )}
         {SIGNALS.map(({ key, label, signal }) => {
@@ -164,7 +162,7 @@ function TelemetryExportForm() {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-1.5">
                   {status && <ConnectionStatusDot dotClassName={status.dot} />}
-                  <Label htmlFor={key}>{label} endpoint</Label>
+                  <Label htmlFor={key}>{label}端点</Label>
                 </div>
                 {status && <span className="text-xs text-muted-foreground">{status.label}</span>}
               </div>
@@ -174,7 +172,7 @@ function TelemetryExportForm() {
                   size="sm"
                   type="url"
                   pattern="[Hh][Tt][Tt][Pp][Ss]?://.*"
-                  title="Enter an HTTP or HTTPS endpoint, or leave empty to disable export."
+                  title="输入 HTTP 或 HTTPS 端点，留空可禁用导出。"
                   placeholder={`http://localhost:4318/v1/${signal}`}
                   value={values[key]}
                   disabled={saving || !canEdit}
@@ -198,13 +196,13 @@ function TelemetryExportForm() {
                     disabled={!isHttpUrl(url) || checks[key]?.result === null}
                     onClick={() => void checkEndpoint(key, signal, url)}
                   >
-                    Test
+                    测试
                   </Button>
                 )}
               </div>
               {saved[key] !== (running?.[key] ?? "") && (
                 <p className="break-all text-xs text-muted-foreground">
-                  Running: {running?.[key] || "Disabled"}
+                  运行配置：{running?.[key] || "已禁用"}
                 </p>
               )}
             </div>
@@ -230,10 +228,10 @@ function TelemetryExportForm() {
                 }
               }}
             >
-              Discard
+              丢弃
             </Button>
             <Button type="submit" size="xs" disabled={!changed || saving || !canEdit}>
-              {saving ? "Saving…" : "Save"}
+              {saving ? "正在保存…" : "保存"}
             </Button>
           </div>
         </div>

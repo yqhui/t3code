@@ -111,7 +111,7 @@ function SidebarUpdateArchitectureWarningContent() {
   return (
     <Alert variant="warning">
       <TriangleAlertIcon />
-      <AlertTitle>Intel build on Apple Silicon</AlertTitle>
+      <AlertTitle>Apple Silicon 上的 Intel 版本</AlertTitle>
       <AlertDescription>{description}</AlertDescription>
     </Alert>
   );
@@ -135,7 +135,7 @@ async function downloadLocalUpdate(
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not download update",
+          title: "无法下载更新",
           description: actionError,
         }),
       );
@@ -145,8 +145,8 @@ async function downloadLocalUpdate(
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not start update download",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: "无法开始下载更新",
+        description: error instanceof Error ? error.message : "发生意外错误。",
       }),
     );
     return false;
@@ -170,7 +170,7 @@ async function installLocalUpdate(bridge: DesktopBridge): Promise<void> {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not install update",
+        title: "无法安装更新",
         description: actionError,
       }),
     );
@@ -178,8 +178,8 @@ async function installLocalUpdate(bridge: DesktopBridge): Promise<void> {
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Could not install update",
-        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        title: "无法安装更新",
+        description: error instanceof Error ? error.message : "发生意外错误。",
       }),
     );
   }
@@ -237,16 +237,16 @@ function SidebarUpdateControl() {
     showCheckIcon,
   });
   const tooltip = isRunningEverything
-    ? "Updating…"
+    ? "正在更新…"
     : runsEverything
       ? everything.summary
       : showUpdateDetails
         ? state
           ? getDesktopUpdateButtonTooltip(state)
-          : "Update available"
+          : "有可用更新"
         : showCheckIcon
-          ? "Checking for updates…"
-          : "Check for updates";
+          ? "正在检查更新…"
+          : "检查更新";
   const disabled = showCheckIcon
     ? true
     : runsEverything
@@ -302,8 +302,8 @@ function SidebarUpdateControl() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not confirm update",
-            description: error instanceof Error ? error.message : "Update confirmation failed.",
+            title: "无法确认更新",
+            description: error instanceof Error ? error.message : "更新确认失败。",
           }),
         );
         return;
@@ -327,9 +327,8 @@ function SidebarUpdateControl() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not check for updates",
-            description:
-              result.state.message ?? "Automatic updates are not available in this build.",
+            title: "无法检查更新",
+            description: result.state.message ?? "此构建版本不支持自动更新。",
           }),
         );
       })
@@ -337,8 +336,8 @@ function SidebarUpdateControl() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not check for updates",
-            description: error instanceof Error ? error.message : "Update check failed.",
+            title: "无法检查更新",
+            description: error instanceof Error ? error.message : "检查更新失败。",
           }),
         );
       })
@@ -361,8 +360,8 @@ function SidebarUpdateControl() {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not update everything",
-          description: error instanceof Error ? error.message : "An unexpected error occurred.",
+          title: "无法更新全部",
+          description: error instanceof Error ? error.message : "发生意外错误。",
         }),
       );
     } finally {
@@ -478,7 +477,7 @@ function SidebarUpdateControl() {
         {showReleaseNotesPopover && state ? (
           <PopoverPopup
             align="center"
-            aria-label="Nightly update release notes"
+            aria-label="Nightly 更新发行说明"
             initialFocus={false}
             onKeyDownCapture={(event) => {
               if (

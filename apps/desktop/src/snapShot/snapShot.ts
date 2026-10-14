@@ -49,19 +49,19 @@ export function snapShotShortcutRegistrationFailureMessage(
 }
 
 const COMMON_MOD_ACTIONS: Readonly<Record<string, string>> = {
-  a: "Select All",
-  c: "Copy",
-  f: "Find",
-  n: "New",
-  o: "Open",
-  p: "Print",
-  q: "Quit",
-  s: "Save",
-  t: "New Tab",
-  v: "Paste",
-  w: "Close Window",
-  x: "Cut",
-  z: "Undo",
+  a: "全选",
+  c: "复制",
+  f: "查找",
+  n: "新建",
+  o: "打开",
+  p: "打印",
+  q: "退出",
+  s: "保存",
+  t: "新建标签页",
+  v: "粘贴",
+  w: "关闭窗口",
+  x: "剪切",
+  z: "撤销",
 };
 
 export function snapShotShortcutSystemConflict(shortcut: SnapShotKeyChord): string | null {

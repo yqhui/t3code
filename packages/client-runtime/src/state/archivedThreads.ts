@@ -59,7 +59,7 @@ export function createArchivedThreadSnapshotsAtomFamily<E>(options: {
         }
 
         if (error === null && result._tag === "Failure") {
-          error = "Failed to load archived threads.";
+          error = "无法加载已归档的会话。";
         }
       }
 

@@ -32,7 +32,7 @@ export function normalizeFileCommentRange(range: SelectedLineRange): {
 }
 
 export function formatFileCommentRange(startLine: number, endLine: number): string {
-  return startLine === endLine ? `L${startLine}` : `L${startLine} to L${endLine}`;
+  return startLine === endLine ? `L${startLine}` : `L${startLine} 到 L${endLine}`;
 }
 
 export function remapFileCommentAnnotations(

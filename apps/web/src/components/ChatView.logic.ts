@@ -85,13 +85,13 @@ export function agentControlledBrowserCloseConfirmation(
   if (activeBrowserCount === 0) return null;
   if (activeBrowserCount === 1) {
     return [
-      "Close browser while the agent is using it?",
-      "The agent is actively controlling this browser. Closing it may interrupt the current browser action.",
+      "要在 Agent 使用浏览器时关闭它吗？",
+      "Agent 正在控制此浏览器。关闭它可能会中断当前的浏览器操作。",
     ].join("\n");
   }
   return [
-    `Close ${activeBrowserCount} browsers while the agent is using them?`,
-    "The agent is actively controlling these browsers. Closing them may interrupt the current browser actions.",
+    `要在 Agent 使用 ${activeBrowserCount} 个浏览器时关闭它们吗？`,
+    "Agent 正在控制这些浏览器。关闭它们可能会中断当前的浏览器操作。",
   ].join("\n");
 }
 
@@ -517,7 +517,7 @@ export function buildLocalDraftThread(
   return presentThreadShell(draftThread.environmentId, {
     id: threadId,
     projectId: draftThread.projectId,
-    title: "New thread",
+    title: "新建会话",
     providerInstanceId: fallbackModelSelection.instanceId,
     modelSelection: fallbackModelSelection,
     runtimeMode: draftThread.runtimeMode,
@@ -647,18 +647,18 @@ export function getAntigravitySendBlockReason(
 ): string | null {
   if (provider?.driver !== "antigravity") return null;
   if (!provider.installed) {
-    return "Install Antigravity in provider settings before sending.";
+    return "发送前请先在提供商设置中安装 Antigravity。";
   }
   if (provider.auth.status === "unauthenticated") {
-    return "Sign in to Antigravity in provider settings before sending.";
+    return "发送前请先在提供商设置中登录 Antigravity。";
   }
   const slug = model.trim();
-  if (slug.length === 0) return "Choose an Antigravity model before sending.";
+  if (slug.length === 0) return "发送前请先选择一个 Antigravity 模型。";
   // A restart clears the account status and catalog. Session startup checks
   // saved credentials and validates the model before sending the prompt.
   if (provider.auth.status === "unknown") return null;
   if (provider.models.length === 0) {
-    return "Refresh Antigravity models in provider settings before sending.";
+    return "发送前请先在提供商设置中刷新 Antigravity 模型。";
   }
   // A saved model that left the catalog is kept in the picker as unavailable
   // so the user sees what the thread used. The server rejects it at turn
@@ -669,7 +669,7 @@ export function getAntigravitySendBlockReason(
     slug !== ANTIGRAVITY_DEFAULT_MODEL &&
     !provider.models.some((entry) => entry.slug === slug || entry.aliases?.includes(slug))
   ) {
-    return "That Antigravity model is no longer available. Choose another model.";
+    return "该 Antigravity 模型已不可用。请选择其他模型。";
   }
   return null;
 }
@@ -736,7 +736,7 @@ export async function resolveFileAttachmentUrl(input: {
   });
   if (result._tag === "Failure") throw squashAtomCommandFailure(result);
   const url = resolveAssetUrl(input.httpBaseUrl, result.value.relativeUrl);
-  if (url === null) throw new Error("The environment returned an invalid attachment URL.");
+  if (url === null) throw new Error("环境返回了无效的附件 URL。");
   return url;
 }
 
@@ -749,7 +749,7 @@ export async function prepareRevertedMessageAttachments(input: {
   return Promise.all(
     (input.message.attachments ?? []).map(async (attachment) => {
       if (attachment.type !== "image" && attachment.type !== "file") {
-        throw new Error("This message has an attachment that cannot be restored.");
+        throw new Error("此消息包含无法恢复的附件。");
       }
       const result = await input.createAssetUrl({
         environmentId: input.environmentId,
@@ -764,9 +764,9 @@ export async function prepareRevertedMessageAttachments(input: {
       });
       if (result._tag === "Failure") throw squashAtomCommandFailure(result);
       const url = resolveAssetUrl(input.httpBaseUrl, result.value.relativeUrl);
-      if (url === null) throw new Error("The environment returned an invalid attachment URL.");
+      if (url === null) throw new Error("环境返回了无效的附件 URL。");
       const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-      if (!response.ok) throw new Error(`Could not restore attachment: ${attachment.name}`);
+      if (!response.ok) throw new Error(`无法恢复附件：${attachment.name}`);
       return new File([await response.blob()], attachment.name, { type: attachment.mimeType });
     }),
   );
@@ -894,16 +894,16 @@ export function buildExpiredTerminalContextToastCopy(
   variant: "omitted" | "empty",
 ): { title: string; description: string } {
   const count = Math.max(1, Math.floor(expiredTerminalContextCount));
-  const noun = count === 1 ? "Expired terminal context" : "Expired terminal contexts";
+  const noun = count === 1 ? "已过期的终端上下文" : "已过期的终端上下文";
   if (variant === "empty") {
     return {
-      title: `${noun} won't be sent`,
-      description: "Remove it or re-add it to include terminal output.",
+      title: `${noun}不会被发送`,
+      description: "请移除或重新添加，以包含终端输出。",
     };
   }
   return {
-    title: `${noun} omitted from message`,
-    description: "Re-add it if you want that terminal output included.",
+    title: `${noun}已从消息中省略`,
+    description: "如需包含该终端输出，请重新添加。",
   };
 }
 
@@ -1069,8 +1069,8 @@ export function getStartedThreadModelChangeBlockReason(input: {
       return null;
     }
     return {
-      title: "Start a new chat to switch providers",
-      description: "This thread does not support switching providers after it has started.",
+      title: "开始新对话以切换提供商",
+      description: "此会话开始后不支持切换提供商。",
     };
   }
   const currentProvider = input.providers.find(
@@ -1086,8 +1086,8 @@ export function getStartedThreadModelChangeBlockReason(input: {
     return null;
   }
   return {
-    title: "Start a new chat to change models",
-    description: "This provider does not allow switching models after a conversation has started.",
+    title: "开始新对话以更改模型",
+    description: "此提供商不允许在对话开始后切换模型。",
   };
 }
 
@@ -1121,7 +1121,7 @@ export async function waitForRevertedMessage(
   const readProjection = () => Option.getOrNull(appAtomRegistry.get(threadAtom).data);
   const initial = readProjection();
   if (!initial?.messages.some((message) => message.id === messageId)) {
-    throw new Error("The message to rewind is no longer available.");
+    throw new Error("要回退的消息已不可用。");
   }
   const messageRunId = initial.messages.find((message) => message.id === messageId)?.runId;
   return new Promise<void>((resolve, reject) => {
@@ -1156,7 +1156,7 @@ export async function waitForRevertedMessage(
     };
     unsubscribe = appAtomRegistry.subscribe(threadAtom, inspect);
     timeout = globalThis.setTimeout(() => {
-      finish(new Error("Timed out waiting for the thread to rewind."));
+      finish(new Error("等待会话回退超时。"));
     }, timeoutMs);
     Promise.resolve()
       .then(revert)

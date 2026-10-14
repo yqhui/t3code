@@ -72,7 +72,7 @@ function GuideRunWatcher({ runKey, watch }: { runKey: string; watch: GuideRunWat
     const looking = document.visibilityState === "visible" && document.hasFocus();
     if (looking && store.shownKey === runKey) return;
 
-    const title = failure === null ? "Review guide ready" : "Review guide failed";
+    const title = failure === null ? "审查指南已就绪" : "审查指南生成失败";
     const body = watch.title ?? `${watch.reference.repository} #${watch.reference.number}`;
     const open = () => {
       useGuideRunStore.getState().requestOpen(runKey);
@@ -109,7 +109,7 @@ function GuideRunWatcher({ runKey, watch }: { runKey: string; watch: GuideRunWat
             ),
         },
         actionProps: {
-          children: "Open guide",
+          children: "打开指南",
           onClick: () => {
             toastManager.close(toastId);
             open();

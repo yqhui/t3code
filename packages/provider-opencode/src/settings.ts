@@ -23,8 +23,8 @@ export const OpenCodeSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("opencode").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description: "Path to the OpenCode binary.",
+        title: "可执行文件路径",
+        description: "OpenCode 可执行文件的路径。",
         providerSettingsForm: {
           placeholder: "opencode",
           clearWhenEmpty: "omit",
@@ -34,8 +34,8 @@ export const OpenCodeSettings = makeProviderSettingsSchema(
     serverUrl: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Server URL",
-        description: "Leave blank to let T3 Code spawn the server when needed.",
+        title: "服务器 URL",
+        description: "留空以让 T3 Code 在需要时启动服务器。",
         providerSettingsForm: {
           placeholder: "http://127.0.0.1:4096",
           clearWhenEmpty: "omit",
@@ -45,11 +45,11 @@ export const OpenCodeSettings = makeProviderSettingsSchema(
     serverPassword: TrimmedString.pipe(
       Schema.withDecodingDefault(Effect.succeed("")),
       Schema.annotateKey({
-        title: "Server password",
-        description: "Stored in plain text on disk.",
+        title: "服务器密码",
+        description: "以明文形式存储在磁盘上。",
         providerSettingsForm: {
           control: "password",
-          placeholder: "Optional",
+          placeholder: "可选",
           clearWhenEmpty: "omit",
         },
       }),

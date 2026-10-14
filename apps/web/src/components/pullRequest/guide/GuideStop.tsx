@@ -31,11 +31,11 @@ import { GuideProse } from "./GuideProse";
 import { letterStopNotes } from "@t3tools/client-runtime/review-guide-tour";
 
 const ATTENTION_LABELS = {
-  tradeoff: "A tradeoff to weigh",
-  contract: "A contract to check",
-  product: "A product call",
-  risk: "A risk to judge",
-  accessibility: "An accessibility call",
+  tradeoff: "一个需要权衡的取舍",
+  contract: "一个需要检查的契约",
+  product: "一个产品决策",
+  risk: "一个需要判断的风险",
+  accessibility: "一个无障碍决策",
 } as const satisfies Record<PullRequestReviewGuideAttention["kind"], string>;
 
 /**
@@ -101,7 +101,7 @@ export function GuideStop({
         <Collapsible open={railOpen} onOpenChange={onRailOpenChange}>
           <header className="flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground tabular-nums @max-[56rem]/guide:hidden">
-              Stop {index + 1} of {stopCount}
+              第 {index + 1} 站，共 {stopCount} 站
             </p>
             <CollapsibleTrigger
               render={
@@ -109,7 +109,7 @@ export function GuideStop({
               }
             >
               <span className="tabular-nums">
-                Stop {index + 1} of {stopCount}
+                第 {index + 1} 站，共 {stopCount} 站
               </span>
               <ChevronDownIcon aria-hidden className={cn(railOpen && "rotate-180")} />
             </CollapsibleTrigger>
@@ -117,7 +117,7 @@ export function GuideStop({
               <Button
                 size="icon-xs"
                 variant="outline"
-                aria-label="Previous stop"
+                aria-label="上一站"
                 disabled={index === 0}
                 onClick={() => onStep(-1)}
               >
@@ -126,7 +126,7 @@ export function GuideStop({
               <Button
                 size="icon-xs"
                 variant="outline"
-                aria-label="Next stop"
+                aria-label="下一站"
                 disabled={index === stopCount - 1}
                 onClick={() => onStep(1)}
               >
@@ -191,7 +191,7 @@ export function GuideStop({
         {otherFiles.length > 0 ? (
           <section className="flex flex-col gap-1.5">
             <h3 className="text-xs font-medium text-muted-foreground">
-              {stop.excerpts.length > 0 ? "Also in this stop" : "Files in this stop"}
+              {stop.excerpts.length > 0 ? "本站的其他文件" : "本站的文件"}
             </h3>
             <DiffWorkerPoolProvider>
               <ul className="flex flex-col overflow-hidden rounded-lg border border-border/60">
@@ -231,9 +231,7 @@ export function GuideStop({
                             <GuideFileDiff file={diff} loadDiffFiles={loadDiffFiles} />
                           ) : (
                             <p className="px-3 py-2 text-xs text-muted-foreground">
-                              {diffLoading
-                                ? "Loading the diff..."
-                                : "This file is not in the loaded diff."}
+                              {diffLoading ? "正在加载 Diff…" : "此文件不在已加载的 Diff 中。"}
                             </p>
                           )}
                         </CollapsiblePanel>
@@ -249,7 +247,7 @@ export function GuideStop({
         {stop.questions.length > 0 || onAsk !== null ? (
           <section className="flex flex-col gap-1.5">
             {stop.questions.length > 0 ? (
-              <h3 className="text-xs font-medium text-muted-foreground">Questions to consider</h3>
+              <h3 className="text-xs font-medium text-muted-foreground">值得思考的问题</h3>
             ) : null}
             <div className="flex flex-col items-start gap-1.5">
               {stop.questions.map((question) =>
@@ -269,7 +267,7 @@ export function GuideStop({
                       aria-hidden
                       className="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
                     />
-                    <span className="sr-only">Ask an agent: </span>
+                    <span className="sr-only">询问 Agent：</span>
                     <span>
                       <GuideProse text={question} plain />
                     </span>
@@ -279,7 +277,7 @@ export function GuideStop({
               {onAsk !== null ? (
                 <Button size="sm" variant="ghost-muted" onClick={() => onAsk("")}>
                   <MessageCircleQuestionIcon aria-hidden />
-                  Ask about this stop
+                  就本站提问
                 </Button>
               ) : null}
             </div>
@@ -289,13 +287,13 @@ export function GuideStop({
         <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border/60 pt-4">
           {nextTitle !== null ? (
             <Button className="min-w-0" onClick={() => onStep(1)}>
-              <span className="min-w-0 truncate">Next: {nextTitle}</span>
+              <span className="min-w-0 truncate">下一站：{nextTitle}</span>
               <ArrowRightIcon aria-hidden />
             </Button>
           ) : onFinish !== null ? (
             <Button onClick={onFinish}>
               <MessageSquareIcon aria-hidden />
-              Finish review
+              完成审查
             </Button>
           ) : null}
         </footer>

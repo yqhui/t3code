@@ -176,7 +176,7 @@ export function BranchPicker({
       {children}
       <ComboboxPopup {...popupProps}>
         <ComboboxSearchInput
-          placeholder="Search refs..."
+          placeholder="搜索引用…"
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           onKeyDown={(event) => {
@@ -194,7 +194,7 @@ export function BranchPicker({
           }}
         />
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <ComboboxEmpty>No refs found.</ComboboxEmpty>
+          <ComboboxEmpty>未找到引用。</ComboboxEmpty>
           <div className="relative min-h-0 w-full max-h-56 flex-1 overflow-hidden">
             <ComboboxListVirtualized className="size-full min-w-0">
               <LegendList<string>
@@ -234,21 +234,20 @@ export function BranchPicker({
                   >
                     <span className="flex min-w-0 items-center gap-1.5 font-medium text-muted-foreground">
                       <RefreshIcon aria-hidden="true" className="size-3 shrink-0" />
-                      <span className="truncate">Start from origin</span>
+                      <span className="truncate">从 origin 开始</span>
                     </span>
                     <Switch
                       id={startFromOriginSwitchId}
                       checked={originControl.checked}
                       size="sm"
-                      aria-label="Start worktree from origin"
+                      aria-label="从 origin 创建 Worktree"
                       onCheckedChange={(checked) => originControl.onCheckedChange(Boolean(checked))}
                     />
                   </label>
                 }
               />
               <TooltipPopup side="top" className="max-w-72 whitespace-normal">
-                Creates the worktree from the latest matching branch on origin instead of your local
-                branch.
+                基于 origin 上最新的匹配分支创建 Worktree，而不是基于你的本地分支。
               </TooltipPopup>
             </Tooltip>
           ) : null}
@@ -280,13 +279,13 @@ export function BranchPickerRefItem({
   const hasSecondaryWorktree =
     refName.worktreePath && activeProjectCwd && refName.worktreePath !== activeProjectCwd;
   const badge = refName.current
-    ? "current"
+    ? "当前"
     : hasSecondaryWorktree
-      ? "worktree"
+      ? "Worktree"
       : refName.isRemote
-        ? "remote"
+        ? "远程"
         : refName.isDefault
-          ? "default"
+          ? "默认"
           : null;
   return (
     <ComboboxItem

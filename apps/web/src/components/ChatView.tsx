@@ -1550,7 +1550,7 @@ type LocalThreadErrorEntry = {
 };
 
 function chatActionErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "An error occurred.";
+  return error instanceof Error ? error.message : "发生错误。";
 }
 
 const ENVIRONMENT_UNAVAILABLE_SEND_TOAST_TRAIL_SIZE = 3;
@@ -1861,9 +1861,8 @@ export default function ChatView(props: ChatViewProps) {
       if (!inserted) {
         toastManager.add({
           type: "warning",
-          title: "The composer is not ready",
-          description:
-            "Try citing the selection after the connection or pending input is resolved.",
+          title: "输入框尚未就绪",
+          description: "请等连接恢复或待处理的输入完成后再引用所选内容。",
         });
       }
       return inserted;
@@ -2178,7 +2177,7 @@ export default function ChatView(props: ChatViewProps) {
         ? null
         : {
             threadId: parentSubagentThreadRef.threadId,
-            title: parentSubagentThread?.title ?? "Parent thread",
+            title: parentSubagentThread?.title ?? "父会话",
           },
     [parentSubagentThread?.title, parentSubagentThreadRef],
   );
@@ -2522,7 +2521,7 @@ export default function ChatView(props: ChatViewProps) {
           stackedThreadToast({
             type: "error",
             title,
-            description: error instanceof Error ? error.message : "An error occurred.",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       }
@@ -2533,10 +2532,10 @@ export default function ChatView(props: ChatViewProps) {
     activeProjectClone === null
       ? null
       : activeProjectClone.phase === "running"
-        ? "Cloning repository"
+        ? "正在克隆仓库"
         : activeProjectClone.phase === "done"
           ? null
-          : "Repository not cloned";
+          : "仓库未克隆";
   const projectCloneBannerItem = useMemo<ComposerBannerStackItem | null>(() => {
     if (!activeProjectClone || !activeProjectRef || activeProjectClone.phase === "done") {
       return null;
@@ -2549,19 +2548,19 @@ export default function ChatView(props: ChatViewProps) {
         variant: "info",
         priority: "activity",
         icon: <DownloadIcon />,
-        title: `Cloning ${name}`,
+        title: `正在克隆 ${name}`,
         description: projectCloneProgressSummary(activeProjectClone),
         actions: (
           <Button
             size="xs"
             variant="ghost"
             onClick={() =>
-              void runProjectCloneAction("Failed to cancel clone", () =>
+              void runProjectCloneAction("取消克隆失败", () =>
                 cancelProjectClone({ environmentId, input: { projectId } }),
               )
             }
           >
-            Cancel
+            取消
           </Button>
         ),
       };
@@ -2571,8 +2570,8 @@ export default function ChatView(props: ChatViewProps) {
       id: `project-clone:${projectId}`,
       variant: cancelled ? "warning" : "error",
       icon: <DownloadIcon />,
-      title: cancelled ? `Cancelled cloning ${name}` : `Failed to clone ${name}`,
-      description: cancelled ? "Retry to bring in the repository." : activeProjectClone.error,
+      title: cancelled ? `已取消克隆 ${name}` : `克隆 ${name} 失败`,
+      description: cancelled ? "重试以引入该仓库。" : activeProjectClone.error,
       actions: (
         <>
           <Button
@@ -2580,18 +2579,18 @@ export default function ChatView(props: ChatViewProps) {
             variant="ghost"
             onClick={() => void removeClonedProject({ environmentId, projectId })}
           >
-            Remove project
+            移除项目
           </Button>
           <Button
             size="xs"
             variant="ghost"
             onClick={() =>
-              void runProjectCloneAction("Failed to retry clone", () =>
+              void runProjectCloneAction("重试克隆失败", () =>
                 retryProjectClone({ environmentId, input: { projectId } }),
               )
             }
           >
-            Retry
+            重试
           </Button>
         </>
       ),
@@ -2712,8 +2711,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not reconnect environment",
-            description: error instanceof Error ? error.message : "Failed to reconnect.",
+            title: "无法重新连接环境",
+            description: error instanceof Error ? error.message : "重新连接失败。",
           }),
         );
       }
@@ -2740,8 +2739,8 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not disconnect server",
-              description: error instanceof Error ? error.message : "Failed to disconnect.",
+              title: "无法断开服务器连接",
+              description: error instanceof Error ? error.message : "断开连接失败。",
             }),
           );
         }
@@ -2851,7 +2850,7 @@ export default function ChatView(props: ChatViewProps) {
   const openOrReuseProjectDraftThread = useCallback(
     async (input: { branch: string; worktreePath: string | null; envMode: DraftThreadEnvMode }) => {
       if (!activeProject) {
-        throw new Error("No active project is available for this pull request.");
+        throw new Error("此拉取请求没有可用的活跃项目。");
       }
       const activeProjectRef = scopeProjectRef(activeProject.environmentId, activeProject.id);
       const logicalProjectKey = deriveLogicalProjectKeyFromSettings(
@@ -3101,12 +3100,12 @@ export default function ChatView(props: ChatViewProps) {
           size="xs"
           variant="ghost"
           disabled={disconnectingEnvironment}
-          title="Hide this server's threads. Switch it on again in Connections."
+          title="隐藏此服务器的会话。可在“连接”中重新开启。"
           onClick={() =>
             void handleDisconnectActiveEnvironment(activeEnvironmentUnavailableState.environmentId)
           }
         >
-          Disconnect server
+          断开服务器
         </Button>
       ) : undefined;
     const environmentReconnecting =
@@ -3123,7 +3122,7 @@ export default function ChatView(props: ChatViewProps) {
         id: `environment-unavailable:${activeEnvironmentUnavailableState.environmentId}`,
         variant: unavailableConnection.phase === "error" ? "error" : "warning",
         icon: <WifiOffIcon />,
-        title: `${activeEnvironmentUnavailableState.label} is ${environmentReconnecting ? "reconnecting" : "offline"}`,
+        title: `${activeEnvironmentUnavailableState.label}${environmentReconnecting ? " 正在重新连接" : " 已离线"}`,
         actions: (
           <>
             {!environmentReconnecting ? (
@@ -3136,7 +3135,7 @@ export default function ChatView(props: ChatViewProps) {
                   )
                 }
               >
-                Reconnect
+                重新连接
               </Button>
             ) : null}
             {disconnectAction}
@@ -3173,7 +3172,7 @@ export default function ChatView(props: ChatViewProps) {
                     type="button"
                     className="block max-w-full cursor-help truncate rounded-sm text-left"
                   >
-                    Server update available
+                    服务器有可用更新
                   </button>
                 }
               />
@@ -3183,7 +3182,7 @@ export default function ChatView(props: ChatViewProps) {
               </TooltipPopup>
             </Tooltip>
           ) : (
-            "Server update available"
+            "服务器有可用更新"
           ),
         description:
           !updateInProgress &&
@@ -3205,14 +3204,14 @@ export default function ChatView(props: ChatViewProps) {
             desktopAppUpdate={versionMismatchDesktopAppUpdate}
             threadContinuation={versionMismatchThreadContinuation}
             targetVersion={versionMismatch.clientVersion}
-            label={updateFailed ? "Retry" : "Update"}
+            label={updateFailed ? "重试" : "更新"}
             variant="ghost"
           />
         ),
         ...(updateInProgress || (!updateFailed && !versionMismatchDismissKey)
           ? {}
           : {
-              dismissLabel: "Dismiss update notice",
+              dismissLabel: "关闭更新提示",
               onDismiss: () => {
                 if (updateFailed) {
                   dismissServerUpdateFailure(serverUpdateState);
@@ -3567,7 +3566,7 @@ export default function ChatView(props: ChatViewProps) {
       return true;
     }
     setUsageLimitsPanel(null);
-    toastManager.add({ type: "info", title: "Usage limits are unavailable for this provider" });
+    toastManager.add({ type: "info", title: "此提供商的用量限额不可用" });
     return false;
   }, [
     activeProviderInstanceId,
@@ -3746,7 +3745,7 @@ export default function ChatView(props: ChatViewProps) {
     async (attachment: ChatFileAttachment) => {
       const connection = readPreparedConnection(environmentId);
       if (!connection) {
-        toastManager.add({ type: "error", title: "The environment is not connected." });
+        toastManager.add({ type: "error", title: "环境未连接。" });
         return;
       }
 
@@ -3764,8 +3763,8 @@ export default function ChatView(props: ChatViewProps) {
       } catch (error) {
         toastManager.add({
           type: "error",
-          title: "Could not download " + attachment.name,
-          description: error instanceof Error ? error.message : "The attachment is unavailable.",
+          title: "无法下载 " + attachment.name,
+          description: error instanceof Error ? error.message : "附件不可用。",
         });
       }
     },
@@ -4428,9 +4427,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add({
         type: "warning",
         id: "load-balancing-attachments",
-        title: "Keep attachments on this machine",
-        description:
-          "Remove attachments before choosing automatic routing, then attach them on the selected machine.",
+        title: "请将附件保留在本机",
+        description: "选择自动路由前请先移除附件，然后在所选机器上重新附加。",
       });
       return;
     }
@@ -4453,12 +4451,12 @@ export default function ChatView(props: ChatViewProps) {
   ]);
   const autoEnvironmentLabel = automaticEnvironment
     ? draftThread?.loadBalancedEnvironmentId
-      ? "Auto balance"
+      ? "自动平衡"
       : loadBalancing.pending
-        ? "Checking machines…"
+        ? "正在检查机器…"
         : loadBalancing.failed
-          ? "Auto balance unavailable"
-          : "Auto balance"
+          ? "自动平衡不可用"
+          : "自动平衡"
     : undefined;
 
   // The machine an in-flight switch is heading to; a newer switch replaces it.
@@ -4528,7 +4526,7 @@ export default function ChatView(props: ChatViewProps) {
       }
       // Keep send disabled until the destination Scratch project is ready.
       setIsEnvironmentChanging(true);
-      void openScratchProject(target.environmentId, "Could not switch machine")
+      void openScratchProject(target.environmentId, "无法切换机器")
         .then((project) => {
           if (project) retarget(project);
         })
@@ -4614,7 +4612,7 @@ export default function ChatView(props: ChatViewProps) {
       const error = squashAtomCommandFailure(result);
       setThreadError(
         activeThread.id,
-        error instanceof Error ? error.message : "Failed to interrupt the current turn.",
+        error instanceof Error ? error.message : "中断当前轮次失败。",
       );
     }
   }, [activeThread, environmentId, interruptThreadTurn, setThreadError]);
@@ -4634,8 +4632,8 @@ export default function ChatView(props: ChatViewProps) {
       if (prompt !== null && !composer.insertTextAtEnd(prompt, { ensureLeadingBoundary: true })) {
         toastManager.add({
           type: "error",
-          title: "Unable to add to chat",
-          description: "The composer is busy; try again once it is ready.",
+          title: "无法添加到聊天",
+          description: "输入框正忙，请就绪后重试。",
         });
         return;
       }
@@ -4648,7 +4646,7 @@ export default function ChatView(props: ChatViewProps) {
   const sendAppMessage = useCallback(
     async (text: string) => {
       if (!isServerThread || activeThreadId === null) {
-        throw new Error("Messages from apps need a started thread.");
+        throw new Error("来自应用的消息需要一个已开始的会话。");
       }
       const result = await startThreadTurn({
         environmentId,
@@ -4662,7 +4660,7 @@ export default function ChatView(props: ChatViewProps) {
       });
       if (result._tag === "Failure") {
         const error = squashAtomCommandFailure(result);
-        throw error instanceof Error ? error : new Error("Could not send the app's message.");
+        throw error instanceof Error ? error : new Error("无法发送该应用的消息。");
       }
     },
     [activeThreadId, environmentId, interactionMode, isServerThread, runtimeMode, startThreadTurn],
@@ -4768,16 +4766,16 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "info",
-          title: "Queued message is no longer queued",
-          description: "Your unsaved edit was kept in the composer.",
+          title: "排队的消息已不在队列中",
+          description: "你未保存的编辑已保留在输入框中。",
         }),
       );
     } else if (recovery === "discarded") {
       toastManager.add(
         stackedThreadToast({
           type: "warning",
-          title: "Queued message is no longer queued",
-          description: "Your unsaved edit was discarded.",
+          title: "排队的消息已不在队列中",
+          description: "你未保存的编辑已被丢弃。",
         }),
       );
     }
@@ -5067,7 +5065,7 @@ export default function ChatView(props: ChatViewProps) {
           const error = squashAtomCommandFailure(openResult);
           setThreadError(
             activeThreadId,
-            error instanceof Error ? error.message : `Failed to run script "${script.name}".`,
+            error instanceof Error ? error.message : `运行脚本 "${script.name}" 失败。`,
           );
         }
         return;
@@ -5087,7 +5085,7 @@ export default function ChatView(props: ChatViewProps) {
           const error = squashAtomCommandFailure(writeResult);
           setThreadError(
             activeThreadId,
-            error instanceof Error ? error.message : `Failed to run script "${script.name}".`,
+            error instanceof Error ? error.message : `运行脚本 "${script.name}" 失败。`,
           );
         }
         return;
@@ -5103,8 +5101,8 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not open preview",
-              description: error instanceof Error ? error.message : "An unexpected error occurred.",
+              title: "无法打开预览",
+              description: error instanceof Error ? error.message : "发生意外错误。",
             }),
           );
         }
@@ -5142,7 +5140,7 @@ export default function ChatView(props: ChatViewProps) {
     void runProjectScriptRef.current(
       {
         id: "chat-code-block",
-        name: "Chat code block",
+        name: "聊天代码块",
         command,
         icon: "play",
         runOnWorktreeCreate: false,
@@ -5180,7 +5178,7 @@ export default function ChatView(props: ChatViewProps) {
           Cause.fail(
             new EnvironmentAuthorizationError({
               requiredScope: AuthSettingsWriteScope,
-              message: "This connection cannot change keyboard shortcuts.",
+              message: "此连接无法更改键盘快捷键。",
             }),
           ),
         );
@@ -5226,8 +5224,8 @@ export default function ChatView(props: ChatViewProps) {
             new EnvironmentAuthorizationError({
               requiredScope: AuthSettingsWriteScope,
               message: isDeletingScript
-                ? "The script was deleted, but its keyboard shortcut could not be removed because permission changed."
-                : "The script was saved, but this connection can no longer change keyboard shortcuts.",
+                ? "脚本已删除，但因权限变更，其键盘快捷键未能移除。"
+                : "脚本已保存，但此连接已无法更改键盘快捷键。",
             }),
           ),
         );
@@ -5332,7 +5330,7 @@ export default function ChatView(props: ChatViewProps) {
       }
       const existingScript = activeProjectScripts.find((script) => script.id === scriptId);
       if (!existingScript) {
-        return AsyncResult.failure(Cause.fail(new Error("Script not found.")));
+        return AsyncResult.failure(Cause.fail(new Error("未找到脚本。")));
       }
 
       const updatedScript = buildProjectScript(existingScript.id, input);
@@ -5371,15 +5369,15 @@ export default function ChatView(props: ChatViewProps) {
       if (result._tag === "Success") {
         toastManager.add({
           type: "success",
-          title: `Deleted action "${deletedName ?? "Unknown"}"`,
+          title: `已删除操作 "${deletedName ?? "未知"}"`,
         });
       } else if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not delete action",
-            description: error instanceof Error ? error.message : "An unexpected error occurred.",
+            title: "无法删除操作",
+            description: error instanceof Error ? error.message : "发生意外错误。",
           }),
         );
       }
@@ -5458,7 +5456,7 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Unable to open browser",
+              title: "无法打开浏览器",
               description: error.message,
             }),
           );
@@ -5726,7 +5724,7 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Unable to update the thread pull request",
+          title: "无法更新会话的 Pull Request",
           description: chatActionErrorMessage(squashAtomCommandFailure(result)),
         }),
       );
@@ -6279,8 +6277,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Failed to copy path",
-          description: "Clipboard API unavailable.",
+          title: "复制路径失败",
+          description: "剪贴板 API 不可用。",
         }),
       );
       return;
@@ -6290,7 +6288,7 @@ export default function ChatView(props: ChatViewProps) {
       () => {
         toastManager.add({
           type: "success",
-          title: "Path copied",
+          title: "路径已复制",
           description: relativePath,
         });
       },
@@ -6298,8 +6296,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to copy path",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "复制路径失败",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       },
@@ -7051,7 +7049,7 @@ export default function ChatView(props: ChatViewProps) {
         '[data-chat-composer-main-surface="true"]',
       );
       const button = composerOverlayElement?.parentElement?.querySelector<HTMLElement>(
-        'button[aria-label="Scroll to end"]',
+        'button[aria-label="滚动到底部"]',
       );
       const clearance =
         composerOverlayElement && mainSurface && button
@@ -7144,7 +7142,7 @@ export default function ChatView(props: ChatViewProps) {
           stackedThreadToast({
             type: "error",
             title: target.failureTitle,
-            description: error instanceof Error ? error.message : "An error occurred.",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       },
@@ -7255,8 +7253,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to un-settle thread",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "取消会话完成状态失败",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       }
@@ -7301,8 +7299,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to wake thread",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "唤醒会话失败",
+            description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
       }
@@ -7367,7 +7365,7 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to switch checkout",
+            title: "切换检出失败",
             description: chatActionErrorMessage(squashAtomCommandFailure(checkoutResult)),
           }),
         );
@@ -7391,7 +7389,7 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Checkout switched, but the thread could not be updated",
+              title: "检出已切换，但会话未能更新",
               description: chatActionErrorMessage(squashAtomCommandFailure(updateResult)),
             }),
           );
@@ -7443,7 +7441,7 @@ export default function ChatView(props: ChatViewProps) {
         const error = squashAtomCommandFailure(result);
         setThreadError(
           activeThread.id,
-          error instanceof Error ? error.message : "Failed to stop background work.",
+          error instanceof Error ? error.message : "停止后台任务失败。",
         );
       }
     }
@@ -7470,8 +7468,8 @@ export default function ChatView(props: ChatViewProps) {
       icon: <MessageCircleIcon />,
       title:
         childThreadInputs.length === 1
-          ? "Subagent needs input"
-          : `${childThreadInputs.length} subagents need input`,
+          ? "子 Agent 需要输入"
+          : `${childThreadInputs.length} 个子 Agent 需要输入`,
       description: childThreadInputs.map((child, index) => (
         <Fragment key={child.id}>
           {index > 0 ? ", " : null}
@@ -7482,7 +7480,7 @@ export default function ChatView(props: ChatViewProps) {
       )),
       actions: (
         <Button size="xs" variant="ghost" onClick={() => onOpenRelatedThread(first.id)}>
-          Open question
+          打开问题
         </Button>
       ),
     };
@@ -7601,17 +7599,17 @@ export default function ChatView(props: ChatViewProps) {
             <Button
               size="xs"
               variant="ghost"
-              onClick={() => void sendStandaloneCommand("/goal resume", "Failed to resume goal.")}
+              onClick={() => void sendStandaloneCommand("/goal resume", "恢复目标失败。")}
             >
-              Resume
+              继续
             </Button>
           ) : null}
           <Button
             size="xs"
             variant="ghost"
-            onClick={() => void sendStandaloneCommand("/goal clear", "Failed to clear goal.")}
+            onClick={() => void sendStandaloneCommand("/goal clear", "清除目标失败。")}
           >
-            Clear
+            清除
           </Button>
         </>
       ),
@@ -7653,7 +7651,7 @@ export default function ChatView(props: ChatViewProps) {
                   ) : (
                     <InlineButton
                       tone="muted"
-                      aria-label={`Open subagent ${item.label}`}
+                      aria-label={`打开子 Agent ${item.label}`}
                       onClick={() => onOpenRelatedThread(childThreadId)}
                     >
                       {item.label}
@@ -7669,7 +7667,7 @@ export default function ChatView(props: ChatViewProps) {
           disabled={!canOperateThread || isStoppingBackgroundWork}
           onClick={() => void handleStopBackgroundWork()}
         >
-          {isStoppingBackgroundWork ? "Stopping..." : "Stop"}
+          {isStoppingBackgroundWork ? "正在停止…" : "停止"}
         </Button>
       ),
     };
@@ -7695,10 +7693,10 @@ export default function ChatView(props: ChatViewProps) {
         icon={<AlarmClockIcon />}
         label={
           activeThreadShell?.snoozedUntil
-            ? `Snoozed, ${formatRelativeTimeUntilLabel(activeThreadShell.snoozedUntil)}`
-            : "Snoozed"
+            ? `已延后，${formatRelativeTimeUntilLabel(activeThreadShell.snoozedUntil)}`
+            : "已延后"
         }
-        actionLabel={isUnsnoozing ? "Waking..." : "Wake now"}
+        actionLabel={isUnsnoozing ? "正在唤醒…" : "立即唤醒"}
         actionDisabled={!canOperateThread || isUnsnoozing}
         onAction={() => void handleUnsnoozeActiveThread()}
       />
@@ -7707,18 +7705,18 @@ export default function ChatView(props: ChatViewProps) {
         icon={<CheckCircle2Icon />}
         label={
           activeThreadShell?.settledAt
-            ? `Settled ${formatRelativeTimeLabel(activeThreadShell.settledAt)}`
-            : "Settled"
+            ? `已完成 ${formatRelativeTimeLabel(activeThreadShell.settledAt)}`
+            : "已完成"
         }
-        actionLabel={isUnsettling ? "Un-settling..." : "Un-settle"}
+        actionLabel={isUnsettling ? "正在取消完成…" : "取消完成"}
         actionDisabled={!canOperateThread || isUnsettling}
         onAction={() => void handleUnsettleActiveThread()}
       />
     ) : activeThreadWokeVisible ? (
       <ThreadStatusLine
         icon={<AlarmClockIcon />}
-        label="Woke from snooze"
-        actionLabel="Dismiss"
+        label="已从延后中唤醒"
+        actionLabel="知道了"
         onAction={acknowledgeActiveThreadWoke}
       />
     ) : null;
@@ -7774,12 +7772,12 @@ export default function ChatView(props: ChatViewProps) {
   const compactDisabled = compactThreadUnavailable;
   const compactDisabledReason = compactDisabled
     ? !canOperateThread
-      ? "This connection cannot change threads."
+      ? "此连接无法更改会话。"
       : !activeProject
-        ? "Choose a project before compacting"
+        ? "压缩前请先选择项目"
         : !manualCompactionProviderAvailable
-          ? "Compaction is unavailable for this provider"
-          : "Compacting is unavailable right now"
+          ? "此提供商不支持压缩"
+          : "压缩当前不可用"
     : null;
   // Tokens a stale Claude session would re-read on its next turn. While set,
   // the composer shows a Compact chip and Enter compacts first; turning the
@@ -7901,7 +7899,7 @@ export default function ChatView(props: ChatViewProps) {
         icon: <GitBranchIcon />,
         title: (
           <span className="flex min-w-0 items-baseline gap-1.5">
-            <span className="shrink-0 font-normal text-muted-foreground">Branch changed — was</span>
+            <span className="shrink-0 font-normal text-muted-foreground">分支已更改 — 原为</span>
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -7911,8 +7909,8 @@ export default function ChatView(props: ChatViewProps) {
                 }
               />
               <TooltipPopup side="top">
-                This thread last ran on {localCheckoutBranchMismatch.threadBranch}. Sending will
-                continue on {localCheckoutBranchMismatch.currentBranch}.
+                此会话上次运行于 {localCheckoutBranchMismatch.threadBranch}
+                。发送后将延续到 {localCheckoutBranchMismatch.currentBranch}。
               </TooltipPopup>
             </Tooltip>
           </span>
@@ -7924,10 +7922,10 @@ export default function ChatView(props: ChatViewProps) {
             disabled={!canWriteSourceControl || isRestoringThreadBranch}
             onClick={handleRestoreThreadBranch}
           >
-            {isRestoringThreadBranch ? "Restoring..." : "Restore branch"}
+            {isRestoringThreadBranch ? "正在恢复…" : "恢复分支"}
           </Button>
         ),
-        dismissLabel: "Dismiss branch change notice",
+        dismissLabel: "关闭分支变更提示",
         onDismiss: () => {
           dismissBranchMismatchForSession(activeBranchMismatchKey);
           setBranchMismatchDismissTick((tick) => tick + 1);
@@ -8116,8 +8114,8 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Failed to settle thread",
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: "标记会话完成失败",
+              description: error instanceof Error ? error.message : "发生错误。",
             }),
           );
         });
@@ -8137,8 +8135,8 @@ export default function ChatView(props: ChatViewProps) {
             toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: pinned ? "Failed to unpin thread" : "Failed to pin thread",
-                description: error instanceof Error ? error.message : "An error occurred.",
+                title: pinned ? "取消置顶会话失败" : "置顶会话失败",
+                description: error instanceof Error ? error.message : "发生错误。",
               }),
             );
           },
@@ -8508,21 +8506,18 @@ export default function ChatView(props: ChatViewProps) {
       if (!message || message.role !== "user") return;
 
       if (!supportsConversationRollback) {
-        setThreadError(
-          activeThread.id,
-          "This provider does not support reverting conversation history. Start a new thread instead.",
-        );
+        setThreadError(activeThread.id, "此提供商不支持回退对话历史。请改为新建会话。");
         return;
       }
       if (activeEnvironmentUnavailable && activeEnvironmentUnavailableLabel) {
         setThreadError(
           activeThread.id,
-          `Reconnect ${activeEnvironmentUnavailableLabel} before reverting checkpoints.`,
+          `回退 Checkpoint 前请先重新连接 ${activeEnvironmentUnavailableLabel}。`,
         );
         return;
       }
       if (phase === "running" || isSendBusy || isConnecting) {
-        setThreadError(activeThread.id, "Interrupt the current turn before reverting checkpoints.");
+        setThreadError(activeThread.id, "回退 Checkpoint 前请先中断当前轮次。");
         return;
       }
       if (restoreFiles === undefined) {
@@ -8536,10 +8531,10 @@ export default function ChatView(props: ChatViewProps) {
       setThreadError(activeThread.id, null);
       try {
         if (composerRef.current?.hasPendingAttachments()) {
-          throw new Error("Wait for attachments to finish preparing before rewinding.");
+          throw new Error("请等待附件准备完成后再回退。");
         }
         const connection = readPreparedConnection(environmentId);
-        if (!connection) throw new Error("The environment is not connected.");
+        if (!connection) throw new Error("环境未连接。");
         const files = await prepareRevertedMessageAttachments({
           message,
           environmentId,
@@ -8552,9 +8547,7 @@ export default function ChatView(props: ChatViewProps) {
           (draft?.images.length ?? 0) + (draft?.files.length ?? 0) + files.length >
           PROVIDER_SEND_TURN_MAX_ATTACHMENTS
         ) {
-          throw new Error(
-            "Make room for this message's attachments in the composer before rewinding.",
-          );
+          throw new Error("回退前请先在输入框中为该消息的附件腾出空间。");
         }
         const commandId = CommandId.make(randomUUID());
         await waitForRevertedMessage(routeThreadRef, messageId, turnCount, commandId, async () => {
@@ -8602,7 +8595,7 @@ export default function ChatView(props: ChatViewProps) {
       } catch (error) {
         setThreadError(
           activeThread.id,
-          error instanceof Error ? error.message : "Failed to revert thread state.",
+          error instanceof Error ? error.message : "回退会话状态失败。",
         );
       } finally {
         useComposerDraftStore.setState((store) => {
@@ -8639,20 +8632,20 @@ export default function ChatView(props: ChatViewProps) {
       if (activeEnvironmentUnavailable && activeEnvironmentUnavailableLabel) {
         setThreadError(
           activeThread.id,
-          `Reconnect ${activeEnvironmentUnavailableLabel} before reverting checkpoints.`,
+          `回退 Checkpoint 前请先重新连接 ${activeEnvironmentUnavailableLabel}。`,
         );
         return;
       }
       if (phase === "running" || isSendBusy || isConnecting) {
-        setThreadError(activeThread.id, "Interrupt the current turn before reverting checkpoints.");
+        setThreadError(activeThread.id, "回退 Checkpoint 前请先中断当前轮次。");
         return;
       }
       const localApi = readLocalApi();
       const confirmed =
         localApi == null
-          ? window.confirm("Roll back this thread to the selected checkpoint?")
+          ? window.confirm("要将此会话回退到所选 Checkpoint 吗？")
           : await localApi.dialogs.confirm(
-              "Roll back this thread to the selected checkpoint?\nThis action cannot be undone.",
+              "要将此会话回退到所选 Checkpoint 吗？\n此操作无法撤销。",
             );
       if (!confirmed) return;
 
@@ -8672,7 +8665,7 @@ export default function ChatView(props: ChatViewProps) {
         const error = squashAtomCommandFailure(result);
         setThreadError(
           activeThread.id,
-          error instanceof Error ? error.message : "Failed to revert thread state.",
+          error instanceof Error ? error.message : "回退会话状态失败。",
         );
       }
       useComposerDraftStore.setState((store) => {
@@ -8714,7 +8707,7 @@ export default function ChatView(props: ChatViewProps) {
           const error = squashAtomCommandFailure(result);
           setThreadError(
             activeThread.id,
-            error instanceof Error ? error.message : "Failed to fork this response.",
+            error instanceof Error ? error.message : "分叉此回复失败。",
           );
         }
         return;
@@ -8723,7 +8716,7 @@ export default function ChatView(props: ChatViewProps) {
       if (!targetThreadReady) {
         setThreadError(
           activeThread.id,
-          "The fork was created, but its thread data did not reach this client. Reconnect and try opening it from the sidebar.",
+          "分叉已创建，但其会话数据未能到达此客户端。请重新连接并尝试从侧边栏打开。",
         );
         return;
       }
@@ -8743,7 +8736,7 @@ export default function ChatView(props: ChatViewProps) {
   );
   const onCompactContext = () => {
     if (compactDisabled) return;
-    void sendStandaloneCommand("/compact", "Failed to compact context.");
+    void sendStandaloneCommand("/compact", "压缩上下文失败。");
   };
 
   const onResume = async () => {
@@ -8790,7 +8783,7 @@ export default function ChatView(props: ChatViewProps) {
             message: {
               messageId: newMessageId(),
               role: "user",
-              text: "Continue where you left off.",
+              text: "从你上次停下的地方继续。",
               attachments: [],
             },
             runtimeMode,
@@ -8806,10 +8799,7 @@ export default function ChatView(props: ChatViewProps) {
       if (result._tag === "Failure") {
         if (!isAtomCommandInterrupted(result)) {
           const error = squashAtomCommandFailure(result);
-          setThreadError(
-            threadId,
-            error instanceof Error ? error.message : "Could not resume thread.",
-          );
+          setThreadError(threadId, error instanceof Error ? error.message : "无法恢复会话。");
         }
       } else {
         clearUsageLimitsFor(routeThreadKey);
@@ -8857,8 +8847,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "info",
-          title: "Annotation attached to draft",
-          description: "Sending is unavailable right now. Finish the current action, then send.",
+          title: "批注已附加到草稿",
+          description: "暂时无法发送。请先完成当前操作，再发送。",
         }),
       );
     };
@@ -8880,12 +8870,10 @@ export default function ChatView(props: ChatViewProps) {
     if (needsLoadBalancing) {
       toastManager.add({
         type: "warning",
-        title: loadBalancing.pending
-          ? "Checking machine resources"
-          : "Choose a machine to continue",
+        title: loadBalancing.pending ? "正在检查机器资源" : "请选择一台机器以继续",
         description: loadBalancing.pending
-          ? "Resource checks are still running. You can choose a machine in the composer."
-          : "No eligible machine has available resources. Choose a machine in the composer to override.",
+          ? "资源检查仍在进行中。你可以在输入框中选择机器。"
+          : "没有符合条件的机器拥有可用资源。可在输入框中选择机器以手动指定。",
       });
       return;
     }
@@ -8896,8 +8884,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add({
         ...stackedThreadToast({
           type: "warning",
-          title: "Not connected: message not sent",
-          description: "Reconnecting to the environment. Try again once it is connected.",
+          title: "未连接：消息未发送",
+          description: "正在重新连接环境。连接成功后请重试。",
         }),
         id: `chat-send-environment-unavailable:${toastSlot}`,
       });
@@ -8921,7 +8909,7 @@ export default function ChatView(props: ChatViewProps) {
       multipleModelSelections !== null &&
       serverConfig?.environment.capabilities.requiredWorktreeBootstrap !== true
     ) {
-      setThreadError(activeThread.id, "Update this server before starting multiple models.");
+      setThreadError(activeThread.id, "启动多个模型前请先更新此服务器。");
       return;
     }
     if (
@@ -8934,9 +8922,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "warning",
-          title: "Choose models and a base branch",
-          description:
-            "Multiple models need a new thread in a Git project. Each gets its own worktree.",
+          title: "请选择模型和基础分支",
+          description: "多个模型需要在 Git 项目中新建会话。每个模型会使用自己的 Worktree。",
         }),
       );
       return;
@@ -9009,7 +8996,7 @@ export default function ChatView(props: ChatViewProps) {
       ) {
         setThreadError(
           editingQueuedRun.threadId,
-          `A message can have at most ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} attachments.`,
+          `一条消息最多可包含 ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} 个附件。`,
         );
         return;
       }
@@ -9053,7 +9040,7 @@ export default function ChatView(props: ChatViewProps) {
             await awaitAttachmentUploads(files.map((file) => file.id));
             validateFiles();
             const uploaded = getUploadedAttachments({ environmentId, images: files });
-            if (uploaded === null) throw new Error("Retry or remove failed uploads before saving.");
+            if (uploaded === null) throw new Error("保存前请重试或移除失败的上传。");
             return uploaded;
           },
         });
@@ -9100,7 +9087,7 @@ export default function ChatView(props: ChatViewProps) {
           },
         });
         if (result._tag === "Failure") {
-          setThreadError(editingQueuedRun.threadId, "Could not save the edited queued message.");
+          setThreadError(editingQueuedRun.threadId, "无法保存已编辑的排队消息。");
           return;
         }
         setThreadError(editingQueuedRun.threadId, null);
@@ -9113,7 +9100,7 @@ export default function ChatView(props: ChatViewProps) {
       } catch (error) {
         setThreadError(
           editingQueuedRun.threadId,
-          error instanceof Error ? error.message : "Could not save the edited queued message.",
+          error instanceof Error ? error.message : "无法保存已编辑的排队消息。",
         );
       } finally {
         queuedEditSaveInFlightRef.current = false;
@@ -9150,8 +9137,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "warning",
-            title: "Start a Codex thread first",
-            description: "Send a message before you submit feedback.",
+            title: "请先开始一个 Codex 会话",
+            description: "提交反馈前请先发送一条消息。",
           }),
         );
         return;
@@ -9302,8 +9289,8 @@ export default function ChatView(props: ChatViewProps) {
       toastManager.add(
         stackedThreadToast({
           type: "warning",
-          title: "Choose a project first",
-          description: "This draft no longer points to an available project.",
+          title: "请先选择项目",
+          description: "此草稿已不再指向可用项目。",
         }),
       );
       return;
@@ -9320,7 +9307,7 @@ export default function ChatView(props: ChatViewProps) {
     const shouldCreateWorktree =
       isFirstMessage && sendEnvMode === "worktree" && !activeThread.worktreePath;
     if (shouldCreateWorktree && !activeThreadBranch) {
-      setThreadError(threadIdForSend, "Select a base branch before sending in New worktree mode.");
+      setThreadError(threadIdForSend, "在“新建 Worktree ”模式下发送前请先选择基础分支。");
       return;
     }
 
@@ -9404,7 +9391,7 @@ export default function ChatView(props: ChatViewProps) {
         (entry) => entry.instanceId === selection.instanceId,
       );
       if (!provider?.enabled || !provider.isAvailable || provider.status !== "ready") {
-        setThreadError(threadIdForSend, `Provider for ${selection.model} is unavailable.`);
+        setThreadError(threadIdForSend, `${selection.model} 的提供商不可用。`);
         return;
       }
       const providerBlockReason = getAntigravitySendBlockReason(provider.snapshot, selection.model);
@@ -9472,7 +9459,7 @@ export default function ChatView(props: ChatViewProps) {
       }
       if (getUploadedAttachments({ environmentId, images: composerAttachmentsSnapshot }) === null) {
         sendInFlightRef.current = false;
-        setThreadError(threadIdForSend, "Retry or remove failed uploads before sending.");
+        setThreadError(threadIdForSend, "发送前请重试或移除上传失败的附件。");
         return;
       }
     }
@@ -9511,8 +9498,7 @@ export default function ChatView(props: ChatViewProps) {
       sendInFlightRef.current = false;
       setThreadError(
         threadIdForSend,
-        attachmentCapabilitiesBeforeDispatch.fileBlockReason ??
-          "This connection cannot change threads.",
+        attachmentCapabilitiesBeforeDispatch.fileBlockReason ?? "此连接无法更改会话。",
       );
       setDockedDraftHeroThreadKey((currentThreadKey) =>
         currentThreadKey === activeThreadKey ? null : currentThreadKey,
@@ -9547,12 +9533,12 @@ export default function ChatView(props: ChatViewProps) {
         if (turnUsesAttachmentUploads) {
           const uploaded = getUploadedAttachments({ environmentId, images: [attachment] })?.[0];
           if (!uploaded) {
-            throw new Error(`Attachment '${attachment.name}' did not finish uploading.`);
+            throw new Error(`附件 “${attachment.name}” 尚未完成上传。`);
           }
           return uploaded;
         }
         if (attachment.type !== "image") {
-          throw new Error("This server does not support file attachments.");
+          throw new Error("此服务器不支持文件附件。");
         }
         return {
           type: "image" as const,
@@ -9585,7 +9571,7 @@ export default function ChatView(props: ChatViewProps) {
         const title = truncate(
           assistantCitationsToPlainText(stripInlineContextReferences(trimmed)).trim() ||
             composerAttachmentsSnapshot[0]?.name ||
-            "New thread",
+            "新建会话",
         );
         promptRef.current = "";
         clearComposerDraftContent(composerDraftTarget);
@@ -9614,9 +9600,7 @@ export default function ChatView(props: ChatViewProps) {
             let requestMayHaveStarted = false;
             try {
               if (uncertainThreadId) {
-                throw new Error(
-                  "The previous request may have started. Open its thread to check before sending again.",
-                );
+                throw new Error("上一个请求可能已开始。请先打开其会话确认，然后再发送。");
               }
               const supportsInlineMessageContext =
                 appAtomRegistry.get(environmentServerConfigsAtom).get(environmentId)?.environment
@@ -9682,18 +9666,18 @@ export default function ChatView(props: ChatViewProps) {
               const failureToastId = toastManager.add(
                 stackedThreadToast({
                   type: "error",
-                  title: `Could not start ${target.selection.model}`,
-                  description: error instanceof Error ? error.message : "Failed to send message.",
+                  title: `无法启动 ${target.selection.model}`,
+                  description: error instanceof Error ? error.message : "发送消息失败。",
                   ...(retainedThreadId
                     ? {
                         timeout: 0,
                         data: {
                           secondaryActionProps: {
-                            children: "Allow retry",
+                            children: "允许重试",
                             onClick: () => {
                               void readLocalApi()
                                 ?.dialogs.confirm(
-                                  "The previous request may already be running. Check its thread first. Allow another send that could create a duplicate thread?",
+                                  "上一个请求可能已在运行。请先查看其会话。是否仍要再次发送？这可能创建重复的会话。",
                                 )
                                 .then(
                                   (confirmed) => {
@@ -9712,7 +9696,7 @@ export default function ChatView(props: ChatViewProps) {
                           },
                         },
                         actionProps: {
-                          children: "Open thread",
+                          children: "打开会话",
                           onClick: () => {
                             void navigate({
                               to: "/$environmentId/$threadId",
@@ -9739,7 +9723,7 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "success",
-              title: `Started ${startedCount} ${startedCount === 1 ? "thread" : "threads"} in background`,
+              title: `已在后台启动 ${startedCount} 个会话`,
             }),
           );
         }
@@ -9748,10 +9732,7 @@ export default function ChatView(props: ChatViewProps) {
         }
       } catch (error) {
         failedSelections.push(...multipleModelSelections);
-        setThreadError(
-          threadIdForSend,
-          error instanceof Error ? error.message : "Failed to send messages.",
-        );
+        setThreadError(threadIdForSend, error instanceof Error ? error.message : "发送消息失败。");
       } finally {
         const restoreFailedDraft = () => {
           setMultipleModelSelections(failedSelections);
@@ -9789,12 +9770,11 @@ export default function ChatView(props: ChatViewProps) {
             const recoveryToastId = toastManager.add(
               stackedThreadToast({
                 type: "error",
-                title: "A background prompt could not be sent",
-                description:
-                  "Your newer draft is unchanged. Restore the failed prompt when this composer is empty.",
+                title: "后台 Prompt 未能发送",
+                description: "你的新草稿保持不变。输入框清空后可恢复失败的 Prompt。",
                 timeout: 0,
                 actionProps: {
-                  children: "Restore prompt",
+                  children: "恢复 Prompt",
                   onClick: () => {
                     if (
                       !draftId ||
@@ -9805,8 +9785,7 @@ export default function ChatView(props: ChatViewProps) {
                       )
                     ) {
                       toastManager.update(recoveryToastId, {
-                        description:
-                          "Return to the original draft and send or clear its current prompt before restoring.",
+                        description: "请先回到原草稿，发送或清空其当前 Prompt 后再恢复。",
                       });
                       return;
                     }
@@ -9911,17 +9890,17 @@ export default function ChatView(props: ChatViewProps) {
     let titleSeed = assistantCitationsToPlainText(stripInlineContextReferences(trimmed)).trim();
     if (!titleSeed) {
       if (firstComposerImageName) {
-        titleSeed = `Image: ${firstComposerImageName}`;
+        titleSeed = `图片：${firstComposerImageName}`;
       } else if (composerFilesSnapshot[0]) {
-        titleSeed = `File: ${composerFilesSnapshot[0].name}`;
+        titleSeed = `文件：${composerFilesSnapshot[0].name}`;
       } else if (composerTerminalContextsSnapshot.length > 0) {
         titleSeed = formatTerminalContextLabel(composerTerminalContextsSnapshot[0]!);
       } else if (composerReviewCommentsSnapshot.length > 0) {
-        titleSeed = `Review: ${reviewCommentContextLabel(composerReviewCommentsSnapshot[0]!)}`;
+        titleSeed = `审查：${reviewCommentContextLabel(composerReviewCommentsSnapshot[0]!)}`;
       } else if (composerPreviewAnnotationsSnapshot.length > 0) {
         titleSeed = previewAnnotationContextLabel(composerPreviewAnnotationsSnapshot[0]!);
       } else {
-        titleSeed = "New thread";
+        titleSeed = "新建会话";
       }
     }
     const title = truncate(titleSeed);
@@ -10076,7 +10055,7 @@ export default function ChatView(props: ChatViewProps) {
           toastManager.add(
             stackedThreadToast({
               type: "warning",
-              title: "Could not open a fresh composer",
+              title: "无法打开新的输入框",
               description: error instanceof Error ? error.message : undefined,
             }),
           );
@@ -10106,10 +10085,10 @@ export default function ChatView(props: ChatViewProps) {
             toastManager.add(
               stackedThreadToast({
                 type: "success",
-                title: "Started in background",
+                title: "已在后台启动",
                 timeout: 5_000,
                 actionProps: {
-                  children: "Open",
+                  children: "打开",
                   onClick: () => {
                     void navigate({
                       to: "/$environmentId/$threadId",
@@ -10185,18 +10164,15 @@ export default function ChatView(props: ChatViewProps) {
       }
       if (!isAtomCommandInterrupted(failure)) {
         const error = squashAtomCommandFailure(failure);
-        setThreadError(
-          threadIdForSend,
-          error instanceof Error ? error.message : "Failed to send message.",
-        );
+        setThreadError(threadIdForSend, error instanceof Error ? error.message : "发送消息失败。");
         if (backgroundDraftOpened && draftId) {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Background task failed",
-              description: error instanceof Error ? error.message : "Failed to send message.",
+              title: "后台任务失败",
+              description: error instanceof Error ? error.message : "发送消息失败。",
               actionProps: {
-                children: "Open draft",
+                children: "打开草稿",
                 onClick: () => {
                   void navigate({ to: "/draft/$draftId", params: { draftId } });
                 },
@@ -10241,7 +10217,7 @@ export default function ChatView(props: ChatViewProps) {
         const error = squashAtomCommandFailure(result);
         setThreadError(
           activeThreadId,
-          error instanceof Error ? error.message : "Failed to submit approval decision.",
+          error instanceof Error ? error.message : "提交批准决定失败。",
         );
       }
       setRespondingRequestIds((existing) => existing.filter((id) => id !== requestId));
@@ -10280,10 +10256,7 @@ export default function ChatView(props: ChatViewProps) {
         if (attachments.length === 0) continue;
         const uploaded = getUploadedAttachments({ environmentId, images: attachments });
         if (!uploaded) {
-          setThreadError(
-            activeThreadId,
-            "Wait for attachments to finish uploading, or remove failed uploads.",
-          );
+          setThreadError(activeThreadId, "请等待附件完成上传，或移除上传失败的附件。");
           return;
         }
         attachmentsByQuestionId.set(
@@ -10311,7 +10284,7 @@ export default function ChatView(props: ChatViewProps) {
         const error = squashAtomCommandFailure(result);
         setThreadError(
           activeThreadId,
-          error instanceof Error ? error.message : "Failed to submit user input.",
+          error instanceof Error ? error.message : "提交用户输入失败。",
         );
       }
       userInputResponsesInFlight.current.delete(responseKey);
@@ -10336,10 +10309,7 @@ export default function ChatView(props: ChatViewProps) {
       });
       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
-        setThreadError(
-          activeThreadId,
-          error instanceof Error ? error.message : "Failed to dismiss the question.",
-        );
+        setThreadError(activeThreadId, error instanceof Error ? error.message : "关闭问题失败。");
       }
       setRespondingUserInputRequestIds((existing) => existing.filter((id) => id !== requestId));
       return result;
@@ -10625,7 +10595,7 @@ export default function ChatView(props: ChatViewProps) {
       const error = squashAtomCommandFailure(failure);
       setThreadError(
         threadIdForSend,
-        error instanceof Error ? error.message : "Failed to send plan follow-up.",
+        error instanceof Error ? error.message : "发送计划跟进失败。",
       );
     }
     sendInFlightRef.current = false;
@@ -10761,11 +10731,8 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not start implementation thread",
-            description:
-              error instanceof Error
-                ? error.message
-                : "An error occurred while creating the new thread.",
+            title: "无法启动实施会话",
+            description: error instanceof Error ? error.message : "创建新会话时发生错误。",
           }),
         );
       }
@@ -10804,7 +10771,7 @@ export default function ChatView(props: ChatViewProps) {
         currentProviderInstanceId: activeRuntime?.providerInstanceId ?? null,
         nextModelSelection: { instanceId, model },
       });
-      return reason ? `${reason.description} Start a new thread to use this model.` : null;
+      return reason ? `${reason.description} 新建会话以使用此模型。` : null;
     },
     [activeRuntime, activeThread, providerStatuses, supportsProviderSwitchingViaHandoff],
   );
@@ -11168,8 +11135,8 @@ export default function ChatView(props: ChatViewProps) {
       <PullRequestDetailGhost />
     ) : renderedRightPanelSurface?.kind === "pull-request" && !supportsPullRequests ? (
       <PullRequestsUnavailableState
-        title="Pull requests unavailable"
-        error="Update this environment's T3 Code server to browse pull requests."
+        title="Pull Request 不可用"
+        error="请更新此环境的 T3 Code 服务器以浏览 Pull Request。"
       />
     ) : renderedRightPanelSurface?.kind === "pull-request" ? (
       // No onClose: the surface tab's own X owns closing here, and a second X in the header
@@ -11514,7 +11481,7 @@ export default function ChatView(props: ChatViewProps) {
                   className="flex items-center gap-2 rounded-full border border-primary/25 bg-background/95 px-4 py-2.5 text-sm font-medium text-foreground shadow-lg"
                 >
                   <PaperclipIcon className="size-4 text-primary" aria-hidden="true" />
-                  Drop files to attach
+                  拖放文件以添加附件
                 </div>
               </div>
             ) : null}
@@ -11665,7 +11632,7 @@ export default function ChatView(props: ChatViewProps) {
                   style={{ bottom: scrollToEndClearance + 4 }}
                 >
                   <Button
-                    aria-label="Scroll to end"
+                    aria-label="滚动到底部"
                     onPointerDown={(event) => event.preventDefault()}
                     onClick={() => {
                       composerRef.current?.restoreAfterTimelineReachedEnd();
@@ -11676,7 +11643,7 @@ export default function ChatView(props: ChatViewProps) {
                     variant="glass"
                   >
                     <ChevronDownIcon className="size-3.5" />
-                    Scroll to end
+                    滚动到底部
                   </Button>
                 </div>
               )}
@@ -11803,17 +11770,17 @@ export default function ChatView(props: ChatViewProps) {
                               isRevertingCheckpoint={isRevertingCheckpoint}
                               sendDisabledReason={
                                 !canOperateThread
-                                  ? "This connection cannot change threads."
+                                  ? "此连接无法更改会话。"
                                   : isEnvironmentChanging
-                                    ? "Preparing machine"
+                                    ? "正在准备机器"
                                     : isRevertingCheckpoint
-                                      ? "Rewinding conversation"
+                                      ? "正在回退对话"
                                       : feedbackUploading
-                                        ? "Sending feedback"
+                                        ? "正在发送反馈"
                                         : threadDetailLoading
-                                          ? "Messages loading"
+                                          ? "消息加载中"
                                           : worktreeSetupBlocksSend
-                                            ? "Preparing worktree"
+                                            ? "正在准备 Worktree"
                                             : projectCloneSendBlockReason
                               }
                               isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
@@ -12018,19 +11985,18 @@ export default function ChatView(props: ChatViewProps) {
               <AlertDialogPopup>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    Switch to{" "}
+                    切换到{" "}
                     <code className="font-medium">
                       {localCheckoutBranchMismatch?.threadBranch ?? ""}
                     </code>
-                    ?
+                    ？
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    You have uncommitted changes. They'll carry over to the other branch, or block
-                    the switch if they conflict.
+                    你有未提交的更改。它们会延续到另一个分支；如有冲突，则会阻止切换。
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+                  <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
                   <Button
                     variant="default"
                     disabled={!canWriteSourceControl}
@@ -12039,7 +12005,7 @@ export default function ChatView(props: ChatViewProps) {
                       void handleSwitchCheckoutToThread();
                     }}
                   >
-                    Switch branch
+                    切换分支
                   </Button>
                 </AlertDialogFooter>
               </AlertDialogPopup>
@@ -12203,14 +12169,13 @@ export default function ChatView(props: ChatViewProps) {
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit from here?</AlertDialogTitle>
+            <AlertDialogTitle>从此处编辑？</AlertDialogTitle>
             <AlertDialogDescription>
-              Rewind chat to before this message. Your prompt and attachments return to the
-              composer.
+              将聊天回退到此消息之前。你的 Prompt 和附件会回到输入框中。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
             <Button
               variant="destructive"
               onClick={() => {
@@ -12219,7 +12184,7 @@ export default function ChatView(props: ChatViewProps) {
                 void onRevertToTurnCount(pendingRevert.turnCount, pendingRevert.messageId, true);
               }}
             >
-              Revert files too
+              同时回退文件
             </Button>
             <Button
               onClick={() => {
@@ -12228,7 +12193,7 @@ export default function ChatView(props: ChatViewProps) {
                 void onRevertToTurnCount(pendingRevert.turnCount, pendingRevert.messageId, false);
               }}
             >
-              Revert and keep changes
+              回退并保留更改
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

@@ -19,7 +19,7 @@ export function hyprlandCaptureExecutable(paths: HyprlandCapturePaths) {
 }
 
 function hyprlandCaptureBinding(appId: string, lua: boolean): string {
-  if (!/^[A-Za-z0-9_.-]+$/.test(appId)) throw new Error("Invalid capture application ID.");
+  if (!/^[A-Za-z0-9_.-]+$/.test(appId)) throw new Error("无效的截图应用 ID。");
   const action = `${appId}:${HYPRLAND_CAPTURE_ACTION}`;
   return lua
     ? `hl.bind("CTRL + SHIFT + 2", hl.dsp.global("${action}"))`
@@ -55,12 +55,7 @@ function run(executable: string, args: string[], signal?: AbortSignal): Promise<
       { timeout: 20_000, maxBuffer: 128 * 1024, encoding: "utf8", ...(signal ? { signal } : {}) },
       (error, stdout, stderr) => {
         if (error)
-          reject(
-            new Error(
-              stderr.trim() ||
-                "Hyprland capture did not respond. Check capture setup and try again.",
-            ),
-          );
+          reject(new Error(stderr.trim() || "Hyprland 截图未响应。请检查截图设置后重试。"));
         else resolve(stdout);
       },
     );
@@ -73,7 +68,7 @@ async function regularFile(path: string): Promise<Buffer | undefined> {
   });
   if (!stat) return undefined;
   if (!stat.isFile() || stat.isSymbolicLink())
-    throw new Error("The capture helper must be a regular file, not a link.");
+    throw new Error("截图辅助程序必须是常规文件，不能是链接。");
   return NodeFSP.readFile(path);
 }
 const decodeCapabilities = Schema.decodeUnknownSync(
@@ -91,28 +86,25 @@ export class HyprlandCaptureSetup {
       if (!installed)
         return {
           status: "not-installed",
-          message: "Install the bundled helper to capture the window you're using.",
+          message: "安装随应用附带的辅助程序，以截取你正在使用的窗口。",
         };
       const bundle = await regularFile(this.paths.bundle);
       if (!bundle)
-        throw new Error(
-          "The Hyprland capture helper is missing from this build. Update or reinstall T3 Code.",
-        );
+        throw new Error("此构建中缺少 Hyprland 截图辅助程序。请更新或重新安装 T3 Code。");
       if (!installed.equals(bundle))
         return {
           status: "update-required",
-          message: "Update the bundled capture helper to continue.",
+          message: "请更新随应用附带的截图辅助程序以继续。",
         };
       return {
         status: "ready",
-        message:
-          "Helper ready. Hyprland may ask for screen-sharing permission on your first capture.",
+        message: "辅助程序已就绪。首次截图时 Hyprland 可能会请求屏幕共享权限。",
         ...decodeCapabilities(await run(hyprlandCaptureExecutable(this.paths), ["check"])),
       };
     } catch (error) {
       return {
         status: "error",
-        message: error instanceof Error ? error.message : "Couldn't check Hyprland capture access.",
+        message: error instanceof Error ? error.message : "无法检查 Hyprland 截图权限。",
       };
     }
   }
@@ -124,14 +116,14 @@ export class HyprlandCaptureSetup {
       return undefined;
     });
     if (stat && (!stat.isDirectory() || stat.isSymbolicLink()))
-      throw new Error("The capture helper directory must not be a link.");
+      throw new Error("截图辅助程序目录不能是链接。");
     await regularFile(executable);
     if (action === "remove-hyprland-helper") {
       await NodeFSP.rm(executable, { force: true });
       return;
     }
     const bundle = await regularFile(this.paths.bundle);
-    if (!bundle) throw new Error("The Hyprland capture helper is missing from this build.");
+    if (!bundle) throw new Error("此构建中缺少 Hyprland 截图辅助程序。");
     await NodeFSP.mkdir(directory, { recursive: true });
     const staging = await NodeFSP.mkdtemp(NodePath.join(directory, ".install-"));
     try {
@@ -168,8 +160,7 @@ export async function captureHyprlandWindow(
   options?: { readonly flash: boolean; readonly animate: boolean },
 ): Promise<LinuxWindowSnapshot> {
   const state = await new HyprlandCaptureSetup(paths).state();
-  if (state.status !== "ready")
-    throw new Error(`${state.message} Open Settings → SnapShots to continue setup.`);
+  if (state.status !== "ready") throw new Error(`${state.message} 请打开“设置 → 快照”继续设置。`);
   const executable = hyprlandCaptureExecutable(paths);
   const directory = await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "t3-hyprland-capture-"));
   const cleanup = () => NodeFSP.rm(directory, { recursive: true, force: true });

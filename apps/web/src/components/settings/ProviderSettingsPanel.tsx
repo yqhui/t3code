@@ -160,29 +160,29 @@ function ProviderLastChecked({ lastCheckedAt }: { lastCheckedAt: string | null }
   }
 
   if (lastCheckedRelative.status === "invalid") {
-    return <span>Checked unavailable</span>;
+    return <span>上次检查时间不可用</span>;
   }
 
   return (
     <span>
       {lastCheckedRelative.suffix ? (
         <>
-          Checked <span className="font-mono tabular-nums">{lastCheckedRelative.value}</span>{" "}
+          上次检查 <span className="font-mono tabular-nums">{lastCheckedRelative.value}</span>{" "}
           {lastCheckedRelative.suffix}
         </>
       ) : (
-        <>Checked {lastCheckedRelative.value}</>
+        <>上次检查 {lastCheckedRelative.value}</>
       )}
     </span>
   );
 }
 
 function providerEnvironmentDetail(environment: EnvironmentPresentation): string {
-  if (environment.entry.target._tag === "PrimaryConnectionTarget") return "Primary device";
+  if (environment.entry.target._tag === "PrimaryConnectionTarget") return "主设备";
   if (environment.relayManaged) return "T3 Connect";
   if (environment.entry.target._tag === "SshConnectionTarget") return "SSH";
-  if (isDesktopLocalConnectionTarget(environment.entry.target)) return "Local device";
-  return environment.displayUrl ?? "Remote device";
+  if (isDesktopLocalConnectionTarget(environment.entry.target)) return "本地设备";
+  return environment.displayUrl ?? "远程设备";
 }
 
 // Shared by the editor grid and the placeholder states so switching devices
@@ -243,16 +243,16 @@ function EnvironmentUnavailablePlaceholder({
 }) {
   const isLoading = access.kind === "loading";
   const title = isLoading
-    ? "Loading provider settings"
+    ? "正在加载提供商设置"
     : access.kind === "error"
-      ? "Could not connect to this device"
-      : "Provider settings are unavailable";
+      ? "无法连接到此设备"
+      : "提供商设置不可用";
   // Keep the description to a short status; the raw failure can be a
   // multi-paragraph CLI dump, so it goes below, clamped and expandable.
   const description = isLoading
     ? access.reason === "permissions"
-      ? "Checking what this session is allowed to change."
-      : `Waiting for ${environment.label}'s configuration.`
+      ? "正在检查此会话可以更改的内容。"
+      : `正在等待 ${environment.label} 的配置。`
     : connectionStatusTitle(environment.connection);
   const error = isLoading ? null : environment.connection.error;
   // No spinner: this state can persist indefinitely for a wedged device, and a
@@ -379,7 +379,7 @@ function ProviderSettingsPanelContent(target: ProviderSettingsTarget) {
     !target.scoped && !onlyPrimaryDevice && options.length > 0 ? (
       <ScrollArea radius="none" hideScrollbars scrollFade className="h-11 min-w-0 flex-1">
         <ToggleGroup
-          aria-label="Devices"
+          aria-label="设备"
           variant="segmented"
           className="my-2"
           value={effectiveEnvironmentId ? [effectiveEnvironmentId] : []}
@@ -431,19 +431,15 @@ function ProviderSettingsPanelContent(target: ProviderSettingsTarget) {
         <ProviderSettingsPlaceholder
           deviceTabs={deviceTabs}
           icon={<EnvironmentMachineIcon kind={resolveEnvironmentMachineKind(null)} />}
-          title="Device unavailable"
-          description="Reconnect this device to set up its provider, or select another device."
+          title="设备不可用"
+          description="重新连接此设备以设置其提供商，或选择其他设备。"
         />
       ) : null}
       {options.length === 0 && !targetEnvironmentMissing ? (
         <ProviderSettingsPlaceholder
           icon={<EnvironmentMachineIcon kind={resolveEnvironmentMachineKind(null)} />}
-          title={isReady ? "No connected devices" : "Loading devices"}
-          description={
-            isReady
-              ? "Connect an execution environment before configuring providers."
-              : "Reading connected execution environments."
-          }
+          title={isReady ? "没有已连接的设备" : "正在加载设备"}
+          description={isReady ? "请先连接执行环境，再配置提供商。" : "正在读取已连接的执行环境。"}
         />
       ) : null}
 
@@ -624,8 +620,8 @@ export function EnvironmentProviderSettings({
         if (result._tag === "Success" && !result.value.accepted) {
           toastManager.add({
             type: "warning",
-            title: "Authentication request expired",
-            description: "Refresh the provider and start the authentication flow again.",
+            title: "认证请求已过期",
+            description: "请刷新提供商并重新开始认证流程。",
           });
           return;
         }
@@ -633,9 +629,8 @@ export function EnvironmentProviderSettings({
           const error = squashAtomCommandFailure(result);
           toastManager.add({
             type: "error",
-            title: "Could not continue authentication",
-            description:
-              error instanceof Error ? error.message : "The authentication request expired.",
+            title: "无法继续认证",
+            description: error instanceof Error ? error.message : "认证请求已过期。",
           });
         }
       });
@@ -691,7 +686,7 @@ export function EnvironmentProviderSettings({
       refreshingRef.current = false;
       setIsRefreshingProviders(false);
       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-        console.warn("Failed to refresh providers", {
+        console.warn("刷新提供商失败", {
           operation: "refresh-providers",
           environmentId,
           ...safeErrorLogAttributes(squashAtomCommandFailure(result)),
@@ -727,11 +722,8 @@ export function EnvironmentProviderSettings({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Could not update ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
-            description:
-              error instanceof Error
-                ? error.message
-                : "The provider update command could not be started.",
+            title: `无法更新 ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
+            description: error instanceof Error ? error.message : "无法启动提供商更新命令。",
           }),
         );
       }
@@ -851,8 +843,8 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Could not update provider instance",
-        description: error instanceof Error ? error.message : "The settings update failed.",
+        title: "无法更新提供商实例",
+        description: error instanceof Error ? error.message : "设置更新失败。",
       });
     }
   };
@@ -866,8 +858,8 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(updateResult);
       toastManager.add({
         type: "error",
-        title: "Could not delete provider instance",
-        description: error instanceof Error ? error.message : "The settings update failed.",
+        title: "无法删除提供商实例",
+        description: error instanceof Error ? error.message : "设置更新失败。",
       });
       return;
     }
@@ -888,8 +880,8 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(uninstallResult);
       toastManager.add({
         type: "warning",
-        title: "Provider deleted, but managed files remain",
-        description: error instanceof Error ? error.message : "Managed binary cleanup failed.",
+        title: "提供商已删除，但托管文件仍保留",
+        description: error instanceof Error ? error.message : "托管二进制文件清理失败。",
       });
     }
   };
@@ -903,8 +895,8 @@ export function EnvironmentProviderSettings({
       const error = squashAtomCommandFailure(result);
       toastManager.add({
         type: "error",
-        title: "Could not reset provider instance",
-        description: error instanceof Error ? error.message : "The settings update failed.",
+        title: "无法重置提供商实例",
+        description: error instanceof Error ? error.message : "设置更新失败。",
       });
     }
   };
@@ -1040,8 +1032,8 @@ export function EnvironmentProviderSettings({
             row.driver === "cursor" &&
             liveProvider?.setup?.canAuthenticate === false ? (
             <SettingsRow
-              title="Cursor account"
-              description="Using CURSOR_API_KEY. Remove it from this provider's environment to use browser sign-in."
+              title="Cursor 账户"
+              description="正在使用 CURSOR_API_KEY。如需使用浏览器登录，请从该提供商的环境变量中移除它。"
             />
           ) : null
         }
@@ -1069,7 +1061,7 @@ export function EnvironmentProviderSettings({
         headerAction={
           mode === "editor" && row.isDefault && row.isDirty ? (
             <SettingResetButton
-              label={`${resetLabel} provider settings`}
+              label={`${resetLabel} 提供商设置`}
               onClick={() => resetDefaultInstance(row.driver)}
             />
           ) : null
@@ -1144,13 +1136,13 @@ export function EnvironmentProviderSettings({
                     size="icon-xs"
                     variant="ghost-muted"
                     onClick={() => setIsAddInstanceDialogOpen(true)}
-                    aria-label="Add provider"
+                    aria-label="添加提供商"
                   >
                     <PlusIcon />
                   </Button>
                 }
               />
-              <TooltipPopup side="top">Add provider</TooltipPopup>
+              <TooltipPopup side="top">添加提供商</TooltipPopup>
             </Tooltip>
           ) : null
         }
@@ -1168,10 +1160,10 @@ export function EnvironmentProviderSettings({
                     onClick={() => void refreshProviders()}
                   >
                     <RefreshIcon refreshing={isRefreshingProviders} />
-                    <span className="sr-only">Refresh provider status</span>
+                    <span className="sr-only">刷新提供商状态</span>
                     <span className="hidden min-w-0 truncate sm:inline">
                       {isRefreshingProviders ? (
-                        "Refreshing providers"
+                        "正在刷新提供商"
                       ) : (
                         <ProviderLastChecked lastCheckedAt={lastCheckedAt} />
                       )}
@@ -1179,7 +1171,7 @@ export function EnvironmentProviderSettings({
                   </Button>
                 }
               />
-              <TooltipPopup side="top">Refresh provider status</TooltipPopup>
+              <TooltipPopup side="top">刷新提供商状态</TooltipPopup>
             </Tooltip>
           </div>
         }
@@ -1190,8 +1182,8 @@ export function EnvironmentProviderSettings({
         {readOnly ? (
           <SettingsGroup divided={false} className="overflow-hidden">
             <SettingsRow
-              title="Limited permissions"
-              description={`This session can view ${environmentLabel}'s providers but can't change their settings.`}
+              title="权限受限"
+              description={`此会话可以查看 ${environmentLabel} 的提供商，但无法更改其设置。`}
             />
           </SettingsGroup>
         ) : null}
@@ -1217,7 +1209,7 @@ export function EnvironmentProviderSettings({
                     onClick={() => setIsAddInstanceDialogOpen(true)}
                   >
                     <PlusIcon className="size-4 shrink-0" />
-                    Add provider
+                    添加提供商
                   </button>
                 ) : null}
               </div>
@@ -1231,9 +1223,7 @@ export function EnvironmentProviderSettings({
               </ScrollArea>
             ) : (
               <div className="p-6 text-sm text-muted-foreground">
-                {targetInstanceMissing
-                  ? "This provider instance is no longer available on this device."
-                  : "No providers configured."}
+                {targetInstanceMissing ? "此提供商实例在此设备上已不可用。" : "尚未配置提供商。"}
               </div>
             )}
           </div>
@@ -1249,20 +1239,18 @@ export function EnvironmentProviderSettings({
         readOnly={readOnly}
       />
 
-      <SettingsSection title="Advanced">
+      <SettingsSection title="高级">
         <SettingsRow
           id={searchableSetting("provider-health-check-interval").id}
           title={
             <span className="inline-flex items-center gap-1.5">
               {searchableSetting("provider-health-check-interval").title}
               <PolicyTooltip>
-                This interval is configured here, then the shared Background activity policy decides
-                whether provider probes may run when the timer fires. Custom intervals appear as
-                Advanced in General settings.
+                此间隔在此处配置，再由共享的后台活动策略决定定时器触发时是否允许运行提供商探测。自定义间隔会在通用设置中显示为“高级”。
               </PolicyTooltip>
             </span>
           }
-          description="Refresh provider status, versions, and models in the background. Set to 0 to disable."
+          description="在后台刷新提供商状态、版本和模型。设为 0 可禁用。"
           resetAction={
             providerHealthRefreshIntervalSeconds !== defaultProviderHealthRefreshIntervalSeconds ? (
               <span
@@ -1270,7 +1258,7 @@ export function EnvironmentProviderSettings({
                 className={!canWriteSettings ? "opacity-50" : undefined}
               >
                 <SettingResetButton
-                  label="provider health check interval"
+                  label="提供商健康检查间隔"
                   onClick={() =>
                     updateSettings(
                       backgroundActivityOverrideSettings(
@@ -1314,12 +1302,12 @@ export function EnvironmentProviderSettings({
                 }
               >
                 <NumberFieldGroup>
-                  <NumberFieldDecrement aria-label="Decrease provider health check interval" />
-                  <NumberFieldInput aria-label="Provider health check interval in seconds" />
-                  <NumberFieldIncrement aria-label="Increase provider health check interval" />
+                  <NumberFieldDecrement aria-label="减小提供商健康检查间隔" />
+                  <NumberFieldInput aria-label="提供商健康检查间隔（秒）" />
+                  <NumberFieldIncrement aria-label="增大提供商健康检查间隔" />
                 </NumberFieldGroup>
               </NumberField>
-              <span className="text-xs text-muted-foreground">seconds</span>
+              <span className="text-xs text-muted-foreground">秒</span>
             </div>
           }
         />

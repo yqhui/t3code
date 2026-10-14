@@ -157,7 +157,7 @@ export const EDITORS = [
     launchStyle: "line-column",
     jetbrainsProductCode: "WS",
   },
-  { id: "file-manager", label: "File Manager", commands: null, launchStyle: "direct-path" },
+  { id: "file-manager", label: "文件管理器", commands: null, launchStyle: "direct-path" },
 ] as const satisfies ReadonlyArray<EditorDefinition>;
 
 export const EditorId = Schema.Literals(EDITORS.map((e) => e.id));

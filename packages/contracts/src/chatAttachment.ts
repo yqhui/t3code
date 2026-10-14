@@ -221,7 +221,7 @@ export function getProviderAttachmentLimitError(
   attachments: ReadonlyArray<Pick<ChatAttachment, "type" | "mimeType" | "sizeBytes">>,
 ): string | undefined {
   if (attachments.length > PROVIDER_SEND_TURN_MAX_ATTACHMENTS) {
-    return `You can attach up to ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} files per message or question response.`;
+    return `每条消息或问题回复最多可附加 ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} 个文件。`;
   }
   const imageBytes = attachments.reduce(
     (total, attachment) =>
@@ -232,7 +232,7 @@ export function getProviderAttachmentLimitError(
     0,
   );
   if (imageBytes > PROVIDER_SEND_TURN_MAX_TOTAL_IMAGE_BYTES) {
-    return "Images can total up to 80 MiB per message or question response. Use smaller images or send fewer at once.";
+    return "每条消息或问题回复中图片总计不得超过 80 MiB。请使用更小的图片，或减少一次发送的数量。";
   }
 }
 

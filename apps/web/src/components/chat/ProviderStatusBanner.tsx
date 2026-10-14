@@ -71,21 +71,21 @@ export function getProviderStatusMessage(status: ServerProvider): string {
   if (status.message) return status.message;
   const providerName = status.displayName?.trim() || formatProviderDriverKindLabel(status.driver);
   if (!status.installed && hasProviderSetup(status)) {
-    return `Open provider setup to install ${formatProviderDriverKindLabel(status.driver)} on this environment.`;
+    return `打开提供商设置，在此环境中安装 ${formatProviderDriverKindLabel(status.driver)}。`;
   }
   if (status.auth.status === "unauthenticated") {
     if (hasProviderSetup(status)) {
       return status.driver === "antigravity"
-        ? "Open provider setup to sign in with Google."
-        : "Open provider setup to sign in.";
+        ? "打开提供商设置，使用 Google 登录。"
+        : "打开提供商设置以登录。";
     }
-    return "Sign in via the CLI to authenticate again.";
+    return "通过 CLI 登录以重新认证。";
   }
   return status.status === "ready"
-    ? "No models are available for this provider."
+    ? "此提供商没有可用模型。"
     : status.status === "error"
-      ? `${providerName} provider is unavailable.`
-      : `${providerName} provider has limited availability.`;
+      ? `${providerName} 提供商不可用。`
+      : `${providerName} 提供商可用性受限。`;
 }
 
 export const ProviderStatusBanner = memo(function ProviderStatusBanner({
@@ -105,10 +105,10 @@ export const ProviderStatusBanner = memo(function ProviderStatusBanner({
   const isUnauthenticated = status.status === "error" && status.auth.status === "unauthenticated";
   const incompatible = getIncompatibleVersion(status);
   const title = isUnauthenticated
-    ? `${providerName} is unauthenticated`
+    ? `${providerName} 未认证`
     : incompatible
-      ? `${providerName} ${status.version ?? ""} is ${incompatible.status === "broken" ? "known to be broken" : "unsupported"}`
-      : `${providerName} provider status`;
+      ? `${providerName} ${status.version ?? ""} ${incompatible.status === "broken" ? "已知存在故障" : "不受支持"}`
+      : `${providerName} 提供商状态`;
   const message = incompatible?.message ?? getProviderStatusMessage(status);
   const isWarning =
     incompatible?.status !== "broken" && (status.status === "warning" || incompatible !== null);
@@ -132,13 +132,13 @@ export const ProviderStatusBanner = memo(function ProviderStatusBanner({
           </Tooltip>
           {onOpenProviderSetup && hasProviderSetup(status) ? (
             <InlineButton onClick={() => onOpenProviderSetup(status.instanceId)}>
-              Open provider setup
+              打开提供商设置
             </InlineButton>
           ) : null}
         </AlertDescription>
         <AlertAction>
           <Button
-            aria-label={`Dismiss ${providerName} provider ${status.status}`}
+            aria-label={`关闭 ${providerName} 提供商的 ${status.status} 状态提示`}
             onClick={onDismiss}
             size="icon-xs"
             variant="ghost-muted"

@@ -1,2 +1,1 @@
-export const DISCONNECTED_COMPOSER_PLACEHOLDER =
-  "Ask for changes, send follow-ups, or attach images";
+export const DISCONNECTED_COMPOSER_PLACEHOLDER = "提出修改需求、发送后续消息或附加图片";

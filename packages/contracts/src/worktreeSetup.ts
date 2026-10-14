@@ -111,14 +111,14 @@ export const WORKTREE_SETUP_STAGE_ORDER: ReadonlyArray<WorktreeSetupStageId> = [
 export function worktreeSetupStageLabel(id: WorktreeSetupStageId): string {
   switch (id) {
     case "fetch":
-      return "Fetch base branch";
+      return "获取基础分支";
     case "checkout":
-      return "Check out files";
+      return "检出文件";
     case "submodules":
-      return "Init submodules";
+      return "初始化子模块";
     case "setup-script":
-      return "Run setup script";
+      return "运行设置脚本";
     case "agent":
-      return "Start agent";
+      return "启动 Agent";
   }
 }

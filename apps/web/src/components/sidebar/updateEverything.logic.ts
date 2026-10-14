@@ -152,12 +152,12 @@ export interface UpdateEverythingPlan {
 }
 
 function countLabel(count: number, noun: string): string | null {
-  return count === 0 ? null : `${count} ${noun}${count === 1 ? "" : "s"}`;
+  return count === 0 ? null : `${count} 个${noun}`;
 }
 
 function joinList(parts: ReadonlyArray<string>): string {
-  if (parts.length <= 2) return parts.join(" and ");
-  return `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`;
+  if (parts.length <= 2) return parts.join(" 和 ");
+  return `${parts.slice(0, -1).join("、")} 和 ${parts.at(-1)}`;
 }
 
 /**
@@ -173,11 +173,11 @@ export function describeUpdateEverything(plan: UpdateEverythingPlan): {
     (count, machine) => count + machine.providers.length,
     0,
   );
-  const summary = `Update ${joinList(
+  const summary = `更新 ${joinList(
     [
-      plan.localVersion ? "this app" : null,
-      countLabel(plan.servers.length, "server"),
-      countLabel(providerCount, "provider"),
+      plan.localVersion ? "本应用" : null,
+      countLabel(plan.servers.length, "服务器"),
+      countLabel(providerCount, "提供商"),
     ].filter((part) => part !== null),
   )}`;
 
@@ -194,8 +194,8 @@ export function describeUpdateEverything(plan: UpdateEverythingPlan): {
     // offers, so it has no target version to show.
     itemsFor(server.environmentId, server.serverLabel).push(
       server.selfUpdate === "desktop-managed"
-        ? "desktop app update"
-        : `server to ${server.targetVersion}`,
+        ? "桌面应用更新"
+        : `服务器更新到 ${server.targetVersion}`,
     );
   }
   for (const machine of plan.providerMachines) {
@@ -205,8 +205,8 @@ export function describeUpdateEverything(plan: UpdateEverythingPlan): {
   return {
     summary,
     lines: [
-      ...(plan.localVersion ? [`This app: ${plan.localVersion}, restarts last`] : []),
-      ...Array.from(machines.values(), ({ label, items }) => `${label}: ${items.join(", ")}`),
+      ...(plan.localVersion ? [`本应用：${plan.localVersion}，最后重启`] : []),
+      ...Array.from(machines.values(), ({ label, items }) => `${label}：${items.join("、")}`),
     ],
   };
 }

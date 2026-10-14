@@ -60,7 +60,7 @@ export class ManagedRelayDpopKeyLoadError extends Schema.TaggedError<ManagedRela
   },
 ) {
   override get message(): string {
-    return "Could not load relay DPoP proof key.";
+    return "无法加载中继 DPoP 证明密钥。";
   }
 }
 
@@ -73,7 +73,7 @@ export class ManagedRelayDpopProofCreationError extends Schema.TaggedError<Manag
   },
 ) {
   override get message(): string {
-    return `Could not create the relay DPoP proof for ${this.method} ${this.url}.`;
+    return `无法为 ${this.method} ${this.url} 创建中继 DPoP 证明。`;
   }
 }
 
@@ -127,7 +127,7 @@ export class ManagedRelayRequestTimeoutError extends Schema.TaggedError<ManagedR
   },
 ) {
   override get message(): string {
-    return `${this.activity} timed out. ${NETWORK_BLOCKING_HINT}`;
+    return `${this.activity} 超时。${NETWORK_BLOCKING_HINT}`;
   }
 }
 
@@ -138,7 +138,7 @@ export class ManagedRelayUrlInvalidError extends Schema.TaggedError<ManagedRelay
   },
 ) {
   override get message(): string {
-    return "Relay URL must be a secure absolute HTTPS origin.";
+    return "中继 URL 必须是安全的绝对 HTTPS 源。";
   }
 }
 
@@ -153,7 +153,7 @@ export class ManagedRelayRequestFailedError extends Schema.TaggedError<ManagedRe
   },
 ) {
   override get message(): string {
-    const message = `Could not ${this.action}.`;
+    const message = `无法完成操作：${this.action}。`;
     return this.transportFailed ? `${message} ${NETWORK_BLOCKING_HINT}` : message;
   }
 }
@@ -166,7 +166,7 @@ export class ManagedRelayAccessTokenScopesUnexpectedError extends Schema.TaggedE
   },
 ) {
   override get message(): string {
-    return "Relay granted unexpected DPoP access token scopes.";
+    return "中继授予了意外的 DPoP 访问令牌权限范围。";
   }
 }
 
@@ -179,7 +179,7 @@ export class ManagedRelayTokenProofCreationError extends Schema.TaggedError<Mana
   },
 ) {
   override get message(): string {
-    return "Could not create relay token DPoP proof.";
+    return "无法创建中继令牌 DPoP 证明。";
   }
 }
 
@@ -192,7 +192,7 @@ export class ManagedRelayRequestProofCreationError extends Schema.TaggedError<Ma
   },
 ) {
   override get message(): string {
-    return "Could not create relay request DPoP proof.";
+    return "无法创建中继请求 DPoP 证明。";
   }
 }
 

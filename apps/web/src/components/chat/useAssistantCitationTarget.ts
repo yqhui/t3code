@@ -93,8 +93,8 @@ export function useAssistantCitationTarget({
         const cursor = loadEarlier.cursor ?? entries[0]?.id ?? "first";
         if (navigation.requestedPages.has(cursor) || navigation.requestedPages.size >= 20) {
           fail(
-            "Could not load the cited response",
-            "Load earlier turns, then click the citation to try again. Your saved quote is unchanged.",
+            "无法加载被引用的回复",
+            "请加载更早的轮次，然后再次点击引用重试。你保存的引用文本不受影响。",
           );
           return;
         }
@@ -102,17 +102,11 @@ export function useAssistantCitationTarget({
         loadEarlier.onLoadEarlier();
         return;
       }
-      fail(
-        "The cited response is unavailable",
-        "It may have been removed. The selected text is still saved in your citation.",
-      );
+      fail("被引用的回复不可用", "它可能已被删除。你选中的文本仍保存在引用中。");
       return;
     }
     if (source.kind !== "message" || source.message.role !== "assistant") {
-      fail(
-        "The citation does not refer to an assistant response",
-        "The selected text is still saved in your citation.",
-      );
+      fail("该引用未指向助手回复", "你选中的文本仍保存在引用中。");
       return;
     }
     const index = rows.findIndex(

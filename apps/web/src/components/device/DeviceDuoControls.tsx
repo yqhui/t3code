@@ -16,8 +16,8 @@ const FOLDS = [
   { id: "open", angle: 180 },
 ] as const;
 const STANDS = [
-  { id: "laptop", label: "Laptop stand" },
-  { id: "tent", label: "Tent stand" },
+  { id: "laptop", label: "笔记本支架" },
+  { id: "tent", label: "帐篷支架" },
 ] as const;
 
 /**
@@ -46,9 +46,9 @@ export function DeviceDuoControls(props: {
   // rotation must also be read in the frame of the display the stand settles on.
   const foldWaits = props.state.pending && (stand || props.state.requested?.control === "pose");
   const foldLabels = {
-    closed: "Closed",
-    half: phoneVertical ? "Book" : "Laptop",
-    open: "Open",
+    closed: "闭合",
+    half: phoneVertical ? "书本" : "笔记本",
+    open: "展开",
   };
   const button = (
     key: string,
@@ -80,8 +80,8 @@ export function DeviceDuoControls(props: {
   const group =
     "pointer-events-auto flex shrink-0 flex-col items-center gap-1 rounded-full border border-border/50 bg-background/80 p-1 shadow-sm";
   return (
-    <div aria-label="iPhone Duo stands" className="flex flex-col items-center gap-2">
-      <div role="group" aria-label="Fold shape" className={group}>
+    <div aria-label="iPhone Duo 支架" className="flex flex-col items-center gap-2">
+      <div role="group" aria-label="折叠形态" className={group}>
         {FOLDS.map(({ id, angle: value }) =>
           button(
             id,
@@ -100,7 +100,7 @@ export function DeviceDuoControls(props: {
           ),
         )}
       </div>
-      <div role="group" aria-label="Device stance" className={group}>
+      <div role="group" aria-label="设备姿态" className={group}>
         {STANDS.map(({ id, label }) =>
           button(
             id,

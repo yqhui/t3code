@@ -14,7 +14,7 @@ class DesktopWslStateUnavailableError extends Schema.TaggedError<DesktopWslState
   {},
 ) {
   override get message(): string {
-    return "Desktop WSL state is unavailable.";
+    return "桌面 WSL 状态不可用。";
   }
 }
 
@@ -23,7 +23,7 @@ class DesktopWslStateLoadError extends Schema.TaggedError<DesktopWslStateLoadErr
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load WSL state.";
+    return "加载 WSL 状态失败。";
   }
 }
 

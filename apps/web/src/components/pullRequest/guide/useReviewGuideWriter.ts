@@ -65,10 +65,10 @@ export function useReviewGuideWriter({
       useGuideRunStore.getState().settle(guideRunKey(environmentId, reference));
       toastManager.add({
         type: "error",
-        title: "Could not start a review guide",
+        title: "无法生成审查指南",
         description: readableFailure(
           squashAtomCommandFailure(result),
-          "Check the review guide model in Settings → Source Control.",
+          "请在设置 → 源代码管理中检查审查指南模型。",
         ),
       });
     }

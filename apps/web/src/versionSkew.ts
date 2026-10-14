@@ -87,7 +87,7 @@ export function resolveVersionMismatch(
   return {
     clientVersion: normalizedClientVersion,
     serverVersion: normalizedServerVersion,
-    hint: "Version mismatch. Try syncing the client and server to the same T3 Code version.",
+    hint: "版本不一致。请尝试将客户端和服务器同步至相同的 T3 Code 版本。",
   };
 }
 
@@ -136,7 +136,7 @@ export function manualServerUpdateCommand(
 }
 
 export function serverUpdateGuidance(capability: ServerSelfUpdateCapability): string {
-  return capability === "desktop-managed" ? "Update the desktop app" : "Update to stay in sync";
+  return capability === "desktop-managed" ? "更新桌面应用" : "更新以保持同步";
 }
 
 export function buildVersionMismatchDismissalKey(

@@ -21,8 +21,8 @@ export function PairingPendingSurface() {
     <StandalonePage tone="pairing">
       <StandalonePageHeader
         eyebrow={APP_DISPLAY_NAME}
-        title="Pairing with this environment"
-        description="Validating the pairing link and preparing your session."
+        title="正在与此环境配对"
+        description="正在验证配对链接并准备你的会话。"
       />
     </StandalonePage>
   );
@@ -90,14 +90,14 @@ export function PairingRouteSurface({
     <StandalonePage tone="pairing">
       <StandalonePageHeader
         eyebrow={APP_DISPLAY_NAME}
-        title="Pair with this environment"
+        title="与此环境配对"
         description={describeAuthGate(auth.bootstrapMethods)}
       />
 
       <form className="mt-6 space-y-4" onSubmit={(event) => void handleSubmit(event)}>
         <div className="space-y-2">
           <label className="text-sm font-medium" htmlFor="pairing-token">
-            Pairing token
+            配对令牌
           </label>
           <Input
             id="pairing-token"
@@ -107,7 +107,7 @@ export function PairingRouteSurface({
             disabled={isSubmitting}
             nativeInput
             onChange={(event) => setCredential(event.currentTarget.value)}
-            placeholder="Paste a one-time token or pairing secret"
+            placeholder="粘贴一次性令牌或配对密钥"
             spellCheck={false}
             value={credential}
           />
@@ -121,7 +121,7 @@ export function PairingRouteSurface({
 
         <div className="flex flex-wrap gap-2">
           <Button disabled={isSubmitting} size="sm" type="submit">
-            {isSubmitting ? "Pairing..." : "Continue"}
+            {isSubmitting ? "正在配对…" : "继续"}
           </Button>
           <Button
             disabled={isSubmitting}
@@ -129,7 +129,7 @@ export function PairingRouteSurface({
             size="sm"
             variant="outline"
           >
-            Reload app
+            重新加载应用
           </Button>
         </div>
       </form>
@@ -150,9 +150,7 @@ export function HostedPairingRouteSurface() {
     hostedPairingRequestRef.current ? "pairing" : "error",
   );
   const [message, setMessage] = useState(() =>
-    hostedPairingRequestRef.current
-      ? "Connecting to this backend."
-      : "This pairing link is missing its backend host or token.",
+    hostedPairingRequestRef.current ? "正在连接此后端。" : "此配对链接缺少后端主机或令牌。",
   );
   const [canRetry, setCanRetry] = useState(false);
   const submitAttemptedRef = useRef(false);
@@ -163,20 +161,20 @@ export function HostedPairingRouteSurface() {
 
     if (!request) {
       setStatus("error");
-      setMessage("This pairing link is missing its backend host or token.");
+      setMessage("此配对链接缺少后端主机或令牌。");
       setCanRetry(false);
       return;
     }
 
     if (tokenSubmittedRef.current) {
       setStatus("error");
-      setMessage("This one-time pairing token was already submitted. Request a new pairing link.");
+      setMessage("此一次性配对令牌已被使用，请重新获取配对链接。");
       setCanRetry(false);
       return;
     }
 
     setStatus("pairing");
-    setMessage("Connecting to this backend.");
+    setMessage("正在连接此后端。");
     setCanRetry(false);
     tokenSubmittedRef.current = true;
 
@@ -186,7 +184,7 @@ export function HostedPairingRouteSurface() {
     });
     if (result._tag === "Success") {
       setStatus("paired");
-      setMessage(`${request.label || "The environment"} is saved in this browser.`);
+      setMessage(`${request.label || "该环境"} 已保存到此浏览器。`);
       return;
     }
 
@@ -194,7 +192,7 @@ export function HostedPairingRouteSurface() {
     setStatus("error");
     setCanRetry(true);
     setMessage(
-      `${errorMessageFromUnknown(squashAtomCommandFailure(result))} If the backend accepted this one-time token, request a new pairing link before retrying.`,
+      `${errorMessageFromUnknown(squashAtomCommandFailure(result))} 如果后端已接受此一次性令牌，请先重新获取配对链接再重试。`,
     );
   }, [connectPairingEnvironment]);
 
@@ -215,26 +213,22 @@ export function HostedPairingRouteSurface() {
       <StandalonePageHeader
         eyebrow={APP_DISPLAY_NAME}
         title={
-          status === "paired"
-            ? "Backend paired"
-            : status === "error"
-              ? "Pairing failed"
-              : "Pairing backend"
+          status === "paired" ? "后端已配对" : status === "error" ? "配对失败" : "正在配对后端"
         }
         description={message}
       />
 
       {request ? (
         <div className="mt-5 rounded-lg border border-border/70 bg-background/55 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
-          Host: <span className="font-mono text-foreground/80">{request.host}</span>
+          主机：<span className="font-mono text-foreground/80">{request.host}</span>
         </div>
       ) : null}
 
       {status === "error" ? (
         <Alert variant="error" className="mt-5">
           <AlertDescription>
-            Verify the backend is reachable from this browser, supports CORS for hosted clients, and
-            is served over HTTPS when opening this page from HTTPS.
+            请确认此后端可从此浏览器访问、支持面向托管客户端的 CORS，并且在从 HTTPS 打开此页面时通过
+            HTTPS 提供服务。
           </AlertDescription>
         </Alert>
       ) : null}
@@ -242,16 +236,16 @@ export function HostedPairingRouteSurface() {
       <div className="mt-6 flex flex-wrap gap-2">
         {status === "pairing" ? (
           <Button disabled size="sm">
-            Pairing...
+            正在配对…
           </Button>
         ) : canRetry ? (
           <Button size="sm" onClick={() => void submitHostedPairingRequest()}>
-            Try again
+            重试
           </Button>
         ) : null}
         {status === "paired" ? (
           <Button size="sm" variant="outline" onClick={() => (window.location.href = "/")}>
-            Open app
+            打开应用
           </Button>
         ) : null}
       </div>
@@ -268,15 +262,15 @@ function errorMessageFromUnknown(error: unknown): string {
     return error;
   }
 
-  return "Authentication failed.";
+  return "认证失败。";
 }
 
 function describeAuthGate(bootstrapMethods: ReadonlyArray<string>): string {
   if (bootstrapMethods.includes("desktop-bootstrap")) {
-    return "This environment expects a trusted pairing credential before the app can connect.";
+    return "此环境要求先提供受信任的配对凭据，应用才能连接。";
   }
 
-  return "Enter a pairing token to start a session with this environment.";
+  return "输入配对令牌，与该环境建立会话。";
 }
 
 function describeSupportedMethods(bootstrapMethods: ReadonlyArray<string>): string {
@@ -284,12 +278,12 @@ function describeSupportedMethods(bootstrapMethods: ReadonlyArray<string>): stri
     bootstrapMethods.includes("desktop-bootstrap") &&
     bootstrapMethods.includes("one-time-token")
   ) {
-    return "Desktop-managed pairing and one-time pairing tokens are both accepted for this environment.";
+    return "此环境同时接受桌面端管理的配对和一次性配对令牌。";
   }
 
   if (bootstrapMethods.includes("desktop-bootstrap")) {
-    return "This environment is desktop-managed. Open it from the desktop app or paste a bootstrap credential if one was issued explicitly.";
+    return "此环境由桌面端管理。请从桌面应用打开它，或在明确签发了引导凭据时粘贴该凭据。";
   }
 
-  return "This environment accepts one-time pairing tokens. Pairing links can open this page directly, or you can paste the token here.";
+  return "此环境接受一次性配对令牌。配对链接可直接打开此页面，你也可以将令牌粘贴到这里。";
 }

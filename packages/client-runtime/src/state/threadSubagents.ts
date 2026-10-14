@@ -80,11 +80,11 @@ export function resolveSubagentPillSegment(
   if (turn.liveCount > 0) {
     return {
       label: `${turn.liveCount}/${total}`,
-      accessibilityLabel: `${turn.liveCount} of ${total} agents working`,
+      accessibilityLabel: `${total} 个 Agent 中有 ${turn.liveCount} 个正在运行`,
     };
   }
   return {
-    label: `${total} done`,
-    accessibilityLabel: `${total} ${total === 1 ? "agent" : "agents"} done`,
+    label: `${total} 个已完成`,
+    accessibilityLabel: `${total} 个 Agent 已完成`,
   };
 }

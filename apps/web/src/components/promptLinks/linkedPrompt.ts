@@ -9,8 +9,8 @@ export function warnAboutHiddenCharacters(prompt: LinkedPrompt): void {
   if (prompt.hiddenCharacters === 0) return;
   toastManager.add({
     type: "warning",
-    title: "This prompt had hidden characters, it may be malicious",
-    description: `T3 Code removed ${prompt.hiddenCharacters} hidden character${prompt.hiddenCharacters === 1 ? "" : "s"}. Read the prompt before you send it.`,
+    title: "此 Prompt 含有隐藏字符，可能存在恶意内容",
+    description: `T3 Code 已移除 ${prompt.hiddenCharacters} 个隐藏字符。发送前请先阅读此 Prompt。`,
     timeout: 0,
   });
 }
@@ -31,8 +31,8 @@ export function placeLinkedPrompt(
     // It was not written here, so it must be read before it is sent.
     toastManager.add({
       type: "info",
-      title: "Prompt added from a link",
-      description: ["Read it before you send.", ...notes].join(" "),
+      title: "已从链接添加 Prompt",
+      description: ["发送前请先阅读。", ...notes].join(" "),
     });
   };
   const existing = useComposerDraftStore.getState().getComposerDraft(target)?.prompt ?? "";
@@ -42,11 +42,11 @@ export function placeLinkedPrompt(
   }
   const id = toastManager.add({
     type: "info",
-    title: "Linked prompt ready",
-    description: "This thread already has a draft. Replace it with the linked prompt?",
+    title: "链接的 Prompt 已就绪",
+    description: "此会话已有草稿。要将其替换为链接的 Prompt 吗？",
     timeout: 0,
     actionProps: {
-      children: "Replace draft",
+      children: "替换草稿",
       onClick: () => {
         toastManager.close(id);
         place();

@@ -20,9 +20,8 @@ export const MuseSettings = makeProviderSettingsSchema(
     ),
     binaryPath: makeBinaryPathSetting("muse").pipe(
       Schema.annotateKey({
-        title: "Binary path",
-        description:
-          "Path to the Muse Code binary on this environment. Sign in with muse login on that host.",
+        title: "可执行文件路径",
+        description: "此环境中的 Muse Code 可执行文件路径。在该主机上使用 muse login 登录。",
         providerSettingsForm: { placeholder: "muse", clearWhenEmpty: "omit" },
       }),
     ),

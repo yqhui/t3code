@@ -136,7 +136,7 @@ export function DevicePhoneViewport(props: {
         />
         <canvas
           ref={canvasRef}
-          aria-label="Interactive 3D device. Drag the screen to interact. Drag outside it or swipe with two fingers to turn."
+          aria-label="可交互的 3D 设备。拖动屏幕进行交互；在屏幕外拖动或双指轻扫可旋转。"
           className="size-full touch-none"
           onPointerDown={(event) => {
             if (event.button !== 0) return;

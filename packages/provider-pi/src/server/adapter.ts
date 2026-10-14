@@ -3385,13 +3385,13 @@ function piQuestion(
     method === "select" && Array.isArray(event["options"])
       ? event["options"]
           .filter((option): option is string => typeof option === "string")
-          .map((option) => ({ label: option || "Empty value", description: option, value: option }))
+          .map((option) => ({ label: option || "空值", description: option, value: option }))
       : method === "editor"
         ? []
         : [
             {
-              label: "Submit empty value",
-              description: "Send an empty string to the extension.",
+              label: "提交空值",
+              description: "向扩展发送空字符串。",
               value: "",
             },
           ];

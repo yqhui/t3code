@@ -34,9 +34,9 @@ import { Tooltip, TooltipPopup, TooltipTrigger } from "./ui/tooltip";
 // folds it into the download phase; everything after the handoff is the
 // restart the user is actually waiting through.
 const UPDATE_STAGE_LABELS: Record<ServerUpdateStage, string> = {
-  downloading: "Downloading…",
-  installing: "Downloading…",
-  resuming: "Restarting…",
+  downloading: "正在下载…",
+  installing: "正在下载…",
+  resuming: "正在重启…",
 };
 const pendingUpdateEnvironmentIds = new Set<EnvironmentId>();
 
@@ -45,7 +45,7 @@ export function serverUpdateStageLabel(stage: ServerUpdateStage): string {
 }
 
 function updateFailureMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Server update failed.";
+  return error instanceof Error ? error.message : "服务器更新失败。";
 }
 
 export interface ServerUpdateTarget {
@@ -69,7 +69,7 @@ type UpdateButtonProps = Pick<ComponentProps<typeof Button>, "variant" | "size" 
     Reports its own success or failure toast; never rejects. */
 export function useServerUpdate() {
   const updateServer = useAtomCommand(serverEnvironment.updateServer, { reportFailure: false });
-  return async (target: ServerUpdateTarget, failureTitle = "Server update failed") => {
+  return async (target: ServerUpdateTarget, failureTitle = "服务器更新失败") => {
     const { environmentId, serverLabel, selfUpdate, targetVersion } = target;
     if (
       !canUpdateServer(appAtomRegistry.get(environmentSession.sessionStateAtom(environmentId))) ||
@@ -96,8 +96,8 @@ export function useServerUpdate() {
         title: `${serverLabel} updated`,
         description:
           selfUpdate === "desktop-managed"
-            ? `Desktop app relaunched on ${result.value.targetVersion}.`
-            : `Reconnected on t3@${result.value.targetVersion}.`,
+            ? `桌面应用已重启到 ${result.value.targetVersion}。`
+            : `已重新连接到 t3@${result.value.targetVersion}。`,
       });
     } catch (error) {
       toastManager.add({
@@ -114,7 +114,7 @@ export function useServerUpdate() {
 /** Updates eligible machines independently; manual paths remain in the machine list. */
 export function ServerUpdatesAction({
   targets,
-  label = "Update all",
+  label = "全部更新",
   variant = "outline",
   size = "xs",
   className,
@@ -141,7 +141,7 @@ export function ServerUpdatesAction({
       if (desktopTargets.length > 0) {
         const confirmed =
           (await requestConfirmDialog(
-            `Update the T3 Code desktop apps on ${desktopTargets.map((target) => target.serverLabel).join(", ")}? They will close and relaunch on those machines.`,
+            `更新 ${desktopTargets.map((target) => target.serverLabel).join(", ")} 上的 T3 Code 桌面应用？这些机器上的应用将关闭并重启。`,
           )) ?? true;
         if (!confirmed) return;
       }
@@ -219,7 +219,7 @@ export function ServerUpdateAction({
   desktopAppUpdate = false,
   threadContinuation = false,
   targetVersion,
-  label = "Update",
+  label = "更新",
   variant = "outline",
   size = "xs",
   className,
@@ -238,18 +238,17 @@ export function ServerUpdateAction({
     onCopy: ({ command }) => {
       toastManager.add({
         type: "success",
-        title:
-          installation?.kind === "npm-global" ? "Update command copied" : "Relaunch command copied",
+        title: installation?.kind === "npm-global" ? "已复制更新命令" : "已复制重启命令",
         description:
           installation?.kind === "npm-global"
-            ? `Run \`${command}\` on ${serverLabel}, then restart t3 with your usual options.`
-            : `Stop t3 on ${serverLabel}, then relaunch with \`${command}\` using the same subcommand and options. This does not update an installed t3 command.`,
+            ? `在 ${serverLabel} 上运行 \`${command}\`，然后使用常用选项重启 t3。`
+            : `停止 ${serverLabel} 上的 t3，然后使用相同的子命令和选项运行 \`${command}\` 以重启。这不会更新已安装的 t3 命令。`,
       });
     },
     onError: (error) => {
       toastManager.add({
         type: "error",
-        title: "Could not copy update command",
+        title: "无法复制更新命令",
         description: error.message,
       });
     },
@@ -268,7 +267,7 @@ export function ServerUpdateAction({
       // remote machine installs without asking anyone there.
       const confirmed =
         (await requestConfirmDialog(
-          `Update the T3 Code desktop app that runs the ${serverLabel}? It will close and relaunch on that machine.`,
+          `更新运行 ${serverLabel} 的 T3 Code 桌面应用？应用将在该机器上关闭并重启。`,
         )) ?? true;
       if (!confirmed) {
         return;
@@ -288,9 +287,7 @@ export function ServerUpdateAction({
 
   if (selfUpdate === "desktop-managed" && !desktopAppUpdate) {
     return (
-      <span className="text-muted-foreground text-xs">
-        Update the desktop app on that machine to update this server.
-      </span>
+      <span className="text-muted-foreground text-xs">更新该机器上的桌面应用以更新此服务器。</span>
     );
   }
 
@@ -299,8 +296,8 @@ export function ServerUpdateAction({
   const actionLabel =
     manualCommand !== null
       ? installation?.kind === "npm-global"
-        ? "Copy update command"
-        : "Copy relaunch command"
+        ? "复制更新命令"
+        : "复制重启命令"
       : label;
   const onClick =
     manualCommand !== null
@@ -316,7 +313,7 @@ export function ServerUpdateAction({
               size="icon-xs"
               variant="ghost-muted"
               className={className}
-              aria-label={`${actionLabel} for ${serverLabel}`}
+              aria-label={`${serverLabel}：${actionLabel}`}
               disabled={manualCommand === null && !canUpdate}
               onClick={onClick}
             />
@@ -351,7 +348,7 @@ export function OutdatedServerUpdateAction({
   serverLabel,
   fromVersion,
   targetVersion,
-  label = "Update",
+  label = "更新",
 }: {
   readonly environmentId: EnvironmentId;
   readonly serverLabel: string;
@@ -376,12 +373,12 @@ export function OutdatedServerUpdateAction({
       toastManager.add({
         type: "success",
         title: `${serverLabel} updated`,
-        description: `Reconnected on t3@${result.value.targetVersion}.`,
+        description: `已重新连接到 t3@${result.value.targetVersion}。`,
       });
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: "Server update failed",
+        title: "服务器更新失败",
         description: updateFailureMessage(error),
       });
     } finally {

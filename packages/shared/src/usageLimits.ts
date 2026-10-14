@@ -33,18 +33,18 @@ export function usesChatGptSharing(provider: ServerProvider | null | undefined):
 export const CURSOR_USAGE_WINDOWS = [
   {
     id: "totalPercentUsed",
-    label: "Overall",
-    description: "Combined usage across both allowances, not a third quota.",
+    label: "总计",
+    description: "两类额度的合计用量，并非第三类额度。",
   },
   {
     id: "autoPercentUsed",
-    label: "Cursor Models",
-    description: "Grok and Composer use this first. Auto can use either pool.",
+    label: "Cursor 模型",
+    description: "Grok 和 Composer 优先使用此额度。Auto 可以使用任一类额度。",
   },
   {
     id: "apiPercentUsed",
-    label: "Other Models",
-    description: "Claude, GPT, and Gemini use this pool. Grok and Composer fall back here.",
+    label: "其他模型",
+    description: "Claude、GPT 和 Gemini 使用此额度。Grok 和 Composer 会在需要时回退到此额度。",
   },
 ] as const;
 
@@ -545,12 +545,12 @@ function poolWindows(accounts: readonly LimitAccount[], now: number): readonly L
 /** The one-line status under a provider heading when there are no bars to draw. */
 export function limitsNotice(limits: ServerProviderUsageLimits): string | null {
   if (limits.unavailable?.reason === "unsupported") {
-    return limits.unavailable.message ?? "This account has no subscription limits.";
+    return limits.unavailable.message ?? "此账户没有订阅限额。";
   }
   if (limits.unavailable?.reason === "probeFailed") {
-    return limits.unavailable.message ?? "Could not read limits.";
+    return limits.unavailable.message ?? "无法读取限额。";
   }
-  return limits.windows.length === 0 ? "No limits reported." : null;
+  return limits.windows.length === 0 ? "暂无限额信息。" : null;
 }
 
 /** Quota left in the window, 0..100. Bars and labels show what remains, as Codex does. */
@@ -607,15 +607,15 @@ export function formatDuration(ms: number): string {
 export function formatResetsIn(window: ServerProviderUsageWindow, now: number): string | null {
   const resetsAt = resetMillis(window);
   if (resetsAt === null) return null;
-  if (resetsAt <= now) return "resets now";
-  if (resetsAt - now < MINUTE) return "Resets momentarily";
-  return `resets in ${formatDuration(resetsAt - now)}`;
+  if (resetsAt <= now) return "现在重置";
+  if (resetsAt - now < MINUTE) return "即将重置";
+  return `${formatDuration(resetsAt - now)} 后重置`;
 }
 
 /** Limit commands are served by T3 from the same snapshots as Usage → Limits. */
 export const USAGE_LIMITS_COMMAND = {
   name: "usage-limits",
-  description: "Show this provider's usage limits",
+  description: "显示此提供商的用量限额",
 } satisfies ServerProviderSlashCommand;
 
 /** Handled by the client without sending a turn; anything with arguments stays an ordinary prompt. */

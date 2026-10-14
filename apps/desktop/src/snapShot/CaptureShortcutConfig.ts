@@ -53,12 +53,11 @@ async function readSnapshot(path: string) {
   );
   try {
     const stat = await file.stat();
-    if (!stat.isFile() || stat.size > MAX_BYTES)
-      throw new Error("Choose a config file smaller than 1 MB.");
+    if (!stat.isFile() || stat.size > MAX_BYTES) throw new Error("请选择小于 1 MB 的配置文件。");
     const bytes = await file.readFile();
     if (bytes.length > MAX_BYTES) throw new Error("Choose a config file smaller than 1 MB.");
     const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
-    if (text.includes("\0")) throw new Error("Choose a text config file.");
+    if (text.includes("\0")) throw new Error("请选择文本格式的配置文件。");
     return { path, resolvedPath, text, bytes, stat };
   } finally {
     await file.close();
@@ -73,9 +72,7 @@ const defaultTools = {
         maxBuffer: 64 * 1024,
       });
     } catch {
-      throw new Error(
-        "Niri couldn't validate the proposed config. Nothing was changed. Check your config in Advanced.",
-      );
+      throw new Error("Niri 无法验证修改后的配置。未做任何更改。请在“高级”中检查你的配置。");
     }
   },
   hyprlandBindings: async () =>
@@ -88,7 +85,7 @@ const defaultTools = {
       timeout: 5000,
       maxBuffer: 64 * 1024,
     });
-    if (errors.stdout.trim()) throw new Error("Hyprland reported config errors.");
+    if (errors.stdout.trim()) throw new Error("Hyprland 报告了配置错误。");
   },
 };
 
@@ -108,9 +105,7 @@ export class CaptureShortcutConfig {
   private async checkHyprlandKeys(appId: string, shortcut: string) {
     const keys = captureConfigKeys(shortcut);
     const bindings = await this.tools.hyprlandBindings().catch(() => {
-      throw new Error(
-        "Couldn't check Hyprland's current shortcuts. Try again from your Hyprland session.",
-      );
+      throw new Error("无法检查 Hyprland 当前的快捷键。请在你的 Hyprland 会话中重试。");
     });
     if (
       bindings.some(
@@ -120,20 +115,20 @@ export class CaptureShortcutConfig {
           !(binding.dispatcher === "global" && binding.arg === `${appId}:capture-window`),
       )
     )
-      throw new Error(`${keys.label} is already used by Hyprland. Choose another shortcut.`);
+      throw new Error(`${keys.label} 已被 Hyprland 使用。请选择其他快捷键。`);
   }
 
   async preview(
     target: Target,
     request: DesktopCaptureConfigRequest,
   ): Promise<DesktopCaptureConfigPreview> {
-    if (this.applying) throw new Error("Wait for the current config change to finish.");
+    if (this.applying) throw new Error("请等待当前的配置更改完成。");
     this.pending = undefined;
     const root = await readSnapshot(target.path).catch(() => {
-      throw new Error("Couldn't read your settings file. Choose a different file in Advanced.");
+      throw new Error("无法读取你的设置文件。请在“高级”中选择其他文件。");
     });
     if (root.stat.uid !== process.getuid?.() || /\/omarchy\/default\//.test(root.resolvedPath))
-      throw new Error("Choose your own config, not system or Omarchy defaults.");
+      throw new Error("请选择你自己的配置，而非系统或 Omarchy 默认配置。");
     const format: CaptureConfigFormat =
       target.desktop === "niri"
         ? "niri"
@@ -145,7 +140,7 @@ export class CaptureShortcutConfig {
         format === "niri" ? ".kdl" : format === "hyprland-lua" ? ".lua" : ".conf",
       )
     )
-      throw new Error("Choose a .kdl Niri config or a .conf/.lua Hyprland config.");
+      throw new Error("请选择 .kdl 的 Niri 配置或 .conf/.lua 的 Hyprland 配置。");
     const edit = editCaptureConfig(
       root.text,
       format,
@@ -162,10 +157,10 @@ export class CaptureShortcutConfig {
           files.length > MAX_FILES ||
           files.reduce((size, item) => size + item.bytes.length, 0) > MAX_BYTES
         )
-          throw new Error("This config has too many included files. Use manual setup in Advanced.");
+          throw new Error("此配置包含的文件过多。请在“高级”中使用手动设置。");
         for (const include of niriConfigIncludes(file.text)) {
           if (include.path.includes("$") || /[*?[\]]/.test(include.path))
-            throw new Error("This config uses a dynamic include. Use manual setup in Advanced.");
+            throw new Error("此配置使用了动态 include。请在“高级”中使用手动设置。");
           const path = include.path.startsWith("~/")
             ? NodePath.join(this.home, include.path.slice(2))
             : NodePath.resolve(NodePath.dirname(file.path), include.path);
@@ -177,10 +172,9 @@ export class CaptureShortcutConfig {
               missing.push(path);
               continue;
             }
-            throw new Error(
-              "Couldn't read an included Niri config. Check its location in Advanced.",
-              { cause: error },
-            );
+            throw new Error("无法读取被包含的 Niri 配置。请在“高级”中检查其位置。", {
+              cause: error,
+            });
           }
           if (files.some((item) => item.resolvedPath === child.resolvedPath)) continue;
           files.push(child);
@@ -188,9 +182,7 @@ export class CaptureShortcutConfig {
             request.operation === "install" &&
             niriConfigConflict(child.text, target.appId, edit.shortcut)
           )
-            throw new Error(
-              `${edit.shortcut} is already used in ${child.path}. Choose another shortcut.`,
-            );
+            throw new Error(`${edit.shortcut} 已被 ${child.path} 使用。请选择其他快捷键。`);
           await visit(child, depth + 1);
         }
       };
@@ -219,7 +211,7 @@ export class CaptureShortcutConfig {
       pending.preview.id !== id ||
       pending.target.desktop !== desktop
     )
-      throw new Error("This preview expired. Review changes again before saving.");
+      throw new Error("此预览已过期。保存前请重新查看更改。");
     this.pending = undefined;
     this.applying = true;
     const { preview, files } = pending;
@@ -236,9 +228,7 @@ export class CaptureShortcutConfig {
               (error: NodeJS.ErrnoException) => error.code !== "ENOENT",
             )
           )
-            throw new Error(
-              "Your config changed since this preview. Review changes again before saving.",
-            );
+            throw new Error("预览后你的配置已更改。保存前请重新查看更改。");
         }
         for (const original of files) {
           const current = await readSnapshot(original.path).catch(() => undefined);
@@ -249,9 +239,7 @@ export class CaptureShortcutConfig {
             current.stat.mode !== original.stat.mode ||
             !current.bytes.equals(original.bytes)
           )
-            throw new Error(
-              "Your config changed since this preview. Nothing was saved. Review changes again before saving.",
-            );
+            throw new Error("预览后你的配置已更改。未保存任何内容。保存前请重新查看更改。");
         }
       };
       await unchanged();
@@ -292,7 +280,7 @@ export class CaptureShortcutConfig {
           await this.tools.reloadHyprland();
         } catch {
           warning =
-            "Config saved, but Hyprland couldn't reload it cleanly. Check hyprctl configerrors, then run hyprctl reload.";
+            "配置已保存，但 Hyprland 未能顺利重新加载。请检查 hyprctl configerrors 的输出，然后运行 hyprctl reload。";
         }
       }
       return { backupPath, warning };

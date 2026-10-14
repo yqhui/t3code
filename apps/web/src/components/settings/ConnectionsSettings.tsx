@@ -233,7 +233,7 @@ function AccessScopeSummary({
   readonly scopes: ReadonlyArray<AuthEnvironmentScope>;
   readonly label: string;
 }) {
-  const scopeCountLabel = `${scopes.length} ${scopes.length === 1 ? "scope" : "scopes"}`;
+  const scopeCountLabel = `${scopes.length} 个权限范围`;
 
   return (
     <Popover>
@@ -244,7 +244,7 @@ function AccessScopeSummary({
         render={
           <button
             type="button"
-            aria-label={`${label}: show ${scopeCountLabel}`}
+            aria-label={`${label}：显示 ${scopeCountLabel}`}
             className="cursor-help underline decoration-border underline-offset-2 outline-hidden hover:text-foreground focus-visible:text-foreground"
           />
         }
@@ -257,7 +257,7 @@ function AccessScopeSummary({
         tooltipStyle
         className="w-max max-w-80 whitespace-normal"
       >
-        <p className="mb-1 font-medium">Granted scopes</p>
+        <p className="mb-1 font-medium">已授予的权限范围</p>
         <div className="flex flex-col gap-0.5">
           {scopes.map((scope) => (
             <code key={scope} className="font-mono text-foreground/85">
@@ -277,7 +277,7 @@ function parseManualDesktopSshTarget(input: {
 }): DesktopSshEnvironmentTarget {
   const rawHost = input.host.trim();
   if (rawHost.length === 0) {
-    throw new Error("SSH host or alias is required.");
+    throw new Error("必须填写 SSH 主机或别名。");
   }
 
   let hostname = rawHost;
@@ -313,11 +313,11 @@ function parseManualDesktopSshTarget(input: {
   }
 
   if (hostname.length === 0) {
-    throw new Error("SSH host or alias is required.");
+    throw new Error("必须填写 SSH 主机或别名。");
   }
 
   if (port !== null && (!Number.isInteger(port) || port <= 0 || port > 65_535)) {
-    throw new Error("SSH port must be between 1 and 65535.");
+    throw new Error("SSH 端口必须在 1 到 65535 之间。");
   }
 
   return {
@@ -369,16 +369,16 @@ function parseRemotePairingFields(input: { readonly host: string; readonly pairi
   const host = input.host.trim();
   const pairingCode = input.pairingCode.trim();
   if (!host) {
-    throw new Error("Enter a backend host.");
+    throw new Error("请输入后端主机。");
   }
   if (!pairingCode) {
-    throw new Error("Enter a pairing code.");
+    throw new Error("请输入配对码。");
   }
   return { host, pairingCode };
 }
 
 function formatDesktopSshConnectionError(error: unknown): string {
-  const fallback = "Failed to connect SSH host.";
+  const fallback = "连接 SSH 主机失败。";
   const rawMessage = error instanceof Error ? error.message : fallback;
   const withoutIpcPrefix = rawMessage.replace(
     /^Error invoking remote method 'desktop:ensure-ssh-environment':\s*/u,
@@ -419,10 +419,8 @@ function summarizeAuthorizedClients(
   links: ReadonlyArray<ServerPairingLinkRecord>,
 ): string {
   const parts = [
-    `${sessions.length} ${sessions.length === 1 ? "client" : "clients"}`,
-    links.length > 0
-      ? `${links.length} ${links.length === 1 ? "pairing link" : "pairing links"}`
-      : null,
+    `${sessions.length} 个客户端`,
+    links.length > 0 ? `${links.length} 个配对链接` : null,
   ];
   return parts.filter((part): part is string => part !== null).join(" · ");
 }
@@ -539,17 +537,17 @@ function isHostedAppPairingUrl(value: string): boolean {
 
 function endpointShareHint(endpoint: AdvertisedEndpoint, url: string): string {
   if (isHostedAppPairingUrl(url)) {
-    return "Opens the hosted app, no install needed";
+    return "打开托管应用，无需安装";
   }
   switch (endpoint.reachability) {
     case "lan":
-      return "Devices on the same network";
+      return "同一网络中的设备";
     case "private-network":
-      return "Devices on your private network";
+      return "你专用网络中的设备";
     case "public":
-      return "Reachable from anywhere";
+      return "可从任意位置访问";
     case "loopback":
-      return "Clients on this machine";
+      return "本机上的客户端";
   }
 }
 
@@ -661,16 +659,16 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
         type: "success",
         title:
           kind === "hosted-link"
-            ? "Hosted app link copied"
+            ? "已复制托管应用链接"
             : kind === "link"
-              ? "Pairing URL copied"
-              : "Pairing code copied",
+              ? "已复制配对 URL"
+              : "已复制配对码",
         description:
           kind === "hosted-link"
-            ? "Open it in the browser on the device you want to connect."
+            ? "在想要连接的设备上的浏览器中打开它。"
             : kind === "link"
-              ? "Open it in the client you want to pair to this environment."
-              : "Paste it into another client to finish pairing.",
+              ? "在想要与此环境配对的客户端中打开它。"
+              : "将其粘贴到另一个客户端即可完成配对。",
       });
     },
     onError: (error, { value, kind }) => {
@@ -683,12 +681,12 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
           type: "error",
           title: canCopyToClipboard
             ? kind === "hosted-link"
-              ? "Could not copy hosted app link"
+              ? "无法复制托管应用链接"
               : kind === "link"
-                ? "Could not copy pairing URL"
-                : "Could not copy pairing code"
-            : "Clipboard copy unavailable",
-          description: canCopyToClipboard ? error.message : "Showing the full value instead.",
+                ? "无法复制配对 URL"
+                : "无法复制配对码"
+            : "剪贴板复制不可用",
+          description: canCopyToClipboard ? error.message : "改为显示完整值。",
         }),
       );
     },
@@ -712,7 +710,7 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
 
   const expiresAbsolute = formatAccessTimestamp(pairingLink.expiresAt);
 
-  const primaryLabel = pairingLink.label ?? "Pairing link";
+  const primaryLabel = pairingLink.label ?? "配对链接";
   const selectedQrOption = selectQrEndpointOption(
     endpointCopyOptions,
     qrEndpointId,
@@ -733,7 +731,7 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex min-h-5 items-center gap-1.5">
             <ConnectionStatusDot
-              tooltipText={`Link created at ${formatAccessTimestamp(pairingLink.createdAt)}`}
+              tooltipText={`链接创建于 ${formatAccessTimestamp(pairingLink.createdAt)}`}
               dotClassName="bg-warning"
             />
             <h3 className="text-sm font-medium text-foreground">{primaryLabel}</h3>
@@ -746,15 +744,15 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
               <TooltipPopup side="top">{expiresAbsolute}</TooltipPopup>
             </Tooltip>
             <span aria-hidden> · </span>
-            <AccessScopeSummary scopes={pairingLink.scopes} label="Pairing link scopes" />
+            <AccessScopeSummary scopes={pairingLink.scopes} label="配对链接权限范围" />
           </p>
           {!credential ? (
             <p className="text-2xs text-muted-foreground/70">
-              Create a new link to share from this client.
+              创建一个新链接，以便从此客户端共享。
             </p>
           ) : shareablePairingUrl === null ? (
             <p className="text-2xs text-muted-foreground/70">
-              Copy the token and pair from another client using this backend&apos;s reachable host.
+              复制令牌，并在另一台客户端上使用此后端可达的主机进行配对。
             </p>
           ) : null}
         </div>
@@ -768,7 +766,7 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
               onClick={() => setIsQrPanelOpen((open) => !open)}
             >
               <QrCodeIcon aria-hidden />
-              Share
+              共享
             </Button>
           ) : null}
           <Dialog
@@ -781,12 +779,12 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
             {!credential ? null : canCopyToClipboard ? (
               shareablePairingUrl ? null : (
                 <Button size="xs" variant="outline" onClick={handleCopyCode}>
-                  Copy code
+                  复制配对码
                 </Button>
               )
             ) : (
               <DialogTrigger render={<Button size="xs" variant="outline" />}>
-                {shareablePairingUrl ? "Show link" : "Show code"}
+                {shareablePairingUrl ? "显示链接" : "显示配对码"}
               </DialogTrigger>
             )}
             <DialogPopup className="max-w-md">
@@ -794,16 +792,16 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
                 <DialogTitle>
                   {isRevealValueUrl
                     ? isRevealValueHostedAppPairingUrl
-                      ? "Hosted app pairing link"
-                      : "Pairing link"
-                    : "Pairing code"}
+                      ? "托管应用配对链接"
+                      : "配对链接"
+                    : "配对码"}
                 </DialogTitle>
                 <DialogDescription>
                   {isRevealValueUrl
                     ? isRevealValueHostedAppPairingUrl
-                      ? "Clipboard copy is unavailable here. Open or manually copy this hosted app link on the device you want to connect."
-                      : "Clipboard copy is unavailable here. Open or manually copy this full pairing URL on the device you want to connect."
-                    : "Clipboard copy is unavailable here. Manually copy this code into another client."}
+                      ? "此处无法使用剪贴板复制。请在要连接的设备上打开或手动复制此托管应用链接。"
+                      : "此处无法使用剪贴板复制。请在要连接的设备上打开或手动复制此完整配对 URL。"
+                    : "此处无法使用剪贴板复制。请手动将此配对码复制到另一个客户端。"}
                 </DialogDescription>
               </DialogHeader>
               <DialogPanel>
@@ -821,18 +819,18 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
                       size={132}
                       level="M"
                       marginSize={2}
-                      title="Pairing link — scan to open on another device"
+                      title="配对链接——扫码可在其他设备上打开"
                     />
                   </div>
                 ) : null}
               </DialogPanel>
               <DialogFooter variant="bare">
                 <Button variant="outline" onClick={() => setIsRevealDialogOpen(false)}>
-                  Done
+                  完成
                 </Button>
                 {canCopyToClipboard ? (
                   <Button variant="outline" onClick={handleCopyCode}>
-                    Copy code
+                    复制配对码
                   </Button>
                 ) : null}
               </DialogFooter>
@@ -844,7 +842,7 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
             disabled={!canRevoke || revokingPairingLinkId === pairingLink.id}
             onClick={() => void onRevoke(pairingLink.id)}
           >
-            {revokingPairingLinkId === pairingLink.id ? "Revoking…" : "Revoke"}
+            {revokingPairingLinkId === pairingLink.id ? "正在撤销…" : "撤销"}
           </Button>
         </div>
       </div>
@@ -858,9 +856,9 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
               <div
                 className="space-y-1.5"
                 role="radiogroup"
-                aria-label="Endpoint the pairing QR code and URL use"
+                aria-label="配对二维码和 URL 使用的端点"
               >
-                <p className="text-2xs text-muted-foreground/70">Reach this machine via</p>
+                <p className="text-2xs text-muted-foreground/70">通过以下方式访问本机</p>
                 {endpointCopyOptions.map((option) => {
                   const isSelected = option.id === selectedQrOption?.id;
                   return (
@@ -910,11 +908,11 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
                 className="shrink-0"
                 onClick={() => copyPairingValue(qrPairingUrl, copyKindForUrl(qrPairingUrl))}
               >
-                Copy link
+                复制链接
               </Button>
             </div>
             <Button size="xs" variant="ghost" onClick={handleCopyCode}>
-              Copy code only
+              仅复制配对码
             </Button>
           </div>
           {canRenderQrForSelection ? (
@@ -924,14 +922,13 @@ const PairingLinkListRow = memo(function PairingLinkListRow({
                 size={168}
                 level="M"
                 marginSize={1}
-                title="Pairing link — scan to open on another device"
+                title="配对链接——扫码可在其他设备上打开"
               />
             </div>
           ) : (
             <div className="flex size-[192px] shrink-0 items-center justify-center self-center rounded-xl border border-border/50 p-4 sm:self-start">
               <p className="text-center text-2xs text-muted-foreground/70">
-                No QR for this endpoint. Another device scanning a loopback link would dial itself;
-                copy the URL for use on this machine instead.
+                该端点不提供二维码。其他设备扫描环回链接会指向其自身； 请改为复制 URL 在本机使用。
               </p>
             </div>
           )}
@@ -961,11 +958,11 @@ const ConnectedClientListRow = memo(function ConnectedClientListRow({
   const lastConnectedAt = clientSession.lastConnectedAt;
   const statusTooltip = isLive
     ? lastConnectedAt
-      ? `Connected for ${formatElapsedDurationLabel(lastConnectedAt, nowMs)}`
-      : "Connected"
+      ? `已连接 ${formatElapsedDurationLabel(lastConnectedAt, nowMs)}`
+      : "已连接"
     : lastConnectedAt
-      ? `Last connected at ${formatAccessTimestamp(lastConnectedAt)}`
-      : "Not connected yet.";
+      ? `最后连接于 ${formatAccessTimestamp(lastConnectedAt)}`
+      : "尚未连接。";
   const deviceInfoBits = [
     clientSession.client.deviceType !== "unknown"
       ? clientSession.client.deviceType[0]?.toUpperCase() + clientSession.client.deviceType.slice(1)
@@ -992,7 +989,7 @@ const ConnectedClientListRow = memo(function ConnectedClientListRow({
             <h3 className="text-sm font-medium text-foreground">{primaryLabel}</h3>
             {clientSession.current ? (
               <span className="text-3xs text-muted-foreground/80 rounded-md border border-border/50 bg-muted/50 px-1 py-0.5">
-                This device
+                本设备
               </span>
             ) : null}
           </div>
@@ -1003,7 +1000,7 @@ const ConnectedClientListRow = memo(function ConnectedClientListRow({
                 <span aria-hidden> · </span>
               </>
             ) : null}
-            <AccessScopeSummary scopes={clientSession.scopes} label="Client scopes" />
+            <AccessScopeSummary scopes={clientSession.scopes} label="客户端权限范围" />
           </p>
         </div>
         <div className="flex w-full shrink-0 items-center gap-2 sm:w-auto sm:justify-end">
@@ -1014,7 +1011,7 @@ const ConnectedClientListRow = memo(function ConnectedClientListRow({
               disabled={!canRevoke || revokingClientSessionId === clientSession.sessionId}
               onClick={() => void onRevokeSession(clientSession.sessionId)}
             >
-              {revokingClientSessionId === clientSession.sessionId ? "Revoking…" : "Revoke"}
+              {revokingClientSessionId === clientSession.sessionId ? "正在撤销…" : "撤销"}
             </Button>
           ) : null}
         </div>
@@ -1068,11 +1065,11 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
       );
       setDialogOpen(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create pairing URL.";
+      const message = error instanceof Error ? error.message : "创建配对 URL 失败。";
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not create pairing URL",
+          title: "无法创建配对 URL",
           description: message,
         }),
       );
@@ -1093,7 +1090,7 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
         disabled={isRevokingOtherClients || !canRevokeOtherClients(clientSessions)}
         onClick={() => void onRevokeOtherClients()}
       >
-        {isRevokingOtherClients ? "Revoking…" : "Revoke others"}
+        {isRevokingOtherClients ? "正在撤销…" : "撤销其他客户端"}
       </Button>
       <Dialog
         open={dialogOpen}
@@ -1111,27 +1108,26 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
           render={
             <Button size="xs" variant="default">
               <PlusIcon className="size-3" />
-              Create link
+              创建链接
             </Button>
           }
         />
         <DialogPopup className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Create pairing link</DialogTitle>
+            <DialogTitle>创建配对链接</DialogTitle>
             <DialogDescription>
-              Generate a one-time link that another device can use to pair with this backend as an
-              authorized client.
+              生成一个一次性链接，其他设备可借助它与此后端配对为已授权的客户端。
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
             <label className="block">
               <span className="mb-1.5 block text-xs font-medium text-foreground">
-                Client label (optional)
+                客户端标签（可选）
               </span>
               <Input
                 value={pairingLabel}
                 onChange={(event) => setPairingLabel(event.target.value)}
-                placeholder="e.g. Living room iPad"
+                placeholder="例如 客厅的 iPad"
                 disabled={isCreatingPairingLink}
                 autoFocus
               />
@@ -1139,10 +1135,8 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
             <section className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-xs font-medium text-foreground">Permissions</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Limit what the paired client can do.
-                  </p>
+                  <h3 className="text-xs font-medium text-foreground">权限</h3>
+                  <p className="text-xs text-muted-foreground">限制已配对客户端可执行的操作。</p>
                 </div>
                 <div className="flex gap-1">
                   <Button
@@ -1160,7 +1154,7 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
                       )
                     }
                   >
-                    Read only
+                    只读
                   </Button>
                   <Button
                     size="xs"
@@ -1174,7 +1168,7 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
                       )
                     }
                   >
-                    Standard
+                    标准
                   </Button>
                 </div>
               </div>
@@ -1202,11 +1196,9 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
                 )}
               </div>
               {selectedScopes.length === 0 ? (
-                <p className="text-xs text-destructive">Select at least one permission.</p>
+                <p className="text-xs text-destructive">请至少选择一项权限。</p>
               ) : selectedScopes.includes(AuthAccessWriteScope) ? (
-                <p className="text-xs text-warning">
-                  This client can create or revoke access for other devices.
-                </p>
+                <p className="text-xs text-warning">该客户端可以为其他设备创建或撤销访问权限。</p>
               ) : null}
             </section>
           </DialogPanel>
@@ -1216,13 +1208,13 @@ const AuthorizedClientsHeaderAction = memo(function AuthorizedClientsHeaderActio
               disabled={isCreatingPairingLink}
               onClick={() => setDialogOpen(false)}
             >
-              Cancel
+              取消
             </Button>
             <Button
               disabled={isCreatingPairingLink || selectedScopes.length === 0}
               onClick={() => void handleCreatePairingLink()}
             >
-              {isCreatingPairingLink ? "Creating…" : "Create link"}
+              {isCreatingPairingLink ? "正在创建…" : "创建链接"}
             </Button>
           </DialogFooter>
         </DialogPopup>
@@ -1292,7 +1284,7 @@ const PairingClientsList = memo(function PairingClientsList({
 
       {pairingLinks.length === 0 && clientSessions.length === 0 && !isLoading ? (
         <div className={accessRowClassName(presentation)}>
-          <p className="text-xs text-muted-foreground/60">No pairing links or client sessions.</p>
+          <p className="text-xs text-muted-foreground/60">暂无配对链接或客户端会话。</p>
         </div>
       ) : null}
     </>
@@ -1348,14 +1340,14 @@ const AdvertisedEndpointListRow = memo(function AdvertisedEndpointListRow({
           ) : null}
           {!isAvailable ? (
             <span className="shrink-0 rounded-md border border-border/70 px-1 py-0.5 text-3xs text-muted-foreground">
-              Setup required
+              需要设置
             </span>
           ) : null}
         </div>
         <div className="ml-auto flex min-h-6 shrink-0 items-center justify-end gap-2">
           {isDefault ? (
             <span className="rounded-md border border-primary/30 bg-primary/10 px-1 py-0.5 text-3xs text-primary">
-              Default
+              默认
             </span>
           ) : null}
           {needsTailscaleSetup ? (
@@ -1365,7 +1357,7 @@ const AdvertisedEndpointListRow = memo(function AdvertisedEndpointListRow({
               onClick={() => onSetupTailscaleServe(endpoint)}
               disabled={isUpdatingTailscaleServe}
             >
-              {isUpdatingTailscaleServe ? "Restarting…" : "Setup"}
+              {isUpdatingTailscaleServe ? "正在重启…" : "设置"}
             </Button>
           ) : null}
           {canDisableTailscaleServe ? (
@@ -1375,12 +1367,12 @@ const AdvertisedEndpointListRow = memo(function AdvertisedEndpointListRow({
               onClick={() => onDisableTailscaleServe(endpoint)}
               disabled={isUpdatingTailscaleServe}
             >
-              {isUpdatingTailscaleServe ? "Restarting…" : "Disable"}
+              {isUpdatingTailscaleServe ? "正在重启…" : "禁用"}
             </Button>
           ) : null}
           {!needsTailscaleSetup && !isDefault ? (
             <Button size="xs" variant="outline" onClick={() => onSetDefault(endpoint)}>
-              Set as default
+              设为默认
             </Button>
           ) : null}
         </div>
@@ -1411,7 +1403,7 @@ function NetworkAccessDescription({
       <span className="min-w-0 truncate">{endpoint.httpBaseUrl}</span>
       {hiddenEndpointCount > 0 ? (
         <span className="shrink-0 text-xs font-medium">
-          {expanded ? "Hide" : `+${hiddenEndpointCount}`}
+          {expanded ? "收起" : `+${hiddenEndpointCount}`}
         </span>
       ) : null}
     </>
@@ -1419,7 +1411,7 @@ function NetworkAccessDescription({
 
   return (
     <span className="inline-flex min-w-0 max-w-full items-baseline gap-1">
-      <span className="shrink-0">Reachable at</span>
+      <span className="shrink-0">访问地址</span>
       {hiddenEndpointCount > 0 ? (
         <button
           type="button"
@@ -1454,30 +1446,30 @@ function savedBackendStatus(environment: EnvironmentPresentation): {
   readonly tone: "muted" | "error";
 } {
   if (!environment.entry.enabled && environment.connection.phase !== "unsupported")
-    return { text: "Off", tone: "muted" };
+    return { text: "已关闭", tone: "muted" };
   const { connection } = environment;
   switch (connection.phase) {
     case "connected":
-      return { text: "Connected", tone: "muted" };
+      return { text: "已连接", tone: "muted" };
     case "connecting":
-      return { text: "Connecting", tone: "muted" };
+      return { text: "连接中", tone: "muted" };
     case "reconnecting":
       return {
-        text: connection.error ? `Reconnecting: ${connection.error}` : "Reconnecting",
+        text: connection.error ? `正在重连：${connection.error}` : "正在重连",
         tone: "error",
       };
     // Not a failure: the machine is fine, this build just cannot talk to it.
     case "unsupported":
-      return { text: "Client not supported", tone: "muted" };
+      return { text: "客户端不支持", tone: "muted" };
     case "error":
       return {
-        text: connection.error ? `Connection failed: ${connection.error}` : "Connection failed",
+        text: connection.error ? `连接失败：${connection.error}` : "连接失败",
         tone: "error",
       };
     case "offline":
-      return { text: "Offline", tone: "muted" };
+      return { text: "离线", tone: "muted" };
     case "available":
-      return { text: "Not connected", tone: "muted" };
+      return { text: "未连接", tone: "muted" };
   }
 }
 
@@ -1502,11 +1494,11 @@ function SavedBackendListRow({
   const isRemoving = removingEnvironmentId === environmentId;
   const errorTraceId = environment.connection.traceId;
   const { copyToClipboard: copyTraceIdToClipboard } = useCopyToClipboard<{ traceId: string }>({
-    target: "trace ID",
+    target: "追踪 ID",
     onCopy: ({ traceId }) => {
       toastManager.add({
         type: "success",
-        title: "Trace ID copied",
+        title: "已复制 Trace ID",
         description: traceId,
       });
     },
@@ -1514,7 +1506,7 @@ function SavedBackendListRow({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy trace ID",
+          title: "无法复制 Trace ID",
           description: error.message,
         }),
       );
@@ -1531,15 +1523,15 @@ function SavedBackendListRow({
     onCopy: ({ url }) => {
       toastManager.add({
         type: "success",
-        title: "MCP URL copied",
-        description: `Add it to an agent, e.g. claude mcp add --transport http t3 ${url}`,
+        title: "已复制 MCP URL",
+        description: `将其添加到 Agent，例如 claude mcp add --transport http t3 ${url}`,
       });
     },
     onError: (error) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy MCP URL",
+          title: "无法复制 MCP URL",
           description: error.message,
         }),
       );
@@ -1588,7 +1580,7 @@ function SavedBackendListRow({
   const routeCount = connectionRoutes(environment.entry).length;
   const subtitleText = [
     environmentTransportLabel(environment, connectedTarget),
-    resumingServerUpdate ? "Restarting" : status.text,
+    resumingServerUpdate ? "正在重启" : status.text,
     enabled && versionMismatch ? serverVersion : null,
   ]
     .filter((value): value is string => value !== null)
@@ -1607,10 +1599,10 @@ function SavedBackendListRow({
       ? (environment.connection.error ?? connectionStatusText(environment.connection))
       : enabled
         ? connectionStatusText(environment.connection)
-        : "Switched off"
+        : "已关闭"
   }${
     versionMismatch
-      ? `\nUpdate available: ${versionMismatch.serverVersion} → ${versionMismatch.clientVersion}`
+      ? `\n有可用更新：${versionMismatch.serverVersion} → ${versionMismatch.clientVersion}`
       : ""
   }`;
 
@@ -1653,7 +1645,7 @@ function SavedBackendListRow({
             onClick={() => setRoutesOpen((open) => !open)}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
           >
-            {routeCount === 1 ? "Routes" : `${routeCount} routes`}
+            {routeCount === 1 ? "路由" : `${routeCount} 条路由`}
             <ChevronRightIcon
               aria-hidden
               className={cn(
@@ -1672,7 +1664,7 @@ function SavedBackendListRow({
             onClick={() => setPermissionsOpen((open) => !open)}
             className="inline-flex shrink-0 items-center gap-0.5 rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring"
           >
-            Permissions
+            权限
             <ChevronRightIcon
               aria-hidden
               className={cn(
@@ -1718,22 +1710,22 @@ function SavedBackendListRow({
       serverUpdateState.status !== "running" ? (
         <OutdatedServerUpdateAction
           environmentId={environmentId}
-          serverLabel={`${environment.label} server`}
+          serverLabel={`${environment.label} 服务器`}
           fromVersion={lastDescriptor?.serverVersion}
           targetVersion={APP_VERSION}
-          label={serverUpdateState.status === "failed" ? "Retry update" : "Update"}
+          label={serverUpdateState.status === "failed" ? "重试更新" : "更新"}
         />
       ) : null}
       {showUpdateAction ? (
         <ServerUpdateAction
           environmentId={environmentId}
-          serverLabel={`${environment.label} server`}
+          serverLabel={`${environment.label} 服务器`}
           selfUpdate={resolveServerSelfUpdateCapability(environment.serverConfig)}
           installation={environment.serverConfig?.environment.capabilities.serverInstallation}
           desktopAppUpdate={supportsDesktopAppUpdate(environment.serverConfig)}
           threadContinuation={supportsServerUpdateThreadContinuation(environment.serverConfig)}
           targetVersion={versionMismatch.clientVersion}
-          label={serverUpdateState.status === "failed" ? "Retry update" : "Update"}
+          label={serverUpdateState.status === "failed" ? "重试更新" : "更新"}
           appearance="icon"
         />
       ) : null}
@@ -1744,13 +1736,13 @@ function SavedBackendListRow({
               size="sm"
               checked={enabled}
               disabled={isRemoving || unsupported}
-              aria-label={`${enabled ? "Switch off" : "Switch on"} ${environment.label}`}
+              aria-label={`${enabled ? "关闭" : "开启"} ${environment.label}`}
               onCheckedChange={(checked) => onSetEnabled(environmentId, checked)}
             />
           }
         />
         <TooltipPopup side="top">
-          {unsupported ? "Client not supported" : enabled ? "Switch off" : "Switch on"}
+          {unsupported ? "客户端不支持" : enabled ? "关闭" : "开启"}
         </TooltipPopup>
       </Tooltip>
       <Menu>
@@ -1761,7 +1753,7 @@ function SavedBackendListRow({
               variant="ghost-muted"
               size="icon-xs"
               disabled={isRemoving}
-              aria-label={`More actions for ${environment.label}`}
+              aria-label={`${environment.label} 的更多操作`}
             />
           }
         >
@@ -1774,17 +1766,17 @@ function SavedBackendListRow({
           />
           <MenuItem onClick={() => setRoutesOpen((open) => !open)}>
             <RouteIcon />
-            {routesOpen ? "Hide routes" : "Routes"}
+            {routesOpen ? "收起路由" : "路由"}
           </MenuItem>
           {mcpUrl ? (
-            <MenuItem onClick={() => copyMcpUrl(mcpUrl, { url: mcpUrl })}>Copy MCP URL</MenuItem>
+            <MenuItem onClick={() => copyMcpUrl(mcpUrl, { url: mcpUrl })}>复制 MCP URL</MenuItem>
           ) : null}
           {errorTraceId ? (
-            <MenuItem onClick={() => copyTraceId(errorTraceId)}>Copy trace ID</MenuItem>
+            <MenuItem onClick={() => copyTraceId(errorTraceId)}>复制 Trace ID</MenuItem>
           ) : null}
           <MenuSeparator />
           <MenuItem variant="destructive" onClick={() => onRemove(environment)}>
-            {isRemoving ? "Removing…" : "Remove from this device…"}
+            {isRemoving ? "正在移除…" : "从此设备移除…"}
           </MenuItem>
         </MenuPopup>
       </Menu>
@@ -1797,7 +1789,7 @@ function CloudLinkSwitch({
   disabled,
   disabledReason,
   onCheckedChange,
-  ariaLabel = "Enable T3 Connect",
+  ariaLabel = "启用 T3 Connect",
 }: {
   readonly checked: boolean;
   readonly disabled: boolean;
@@ -1838,9 +1830,9 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
   const [isUpdatingPreference, setIsUpdatingPreference] = useState(false);
 
   const disabledReason = !isSignedIn
-    ? "Sign in to T3 Connect to manage this environment."
+    ? "登录 T3 Connect 后才能管理此环境。"
     : !canManageRelay
-      ? "Your session does not have permission to manage T3 Connect access."
+      ? "你的会话没有管理 T3 Connect 访问的权限。"
       : null;
   const isBusy = isUpdating || isUpdatingPreference;
 
@@ -1858,15 +1850,15 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
       toastManager.add({
         type: "success",
         title: enabled
-          ? "T3 Connect linked"
+          ? "已关联 T3 Connect"
           : publishAgentActivity
-            ? "T3 Connect tunnel disabled"
-            : "T3 Connect unlinked",
+            ? "已禁用 T3 Connect 隧道"
+            : "已取消关联 T3 Connect",
         description: enabled
-          ? "This environment is available through T3 Connect."
+          ? "此环境现在可以通过 T3 Connect 访问。"
           : publishAgentActivity
-            ? "The managed tunnel was removed. Agent activity publishing stays on."
-            : "This environment is no longer available through T3 Connect.",
+            ? "托管隧道已移除。Agent 活动发布保持开启。"
+            : "此环境不再通过 T3 Connect 提供。",
       });
     }
     setIsUpdating(false);
@@ -1883,10 +1875,10 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
     if (ok) {
       toastManager.add({
         type: "success",
-        title: enabled ? "Agent activity enabled" : "Agent activity disabled",
+        title: enabled ? "已启用 Agent 活动" : "已禁用 Agent 活动",
         description: enabled
-          ? "This environment publishes agent activity to your mobile clients."
-          : "This environment will stop publishing agent activity.",
+          ? "此环境会向你的移动客户端发布 Agent 活动。"
+          : "此环境将停止发布 Agent 活动。",
       });
     }
     setIsUpdatingPreference(false);
@@ -1902,10 +1894,10 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
     if (ok) {
       toastManager.add({
         type: "success",
-        title: enabled ? "Webhooks held while offline" : "Webhooks no longer held",
+        title: enabled ? "离线时暂存 Webhook" : "不再暂存 Webhook",
         description: enabled
-          ? "T3 Connect keeps webhook requests for up to 24 hours while this environment is offline."
-          : "Requests to an offline environment now fail. Anything already held is still delivered.",
+          ? "此环境离线时，T3 Connect 会最多保留 24 小时的 webhook 请求。"
+          : "发往离线环境的请求现在会直接失败。已暂存的请求仍会送达。",
       });
     }
     setIsUpdatingPreference(false);
@@ -1918,8 +1910,8 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
           title={searchableSetting("t3-connect").title}
           description={
             managedTunnelActive
-              ? "This environment is available to your other devices through T3 Connect."
-              : "Make this environment available to your other devices through T3 Connect."
+              ? "此环境已可通过 T3 Connect 供你的其他设备访问。"
+              : "使此环境可通过 T3 Connect 供你的其他设备访问。"
           }
           status={operationError ?? primaryCloudLinkState.error}
           control={
@@ -1940,10 +1932,10 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
       ) : null}
       <SettingsRow
         title={searchableSetting("publish-agent-activity").title}
-        description="Send activity to mobile notifications and Live Activities without T3 Connect."
+        description="在不使用 T3 Connect 的情况下，将活动发送到移动端通知和实时活动（Live Activities）。"
         control={
           <CloudLinkSwitch
-            ariaLabel="Publish agent activity to mobile clients"
+            ariaLabel="向移动客户端发布 Agent 活动"
             checked={publishAgentActivity}
             disabled={
               !canManageRelay ||
@@ -1960,10 +1952,10 @@ function ConfiguredCloudLinkRow({ canManageRelay }: { readonly canManageRelay: b
       {managedTunnelActive ? (
         <SettingsRow
           title={searchableSetting("hold-webhooks-while-offline").title}
-          description="Keep webhook requests for up to 24 hours while this environment is offline, then deliver them. Off: T3 Connect only forwards requests and stores nothing."
+          description="此环境离线时暂存 webhook 请求（最多 24 小时），恢复后再送达。关闭时：T3 Connect 只转发请求，不存储任何内容。"
           control={
             <CloudLinkSwitch
-              ariaLabel="Hold webhook requests while this environment is offline"
+              ariaLabel="在此环境离线时暂存 webhook 请求"
               checked={holdWebhooksWhileOffline}
               disabled={!canManageRelay || !isSignedIn || primaryCloudLinkState.isPending || isBusy}
               disabledReason={disabledReason}
@@ -1988,7 +1980,7 @@ function CloudLinkRow({
     return (
       <SettingsRow
         title="T3 Connect"
-        description="To edit these settings, pair this connection with both View relay and Manage relay permissions."
+        description="要编辑这些设置，请使用同时具备“查看中继”和“管理中继”权限的连接进行配对。"
       />
     );
   }
@@ -2002,11 +1994,11 @@ function EmptyRemoteEnvironments({ cloudEnabled = true }: { readonly cloudEnable
         <ChevronsLeftRightEllipsisIcon />
       </EmptyMedia>
       <EmptyHeader>
-        <EmptyTitle>No saved remote environments</EmptyTitle>
+        <EmptyTitle>没有已保存的远程环境</EmptyTitle>
         <EmptyDescription>
           {cloudEnabled
-            ? "Click “Add environment” to pair another environment, or connect one from T3 Connect."
-            : "Click “Add environment” to pair another environment."}
+            ? "点击“添加环境”配对另一个环境，或从 T3 Connect 连接一个。"
+            : "点击“添加环境”配对另一个环境。"}
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
@@ -2356,14 +2348,13 @@ export function ConnectionsSettings() {
         setIsDesktopServerExposureDialogOpen(false);
         setIsUpdatingDesktopServerExposure(false);
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Failed to update network exposure.";
+        const message = error instanceof Error ? error.message : "更新网络暴露失败。";
         setIsDesktopServerExposureDialogOpen(false);
         setDesktopServerExposureMutationError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not update network access",
+            title: "无法更新网络访问",
             description: message,
           }),
         );
@@ -2397,13 +2388,12 @@ export function ConnectionsSettings() {
       refreshDesktopNetworkAccessState();
       setPendingTailscaleServeEndpoint(null);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to configure Tailscale HTTPS.";
+      const message = error instanceof Error ? error.message : "配置 Tailscale HTTPS 失败。";
       setDesktopServerExposureMutationError(message);
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not set up Tailscale HTTPS",
+          title: "无法设置 Tailscale HTTPS",
           description: message,
         }),
       );
@@ -2439,12 +2429,12 @@ export function ConnectionsSettings() {
       refreshDesktopNetworkAccessState();
       setDisableTailscaleServeDialogOpen(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to disable Tailscale HTTPS.";
+      const message = error instanceof Error ? error.message : "禁用 Tailscale HTTPS 失败。";
       setDesktopServerExposureMutationError(message);
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not disable Tailscale HTTPS",
+          title: "无法禁用 Tailscale HTTPS",
           description: message,
         }),
       );
@@ -2469,12 +2459,12 @@ export function ConnectionsSettings() {
       try {
         await revokeServerPairingLink(id);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to revoke pairing link.";
+        const message = error instanceof Error ? error.message : "撤销配对链接失败。";
         setDesktopAccessManagementMutationError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not revoke pairing link",
+            title: "无法撤销配对链接",
             description: message,
           }),
         );
@@ -2497,12 +2487,12 @@ export function ConnectionsSettings() {
       try {
         await revokeServerClientSession(sessionId);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to revoke client access.";
+        const message = error instanceof Error ? error.message : "撤销客户端访问失败。";
         setDesktopAccessManagementMutationError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not revoke client access",
+            title: "无法撤销客户端访问",
             description: message,
           }),
         );
@@ -2525,16 +2515,16 @@ export function ConnectionsSettings() {
       const revokedCount = await revokeOtherServerClientSessions();
       toastManager.add({
         type: "success",
-        title: revokedCount === 1 ? "Revoked 1 other client" : `Revoked ${revokedCount} clients`,
-        description: "Other paired clients will need a new pairing link before reconnecting.",
+        title: revokedCount === 1 ? "已撤销 1 个其他客户端" : `已撤销 ${revokedCount} 个客户端`,
+        description: "其他已配对的客户端需要新的配对链接才能重新连接。",
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to revoke other clients.";
+      const message = error instanceof Error ? error.message : "撤销其他客户端失败。";
       setDesktopAccessManagementMutationError(message);
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not revoke other clients",
+          title: "无法撤销其他客户端",
           description: message,
         }),
       );
@@ -2569,10 +2559,10 @@ export function ConnectionsSettings() {
       setAddBackendDialogOpen(false);
       toastManager.add({
         type: "success",
-        title: routeTarget ? "Route added" : "Environment connected",
+        title: routeTarget ? "已添加路由" : "环境已连接",
         description: routeTarget
-          ? `${routeTarget.label} can now be reached over SSH ${target.alias}.`
-          : `${target.alias} is ready over an SSH-managed tunnel.`,
+          ? `${routeTarget.label} 现在可以通过 SSH ${target.alias} 访问。`
+          : `${target.alias} 已就绪，通过 SSH 管理的隧道连接。`,
       });
       setIsAddingSavedBackend(false);
     },
@@ -2606,12 +2596,12 @@ export function ConnectionsSettings() {
         pairingCode: savedBackendPairingCode,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to add backend.";
+      const message = error instanceof Error ? error.message : "添加后端失败。";
       setSavedBackendError(message);
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not add backend",
+          title: "无法添加后端",
           description: message,
         }),
       );
@@ -2626,12 +2616,12 @@ export function ConnectionsSettings() {
     if (result._tag === "Failure") {
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
-        const message = error instanceof Error ? error.message : "Failed to add backend.";
+        const message = error instanceof Error ? error.message : "添加后端失败。";
         setSavedBackendError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not add backend",
+            title: "无法添加后端",
             description: message,
           }),
         );
@@ -2650,13 +2640,13 @@ export function ConnectionsSettings() {
       routeTarget
         ? {
             type: "success",
-            title: "Route added",
-            description: `${routeTarget.label} now has another way to connect.`,
+            title: "已添加路由",
+            description: `${routeTarget.label} 现在有了另一个连接方式。`,
           }
         : {
             type: "success",
-            title: "Backend added",
-            description: "The environment is saved and will reconnect on app startup.",
+            title: "已添加后端",
+            description: "该环境已保存，将在应用启动时自动重连。",
           },
     );
     setIsAddingSavedBackend(false);
@@ -2765,14 +2755,12 @@ export function ConnectionsSettings() {
       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
         const message =
-          error instanceof Error
-            ? error.message
-            : `Failed to switch the backend ${enabled ? "on" : "off"}.`;
+          error instanceof Error ? error.message : `${enabled ? "开启" : "关闭"}后端失败。`;
         setSavedBackendError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Could not switch backend ${enabled ? "on" : "off"}`,
+            title: `无法${enabled ? "开启" : "关闭"}后端`,
             description: message,
           }),
         );
@@ -2790,12 +2778,12 @@ export function ConnectionsSettings() {
       setRemovingSavedEnvironmentId(null);
       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
-        const message = error instanceof Error ? error.message : "Failed to remove backend.";
+        const message = error instanceof Error ? error.message : "移除后端失败。";
         setSavedBackendError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not remove backend",
+            title: "无法移除后端",
             description: message,
           }),
         );
@@ -2818,7 +2806,7 @@ export function ConnectionsSettings() {
       }
       // Fail closed: no mounted confirm host means no removal.
       const confirmed = await requestConfirmDialog(
-        `Remove ${environment.label} from this device?\nThis forgets its pairing, credentials, and cached threads here. Switch it off instead to keep it saved.`,
+        `从此设备移除 ${environment.label}？\n这会在此设备上忘记其配对、凭据和缓存的会话。如需保留，请改为将其关闭。`,
         { variant: "destructive" },
       );
       if (confirmed === true) await removeSavedBackend(environment);
@@ -2924,7 +2912,7 @@ export function ConnectionsSettings() {
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
         <label className="block">
-          <span className="mb-1.5 block text-xs font-medium text-foreground">Host</span>
+          <span className="mb-1.5 block text-xs font-medium text-foreground">主机</span>
           <Input
             value={savedBackendHost}
             onChange={(event) => handleSavedBackendHostChange(event.target.value)}
@@ -2934,7 +2922,7 @@ export function ConnectionsSettings() {
           />
         </label>
         <label className="block">
-          <span className="mb-1.5 block text-xs font-medium text-foreground">Pairing code</span>
+          <span className="mb-1.5 block text-xs font-medium text-foreground">配对码</span>
           <Input
             value={savedBackendPairingCode}
             onChange={(event) => setSavedBackendPairingCode(event.target.value)}
@@ -2946,7 +2934,7 @@ export function ConnectionsSettings() {
       </div>
       <div>
         <span className="mt-1 block text-2xs text-muted-foreground">
-          Paste a full pairing URL here to fill both fields automatically.
+          在此粘贴完整的配对 URL，即可自动填充以上两个字段。
         </span>
       </div>
     </div>
@@ -2974,15 +2962,15 @@ export function ConnectionsSettings() {
     if (result._tag === "Failure") {
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
-        setSavedBackendError(error instanceof Error ? error.message : "Could not add the route.");
+        setSavedBackendError(error instanceof Error ? error.message : "无法添加该路由。");
       }
       return;
     }
     setAddBackendDialogOpen(false);
     toastManager.add({
       type: "success",
-      title: "Route added",
-      description: `${routeTarget.label} falls back to T3 Connect when its other routes are unreachable.`,
+      title: "已添加路由",
+      description: `${routeTarget.label} 将在其他路由不可达时回退到 T3 Connect。`,
     });
   };
   const renderRemoteModeBody = () => (
@@ -2990,7 +2978,7 @@ export function ConnectionsSettings() {
       {relayRouteOffer !== null ? (
         <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
           <p className="text-xs text-muted-foreground">
-            This machine is on your T3 Connect account. Use it as a fallback route.
+            这台机器在你的 T3 Connect 账户中。可将其用作回退路由。
           </p>
           <Button
             size="xs"
@@ -2998,7 +2986,7 @@ export function ConnectionsSettings() {
             disabled={isAddingSavedBackend}
             onClick={() => void addRelayRoute()}
           >
-            Add T3 Connect
+            添加 T3 Connect
           </Button>
         </div>
       ) : null}
@@ -3011,7 +2999,7 @@ export function ConnectionsSettings() {
         onClick={() => void handleAddSavedBackend()}
       >
         <PlusIcon className="size-3.5" />
-        {isAddingSavedBackend ? "Adding…" : routeTarget ? "Add route" : "Add environment"}
+        {isAddingSavedBackend ? "正在添加…" : routeTarget ? "添加路由" : "添加环境"}
       </Button>
     </div>
   );
@@ -3023,7 +3011,7 @@ export function ConnectionsSettings() {
             htmlFor="saved-backend-ssh-host"
             className="mb-1.5 block text-xs font-medium text-foreground"
           >
-            SSH host or alias
+            SSH 主机或别名
           </label>
           <Autocomplete
             items={filteredDiscoveredSshHosts}
@@ -3047,14 +3035,14 @@ export function ConnectionsSettings() {
             <AutocompleteInput
               id="saved-backend-ssh-host"
               onKeyDown={handleSavedBackendSshHostKeyDown}
-              placeholder="Search hosts or type devbox"
+              placeholder="搜索主机或输入 devbox"
               disabled={isAddingSavedBackend}
               spellCheck={false}
             />
             {hasSshHostSuggestionContent ? (
               <AutocompletePopup>
                 {isLoadingDiscoveredSshHosts ? (
-                  <div className="px-3 py-2 text-xs text-muted-foreground">Loading hosts…</div>
+                  <div className="px-3 py-2 text-xs text-muted-foreground">正在加载主机…</div>
                 ) : filteredDiscoveredSshHosts.length > 0 ? (
                   <AutocompleteList className="max-h-72">
                     {filteredDiscoveredSshHosts.map((target, index) => {
@@ -3088,7 +3076,7 @@ export function ConnectionsSettings() {
                   </AutocompleteList>
                 ) : (
                   <AutocompleteEmpty className="break-all">
-                    No hosts match "{savedBackendSshHost.trim()}".
+                    没有匹配“{savedBackendSshHost.trim()}”的主机。
                   </AutocompleteEmpty>
                 )}
               </AutocompletePopup>
@@ -3097,7 +3085,7 @@ export function ConnectionsSettings() {
         </div>
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_7rem]">
           <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-foreground">Username</span>
+            <span className="mb-1.5 block text-xs font-medium text-foreground">用户名</span>
             <Input
               value={savedBackendSshUsername}
               onChange={(event) => setSavedBackendSshUsername(event.target.value)}
@@ -3108,7 +3096,7 @@ export function ConnectionsSettings() {
             />
           </label>
           <label className="block">
-            <span className="mb-1.5 block text-xs font-medium text-foreground">Port</span>
+            <span className="mb-1.5 block text-xs font-medium text-foreground">端口</span>
             <Input
               value={savedBackendSshPort}
               onChange={(event) => setSavedBackendSshPort(event.target.value)}
@@ -3132,7 +3120,7 @@ export function ConnectionsSettings() {
           onClick={() => void handleAddSavedBackend()}
         >
           <PlusIcon className="size-3.5" />
-          {isAddingSavedBackend ? "Adding…" : routeTarget ? "Add route" : "Add environment"}
+          {isAddingSavedBackend ? "正在添加…" : routeTarget ? "添加路由" : "添加环境"}
         </Button>
       </div>
     </div>
@@ -3145,7 +3133,7 @@ export function ConnectionsSettings() {
         setPendingDesktopServerExposureMode(checked ? "network-accessible" : "local-only");
         setIsDesktopServerExposureDialogOpen(true);
       }}
-      aria-label="Enable network access"
+      aria-label="启用网络访问"
     />
   );
   const renderEndpointRows = (presentation: AccessSectionPresentation) =>
@@ -3190,12 +3178,12 @@ export function ConnectionsSettings() {
         // backend on/off or switching distros is picked up here without an
         // explicit renderer reconcile.
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Failed to update WSL backend.";
+        const message = error instanceof Error ? error.message : "更新 WSL 后端失败。";
         setDesktopWslMutationError(message);
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not change WSL backend",
+            title: "无法更改 WSL 后端",
             description: message,
           }),
         );
@@ -3351,7 +3339,7 @@ export function ConnectionsSettings() {
         return (
           <SettingsRow
             {...searchableSetting("wsl-backend")}
-            description="Couldn't load the WSL backend state."
+            description="无法加载 WSL 后端状态。"
             status={<span className="block text-destructive">{desktopWslError}</span>}
             control={
               <Button
@@ -3360,7 +3348,7 @@ export function ConnectionsSettings() {
                 onClick={loadWslState}
                 disabled={isLoadingWslState}
               >
-                {isLoadingWslState ? "Retrying…" : "Retry"}
+                {isLoadingWslState ? "正在重试…" : "重试"}
               </Button>
             }
           />
@@ -3382,7 +3370,7 @@ export function ConnectionsSettings() {
       return (
         <SettingsRow
           {...searchableSetting("wsl-backend")}
-          description="WSL is unavailable, so Windows is running instead. Turn WSL off to clear this preference."
+          description="WSL 不可用，因此当前运行的是 Windows。关闭 WSL 可清除此偏好设置。"
           status={
             desktopWslError ? (
               <span className="block text-destructive">{desktopWslError}</span>
@@ -3395,7 +3383,7 @@ export function ConnectionsSettings() {
               disabled={isUpdatingWslBackend}
               onClick={() => handleSelectWslMode(BACKEND_VALUE_WSL_OFF)}
             >
-              Switch to Windows
+              切换到 Windows
             </Button>
           }
         />
@@ -3412,21 +3400,21 @@ export function ConnectionsSettings() {
       : (desktopWslState.distro ?? defaultDistroName ?? BACKEND_VALUE_DEFAULT_WSL);
     const selectLabel =
       selectValue === BACKEND_VALUE_WSL_OFF
-        ? "Off"
+        ? "关闭"
         : selectValue === BACKEND_VALUE_DEFAULT_WSL
-          ? "Default distro"
+          ? "默认发行版"
           : selectValue;
     return (
       <>
         <SettingsRow
           {...searchableSetting("wsl-backend")}
-          description="Run the selected WSL distro alongside Windows. Projects remain on their current filesystem."
+          description="让所选 WSL 发行版与 Windows 并行运行。项目仍保留在当前文件系统上。"
           status={
             desktopWslError ? (
               <span className="block text-destructive">{desktopWslError}</span>
             ) : desktopWslState.preflightError ? (
               <span className="block text-destructive">
-                WSL backend couldn't start: {desktopWslState.preflightError}
+                WSL 后端无法启动：{desktopWslState.preflightError}
               </span>
             ) : null
           }
@@ -3441,24 +3429,24 @@ export function ConnectionsSettings() {
               <SelectTrigger
                 size="sm"
                 className="w-full sm:w-56"
-                aria-label="WSL backend"
+                aria-label="WSL 后端"
                 disabled={isUpdatingWslBackend}
               >
                 <SelectValue>{selectLabel}</SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
                 <SelectItem hideIndicator value={BACKEND_VALUE_WSL_OFF}>
-                  Off
+                  关闭
                 </SelectItem>
                 {desktopWslState.distros.length === 0 ? (
                   <SelectItem hideIndicator value={BACKEND_VALUE_DEFAULT_WSL}>
-                    Default distro
+                    默认发行版
                   </SelectItem>
                 ) : (
                   desktopWslState.distros.map((distro) => (
                     <SelectItem hideIndicator key={distro.name} value={distro.name}>
                       {distro.name}
-                      {distro.isDefault ? " (default)" : ""}
+                      {distro.isDefault ? "（默认）" : ""}
                     </SelectItem>
                   ))
                 )}
@@ -3468,15 +3456,15 @@ export function ConnectionsSettings() {
         />
         {desktopWslState.enabled ? (
           <SettingsRow
-            title="WSL only"
-            description="Run only the WSL backend. T3 Code restarts when this changes."
+            title="仅 WSL"
+            description="仅运行 WSL 后端。更改此项将重启 T3 Code。"
             className="bg-muted/20 pl-7 sm:pl-8"
             control={
               <Switch
                 checked={desktopWslState.wslOnly}
                 disabled={isUpdatingWslBackend}
                 onCheckedChange={(checked) => handleToggleWslOnly(checked)}
-                aria-label="Run WSL only"
+                aria-label="仅运行 WSL"
               />
             }
           />
@@ -3492,8 +3480,8 @@ export function ConnectionsSettings() {
         tailscaleHttpsEndpoint
           ? tailscaleHttpsEndpoint.status === "available"
             ? tailscaleHttpsEndpoint.httpBaseUrl
-            : "Use Tailscale Serve to expose this backend through a MagicDNS HTTPS URL."
-          : "Start Tailscale to set up HTTPS access through MagicDNS."
+            : "使用 Tailscale Serve 通过 MagicDNS HTTPS URL 暴露此后端。"
+          : "启动 Tailscale 以通过 MagicDNS 设置 HTTPS 访问。"
       }
       control={
         tailscaleHttpsEndpoint ? (
@@ -3507,7 +3495,7 @@ export function ConnectionsSettings() {
               }
               handleStartTailscaleServeDisable(tailscaleHttpsEndpoint);
             }}
-            aria-label="Enable Tailscale HTTPS"
+            aria-label="启用 Tailscale HTTPS"
           />
         ) : null
       }
@@ -3549,16 +3537,16 @@ export function ConnectionsSettings() {
             onToggleExpanded={() => setIsAdvertisedEndpointListExpanded((expanded) => !expanded)}
             fallback={
               desktopServerExposureState?.endpointUrl
-                ? `Reachable at ${desktopServerExposureState.endpointUrl}`
+                ? `访问地址 ${desktopServerExposureState.endpointUrl}`
                 : desktopServerExposureState?.advertisedHost
-                  ? `Exposed on all interfaces. Pairing links use ${desktopServerExposureState.advertisedHost}.`
-                  : "Exposed on all interfaces."
+                  ? `已在所有网络接口上暴露。配对链接使用 ${desktopServerExposureState.advertisedHost}。`
+                  : "已在所有网络接口上暴露。"
             }
           />
         ) : desktopServerExposureState ? (
-          "Limited to this machine."
+          "仅限本机访问。"
         ) : (
-          "Loading…"
+          "加载中…"
         )
       }
       status={
@@ -3574,12 +3562,12 @@ export function ConnectionsSettings() {
       title={searchableSetting("network-access").title}
       description={
         desktopBridge
-          ? "This connection cannot view or change network exposure."
+          ? "此连接无法查看或更改网络暴露。"
           : currentAuthPolicy === "remote-reachable"
-            ? "Remote access is already configured. Change network exposure where the server starts."
+            ? "远程访问已配置。请在启动服务器的地方更改网络暴露。"
             : currentAuthPolicy === "loopback-browser"
-              ? "Only this machine can connect. Restart with a non-loopback host for remote pairing."
-              : "Network exposure information is unavailable."
+              ? "只有本机可以连接。请使用非环回主机重启以进行远程配对。"
+              : "网络暴露信息不可用。"
       }
       control={
         !desktopBridge &&
@@ -3591,14 +3579,13 @@ export function ConnectionsSettings() {
                   <Switch
                     checked={isLocalBackendNetworkAccessible}
                     disabled
-                    aria-label="Enable network access"
+                    aria-label="启用网络访问"
                   />
                 </span>
               }
             />
             <TooltipPopup side="top">
-              Network exposure changes restart the backend and must be controlled where the server
-              process is launched.
+              网络暴露更改会重启后端，必须在启动服务器进程的地方进行控制。
             </TooltipPopup>
           </Tooltip>
         ) : undefined
@@ -3612,9 +3599,7 @@ export function ConnectionsSettings() {
         <>
           <SettingsSection
             {...searchableSetting("connections-environment")}
-            title={
-              primaryEnvironment?.label ?? (desktopBridge ? "This machine" : "Primary environment")
-            }
+            title={primaryEnvironment?.label ?? (desktopBridge ? "本机" : "主环境")}
             icon={
               <EnvironmentMachineIcon
                 aria-hidden
@@ -3635,7 +3620,7 @@ export function ConnectionsSettings() {
                         type="button"
                         variant="ghost-muted"
                         size="icon-xs"
-                        aria-label="More actions for this machine"
+                        aria-label="本机的更多操作"
                       />
                     }
                   >
@@ -3654,7 +3639,7 @@ export function ConnectionsSettings() {
             <LocalEnvironmentSetting />
             {canManageLocalBackend ? (
               <SettingsRow
-                title="Version"
+                title="版本"
                 description={
                   primaryServerUpdateState.status !== "idle" ? (
                     <ServerUpdateProgress state={primaryServerUpdateState} />
@@ -3664,7 +3649,7 @@ export function ConnectionsSettings() {
                       primaryEnvironment?.displayUrl ?? null,
                     ]
                       .filter((value): value is string => value !== null)
-                      .join(" · ") || "Loading…"
+                      .join(" · ") || "加载中…"
                   )
                 }
                 control={
@@ -3675,7 +3660,7 @@ export function ConnectionsSettings() {
                       size="sm"
                       environmentId={primaryEnvironmentId}
                       serverLabel={
-                        primaryEnvironment ? `${primaryEnvironment.label} server` : "server"
+                        primaryEnvironment ? `${primaryEnvironment.label} 服务器` : "服务器"
                       }
                       selfUpdate={resolveServerSelfUpdateCapability(primaryServerConfig)}
                       installation={
@@ -3688,12 +3673,12 @@ export function ConnectionsSettings() {
                       targetVersion={primaryVersionMismatch.clientVersion}
                       label={
                         primaryServerUpdateState.status === "failed"
-                          ? "Retry update"
-                          : `Update to ${primaryVersionMismatch.clientVersion}`
+                          ? "重试更新"
+                          : `更新到 ${primaryVersionMismatch.clientVersion}`
                       }
                     />
                   ) : primaryServerUpdateState.status === "idle" && primaryServerConfig ? (
-                    <span className="text-xs text-muted-foreground">Up to date</span>
+                    <span className="text-xs text-muted-foreground">已是最新版本</span>
                   ) : undefined
                 }
               />
@@ -3719,7 +3704,7 @@ export function ConnectionsSettings() {
             {primaryEnvironment ? (
               <details className="group px-3 sm:px-4">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-                  Permissions
+                  权限
                   <ChevronRightIcon
                     aria-hidden
                     className="size-3 text-muted-foreground group-open:rotate-90"
@@ -3736,7 +3721,7 @@ export function ConnectionsSettings() {
           {canReadAccess || canWriteAccess ? (
             <FoldedSettingsSection
               id="authorized-clients"
-              title="Authorized clients"
+              title="已授权的客户端"
               summary={summarizeAuthorizedClients(
                 desktopClientSessions,
                 visibleDesktopPairingLinks,
@@ -3769,7 +3754,7 @@ export function ConnectionsSettings() {
                   renderAuthorizedClients("current")
                 ) : (
                   <p className="px-4 py-3 text-xs text-muted-foreground">
-                    This connection can create access links but cannot view authorized clients.
+                    此连接可以创建访问链接，但无法查看已授权的客户端。
                   </p>
                 )}
               </ScrollArea>
@@ -3789,13 +3774,13 @@ export function ConnectionsSettings() {
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {pendingDesktopServerExposureMode === "network-accessible"
-                    ? "Enable network access?"
-                    : "Disable network access?"}
+                    ? "启用网络访问？"
+                    : "禁用网络访问？"}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {pendingDesktopServerExposureMode === "network-accessible"
-                    ? "Let your other devices connect to T3 Code over the network. Pair devices to give them access. T3 Code will restart."
-                    : "Devices connected over your local network will disconnect. Existing tunnels, such as T3 Connect or Tailscale HTTPS, keep working. T3 Code will restart."}
+                    ? "允许你的其他设备通过网络连接 T3 Code。配对设备以授予访问权限。T3 Code 将重启。"
+                    : "通过本地网络连接的设备将断开。现有隧道（如 T3 Connect 或 Tailscale HTTPS）仍会继续工作。T3 Code 将重启。"}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -3803,7 +3788,7 @@ export function ConnectionsSettings() {
                   disabled={isUpdatingDesktopServerExposure}
                   render={<Button variant="outline" disabled={isUpdatingDesktopServerExposure} />}
                 >
-                  <span className="[text-box:trim-both_cap_alphabetic]">Cancel</span>
+                  <span className="[text-box:trim-both_cap_alphabetic]">取消</span>
                 </AlertDialogClose>
                 <Button
                   variant="default"
@@ -3817,10 +3802,10 @@ export function ConnectionsSettings() {
                   {isUpdatingDesktopServerExposure && <Spinner size="sm" />}
                   <span className="[text-box:trim-both_cap_alphabetic]">
                     {isUpdatingDesktopServerExposure
-                      ? "Restarting…"
+                      ? "正在重启…"
                       : pendingDesktopServerExposureMode === "network-accessible"
-                        ? "Restart and enable"
-                        : "Restart and disable"}
+                        ? "重启并启用"
+                        : "重启并禁用"}
                   </span>
                 </Button>
               </AlertDialogFooter>
@@ -3838,28 +3823,28 @@ export function ConnectionsSettings() {
                 <AlertDialogTitle>
                   {pendingWslChange?.kind === "disable"
                     ? pendingWslChange.wasWslOnly
-                      ? "Turn off WSL and switch back to Windows?"
-                      : "Disable WSL backend?"
+                      ? "关闭 WSL 并切换回 Windows？"
+                      : "禁用 WSL 后端？"
                     : pendingWslChange?.kind === "distro"
-                      ? "Switch WSL distro?"
+                      ? "切换 WSL 发行版？"
                       : pendingWslChange?.kind === "enable"
-                        ? "Start the WSL backend"
+                        ? "启动 WSL 后端"
                         : pendingWslChange?.nextValue
-                          ? "Run only the WSL backend?"
-                          : "Re-enable the Windows backend?"}
+                          ? "仅运行 WSL 后端？"
+                          : "重新启用 Windows 后端？"}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {pendingWslChange?.kind === "disable"
                     ? pendingWslChange.wasWslOnly
-                      ? "T3 Code will restart on the Windows backend. Threads and projects opened against WSL stay safe inside the distro and become available again when you re-enable WSL."
-                      : "The WSL backend will stop. Threads and projects opened against WSL stay safe inside the distro, but they'll be unavailable in T3 Code until you re-enable WSL."
+                      ? "T3 Code 将在 Windows 后端上重启。针对 WSL 打开的会话和项目仍安全保留在发行版内，重新启用 WSL 后即可再次使用。"
+                      : "WSL 后端将停止。针对 WSL 打开的会话和项目仍安全保留在发行版内，但在重新启用 WSL 之前无法在 T3 Code 中使用。"
                     : pendingWslChange?.kind === "distro"
-                      ? "T3 Code will restart the WSL backend on the new distro. Sessions still running on the current distro will be interrupted."
+                      ? "T3 Code 将在新发行版上重启 WSL 后端。当前发行版上仍在运行的会话将被中断。"
                       : pendingWslChange?.kind === "enable"
-                        ? "Run the WSL backend alongside the Windows one, or stop the Windows backend and use only WSL? You can change this later from Settings."
+                        ? "让 WSL 后端与 Windows 后端并行运行，还是停止 Windows 后端、仅使用 WSL？稍后可在“设置”中更改。"
                         : pendingWslChange?.nextValue
-                          ? "T3 Code will restart and start only the WSL backend. Your Windows-side projects won't be accessible until you turn this off again."
-                          : "T3 Code will restart and bring the Windows backend back up alongside WSL."}
+                          ? "T3 Code 将重启并仅启动 WSL 后端。在再次关闭此项之前，Windows 侧的项目将无法访问。"
+                          : "T3 Code 将重启，并在 WSL 之外恢复 Windows 后端。"}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -3867,7 +3852,7 @@ export function ConnectionsSettings() {
                   disabled={isUpdatingWslBackend}
                   render={<Button variant="outline" disabled={isUpdatingWslBackend} />}
                 >
-                  Cancel
+                  取消
                 </AlertDialogClose>
                 {pendingWslChange?.kind === "enable" ? (
                   <>
@@ -3879,10 +3864,10 @@ export function ConnectionsSettings() {
                       {isUpdatingWslBackend ? (
                         <>
                           <Spinner size="sm" />
-                          Applying…
+                          正在应用…
                         </>
                       ) : (
-                        "Use only WSL"
+                        "仅使用 WSL"
                       )}
                     </Button>
                     <Button
@@ -3893,10 +3878,10 @@ export function ConnectionsSettings() {
                       {isUpdatingWslBackend ? (
                         <>
                           <Spinner size="sm" />
-                          Applying…
+                          正在应用…
                         </>
                       ) : (
-                        "Run both backends"
+                        "同时运行两个后端"
                       )}
                     </Button>
                   </>
@@ -3914,20 +3899,20 @@ export function ConnectionsSettings() {
                     {isUpdatingWslBackend ? (
                       <>
                         <Spinner size="sm" />
-                        Applying…
+                        正在应用…
                       </>
                     ) : pendingWslChange?.kind === "disable" ? (
                       pendingWslChange.wasWslOnly ? (
-                        "Switch to Windows"
+                        "切换到 Windows"
                       ) : (
-                        "Disable WSL"
+                        "禁用 WSL"
                       )
                     ) : pendingWslChange?.kind === "distro" ? (
-                      "Switch distro"
+                      "切换发行版"
                     ) : pendingWslChange?.nextValue ? (
-                      "Restart and enable"
+                      "重启并启用"
                     ) : (
-                      "Restart and disable"
+                      "重启并禁用"
                     )}
                   </Button>
                 )}
@@ -3943,9 +3928,9 @@ export function ConnectionsSettings() {
           >
             <AlertDialogPopup>
               <AlertDialogHeader>
-                <AlertDialogTitle>Disable Tailscale HTTPS?</AlertDialogTitle>
+                <AlertDialogTitle>禁用 Tailscale HTTPS？</AlertDialogTitle>
                 <AlertDialogDescription>
-                  T3 Code will restart the local backend without Tailscale Serve.
+                  T3 Code 将重启本地后端，且不启用 Tailscale Serve。
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -3953,7 +3938,7 @@ export function ConnectionsSettings() {
                   disabled={isUpdatingTailscaleServe}
                   render={<Button variant="outline" disabled={isUpdatingTailscaleServe} />}
                 >
-                  Cancel
+                  取消
                 </AlertDialogClose>
                 <Button
                   variant="destructive"
@@ -3963,10 +3948,10 @@ export function ConnectionsSettings() {
                   {isUpdatingTailscaleServe ? (
                     <>
                       <Spinner size="sm" />
-                      Restarting…
+                      正在重启…
                     </>
                   ) : (
-                    "Restart and disable"
+                    "重启并禁用"
                   )}
                 </Button>
               </AlertDialogFooter>
@@ -3981,15 +3966,15 @@ export function ConnectionsSettings() {
           >
             <DialogPopup className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Set up Tailscale HTTPS?</DialogTitle>
+                <DialogTitle>设置 Tailscale HTTPS？</DialogTitle>
                 <DialogDescription>
-                  T3 Code will restart the local backend with Tailscale Serve enabled and ask
-                  Tailscale to proxy HTTPS traffic to this backend.
+                  T3 Code 将在启用 Tailscale Serve 的情况下重启本地后端，并让 Tailscale 将 HTTPS
+                  流量代理到此后端。
                 </DialogDescription>
               </DialogHeader>
               <DialogPanel>
                 <label className="block">
-                  <span className="text-sm font-medium text-foreground">HTTPS port</span>
+                  <span className="text-sm font-medium text-foreground">HTTPS 端口</span>
                   <Input
                     className="mt-2"
                     type="number"
@@ -4003,15 +3988,15 @@ export function ConnectionsSettings() {
                   />
                 </label>
                 {!isTailscaleServePortValid ? (
-                  <p className="mt-2 text-xs text-destructive">Enter a port from 1 to 65535.</p>
+                  <p className="mt-2 text-xs text-destructive">请输入 1 到 65535 之间的端口。</p>
                 ) : null}
                 <div className="rounded-md border border-border/70 bg-muted/20 px-3 py-2">
-                  <p className="text-xs font-medium text-muted-foreground">HTTPS endpoint</p>
+                  <p className="text-xs font-medium text-muted-foreground">HTTPS 端点</p>
                   <Tooltip>
                     <TooltipTrigger
                       render={
                         <p className="mt-1 truncate text-sm text-foreground">
-                          {pendingTailscaleServeBaseUrl ?? "Pending MagicDNS endpoint"}
+                          {pendingTailscaleServeBaseUrl ?? "MagicDNS 端点待定"}
                         </p>
                       }
                     />
@@ -4026,7 +4011,7 @@ export function ConnectionsSettings() {
                   disabled={isUpdatingTailscaleServe}
                   render={<Button variant="outline" disabled={isUpdatingTailscaleServe} />}
                 >
-                  Cancel
+                  取消
                 </DialogClose>
                 <Button
                   onClick={() => void handleConfirmTailscaleServeSetup()}
@@ -4035,10 +4020,10 @@ export function ConnectionsSettings() {
                   {isUpdatingTailscaleServe ? (
                     <>
                       <Spinner size="sm" />
-                      Restarting…
+                      正在重启…
                     </>
                   ) : (
-                    "Enable"
+                    "启用"
                   )}
                 </Button>
               </DialogFooter>
@@ -4047,10 +4032,7 @@ export function ConnectionsSettings() {
         </>
       ) : (
         <SettingsSection {...searchableSetting("connections-environment")}>
-          <SettingsRow
-            title="No environment selected"
-            description="Connect an environment to view its settings and access."
-          />
+          <SettingsRow title="未选择环境" description="连接一个环境以查看其设置和访问信息。" />
           {/* A turned-off local environment leaves no primary environment, so its switch lives here too. */}
           <LocalEnvironmentSetting />
           {canReadRelay || canManageRelay ? (
@@ -4066,7 +4048,7 @@ export function ConnectionsSettings() {
       {primarySettings}
       <SettingsSection
         {...searchableSetting("remote-environments")}
-        title="Environments"
+        title="环境"
         headerAction={
           <div className="flex items-center gap-1">
             {savedServerUpdateTargets.length > 0 ? (
@@ -4088,25 +4070,25 @@ export function ConnectionsSettings() {
                   render={
                     <DialogTrigger
                       render={
-                        <Button size="xs" variant="ghost-muted" aria-label="Add environment">
+                        <Button size="xs" variant="ghost-muted" aria-label="添加环境">
                           <PlusIcon className="size-3" />
-                          <span>Add environment</span>
+                          <span>添加环境</span>
                         </Button>
                       }
                     />
                   }
                 />
-                <TooltipPopup side="top">Add environment</TooltipPopup>
+                <TooltipPopup side="top">添加环境</TooltipPopup>
               </Tooltip>
               <DialogPopup className="max-h-[80dvh] sm:max-w-3xl">
                 <DialogHeader>
                   <DialogTitle>
-                    {routeTarget ? `Add a route to ${routeTarget.label}` : "Add Environment"}
+                    {routeTarget ? `添加到 ${routeTarget.label} 的路由` : "添加环境"}
                   </DialogTitle>
                   <DialogDescription>
                     {routeTarget
-                      ? "Pair this machine again over another address, such as its Tailscale name. It joins the existing routes instead of adding a second machine."
-                      : "Pair another environment to this client."}
+                      ? "通过另一个地址（例如其 Tailscale 名称）再次配对这台机器。它会加入现有路由，而不是添加第二台机器。"
+                      : "将另一个环境配对此客户端。"}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogPanel>
@@ -4114,16 +4096,15 @@ export function ConnectionsSettings() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       {renderConnectionModeCard({
                         mode: "remote",
-                        title: "Remote link",
-                        description: "Enter a backend host and pairing code.",
+                        title: "远程链接",
+                        description: "输入后端主机和配对码。",
                         icon: <ChevronsLeftRightEllipsisIcon aria-hidden className="size-4" />,
                       })}
                       {desktopBridge
                         ? renderConnectionModeCard({
                             mode: "ssh",
                             title: "SSH",
-                            description:
-                              "Use local SSH config, agent, and tunnels for the backend.",
+                            description: "为后端使用本地 SSH 配置、agent 和隧道。",
                             icon: <TerminalIcon aria-hidden className="size-4" />,
                           })
                         : null}

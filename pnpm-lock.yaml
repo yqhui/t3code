@@ -762,6 +762,9 @@ importers:
       '@clerk/electron':
         specifier: 0.0.44
         version: 0.0.44(@clerk/electron-passkeys@0.0.3)(electron-store@8.2.0)(electron@44.4.5)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@clerk/localizations':
+        specifier: 4.17.0
+        version: 4.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@clerk/react':
         specifier: 6.16.1
         version: 6.16.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2761,6 +2764,10 @@ packages:
         optional: true
       react-dom:
         optional: true
+
+  '@clerk/localizations@4.17.0':
+    resolution: {integrity: sha512-64CJg3ybsOyYf6XSYGeOMYJOq86W6yVYzHNtq8j3gdRUTU1oIKIZWuOUAr9Be/vneP6glK2OHPzxhIzNJyaaKw==}
+    engines: {node: '>=20.9.0'}
 
   '@clerk/react@6.16.1':
     resolution: {integrity: sha512-fYNiouRyVaEAKz8PZwWx7Y/jLnX0OxSplELfc+8VezgU36Xjx79Qu8xnr0XLhF/zwAuj+Avguvz60JbeIiiJ0Q==}
@@ -13560,6 +13567,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  '@clerk/localizations@4.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@clerk/shared': 4.33.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+    transitivePeerDependencies:
+      - react
+      - react-dom
 
   '@clerk/react@6.16.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:

@@ -248,7 +248,7 @@ export function ProviderUpdatePrimaryNotification() {
               addProviderUpdateToast({
                 view: getProviderUpdateRejectedToastView(
                   providerCount,
-                  "This connection cannot manage provider accounts.",
+                  "此连接无法管理提供商账户。",
                 ),
                 openSettings: openProviderSettings,
               });
@@ -302,7 +302,7 @@ export function ProviderUpdatePrimaryNotification() {
       title: initialView.title,
       description: canManageProviders
         ? initialView.description
-        : "This connection cannot manage provider accounts. View provider settings for update details.",
+        : "此连接无法管理提供商账户。 查看提供商设置以了解更新详情。",
       timeout: 0,
       actionProps:
         oneClickProviders.length > 0

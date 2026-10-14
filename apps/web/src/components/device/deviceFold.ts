@@ -14,7 +14,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const parseFold = (payload: unknown): AndroidFoldState => {
   if (!isRecord(payload) || payload.ok !== true || !isRecord(payload.fold)) {
-    throw new Error("Unexpected Android fold response.");
+    throw new Error("Android 折叠响应异常。");
   }
   const { supported, posture, hingeAngle } = payload.fold;
   if (
@@ -27,7 +27,7 @@ const parseFold = (payload: unknown): AndroidFoldState => {
       posture !== "tent") ||
     (hingeAngle !== null && (typeof hingeAngle !== "number" || !Number.isFinite(hingeAngle)))
   ) {
-    throw new Error("Unexpected Android fold response.");
+    throw new Error("Android 折叠响应异常。");
   }
   return { supported, posture, hingeAngle };
 };
@@ -54,9 +54,7 @@ const foldRequest = async (
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null);
     const error = isRecord(payload) ? payload.error : null;
-    throw new Error(
-      typeof error === "string" ? error : `Fold command failed (${response.status}).`,
-    );
+    throw new Error(typeof error === "string" ? error : `折叠命令失败（${response.status}）。`);
   }
   return parseFold(await response.json());
 };

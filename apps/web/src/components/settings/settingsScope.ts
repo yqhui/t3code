@@ -72,24 +72,24 @@ export function resolveSettingsScope(
   ): ResolvedSettingsScope => ({
     kind: "unavailable",
     reason,
-    label: "Unavailable selection",
+    label: "所选内容不可用",
     message,
     members: [],
     environmentIds: [],
   });
 
   if (search.checkout && !search.project) {
-    return unavailable("project-required", "Select a project to choose one of its checkouts.");
+    return unavailable("project-required", "请选择项目以选择其检出目录。");
   }
 
   const environment = environments.find((candidate) => candidate.environmentId === search.machine);
   if (search.machine && !environment) {
-    return unavailable("environment-missing", "This environment is no longer available.");
+    return unavailable("environment-missing", "此环境已不可用。");
   }
 
   if (search.project) {
     const group = groups.find((candidate) => candidate.projectKey === search.project);
-    if (!group) return unavailable("project-missing", "This project is no longer available.");
+    if (!group) return unavailable("project-missing", "此项目已不可用。");
     const members = group.memberProjects.filter(
       (member) =>
         (search.machine === undefined || member.environmentId === search.machine) &&
@@ -99,8 +99,8 @@ export function resolveSettingsScope(
       return unavailable(
         "checkout-missing",
         search.checkout
-          ? "This checkout is no longer available in the selected project and environment."
-          : "This project has no checkout on this environment.",
+          ? "此检出目录在选定项目和环境中已不可用。"
+          : "此项目在此环境中没有检出目录。",
       );
     }
     if (search.checkout) {
@@ -109,10 +109,7 @@ export function resolveSettingsScope(
         (candidate) => candidate.environmentId === checkout.environmentId,
       );
       if (!checkoutEnvironment) {
-        return unavailable(
-          "environment-missing",
-          "This checkout's environment is no longer available.",
-        );
+        return unavailable("environment-missing", "此检出目录的环境已不可用。");
       }
       const sharesEnvironment = group.memberProjects.some(
         (member) =>
@@ -133,7 +130,7 @@ export function resolveSettingsScope(
       kind: "project",
       group,
       environmentId: environment?.environmentId ?? null,
-      label: `${group.displayName} / ${environment?.label ?? "All checkouts"}`,
+      label: `${group.displayName} / ${environment?.label ?? "所有检出目录"}`,
       members,
       environmentIds: [...new Set(members.map((member) => member.environmentId))],
     };
@@ -149,7 +146,7 @@ export function resolveSettingsScope(
   }
   return {
     kind: "all",
-    label: "All environments",
+    label: "所有环境",
     members: [],
     environmentIds: environments.map((candidate) => candidate.environmentId),
   };

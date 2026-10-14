@@ -181,7 +181,7 @@ export function waitForProject(
     let unsubscribe: (() => void) | null = null;
     const timeout = setTimeout(() => {
       unsubscribe?.();
-      reject(new Error("The project did not appear in the desktop app."));
+      reject(new Error("项目未在桌面应用中出现。"));
     }, timeoutMs);
     const finish = (project: EnvironmentProject | null) => {
       if (project === null) return;

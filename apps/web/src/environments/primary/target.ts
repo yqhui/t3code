@@ -27,7 +27,7 @@ export class PrimaryEnvironmentUrlInvalidError extends Schema.TaggedError<Primar
   },
 ) {
   override get message(): string {
-    return `Could not parse ${this.urlKind} for the ${this.source} primary environment target.`;
+    return `无法为 ${this.source} 主环境目标解析 ${this.urlKind}。`;
   }
 }
 
@@ -39,7 +39,7 @@ export class PrimaryEnvironmentProtocolUnsupportedError extends Schema.TaggedErr
   },
 ) {
   override get message(): string {
-    return `The ${this.source} primary environment target uses unsupported protocol ${this.protocol}.`;
+    return `${this.source} 主环境目标使用了不支持的协议 ${this.protocol}。`;
   }
 }
 
@@ -55,7 +55,7 @@ export class DesktopEnvironmentBootstrapIncompleteError extends Schema.TaggedErr
       ...(this.hasHttpBaseUrl ? [] : ["httpBaseUrl"]),
       ...(this.hasWsBaseUrl ? [] : ["wsBaseUrl"]),
     ];
-    return `Desktop bootstrap is missing ${missing.join(" and ")} for the local environment.`;
+    return `本地环境的桌面引导缺少 ${missing.join(" 和 ")}。`;
   }
 }
 
@@ -64,7 +64,7 @@ export class PrimaryEnvironmentDisabledError extends Schema.TaggedError<PrimaryE
   {},
 ) {
   override get message(): string {
-    return "The local environment is disabled.";
+    return "本地环境已禁用。";
   }
 }
 

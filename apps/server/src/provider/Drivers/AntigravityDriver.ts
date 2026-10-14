@@ -134,7 +134,7 @@ export const AntigravityDriver: ProviderDriver<
             new ProviderDriverError({
               driver: DRIVER,
               instanceId,
-              detail: "Could not resolve the Antigravity profile directory.",
+              detail: "无法解析 Antigravity 配置目录。",
               cause,
             }),
         ),
@@ -227,7 +227,7 @@ export const AntigravityDriver: ProviderDriver<
                 new ProviderSetupError({
                   instanceId,
                   operation: "start",
-                  detail: "Could not create an Antigravity runtime temp directory.",
+                  detail: "无法创建 Antigravity 运行时临时目录。",
                   cause,
                 }),
             ),
@@ -280,7 +280,7 @@ export const AntigravityDriver: ProviderDriver<
                 new ProviderSetupError({
                   instanceId,
                   operation: "start",
-                  detail: "Could not create an Antigravity setup workspace.",
+                  detail: "无法创建 Antigravity 初始设置工作区。",
                 }),
             ),
           );
@@ -379,7 +379,7 @@ export const AntigravityDriver: ProviderDriver<
             promptCapabilities: { image: true, audio: true, embeddedContext: true },
             sessionCapabilities: { list: {}, resume: {} },
           },
-          authMethods: [{ id: "oauth-personal", name: "Log in with Google" }],
+          authMethods: [{ id: "oauth-personal", name: "通过 Google 登录" }],
           agentInfo: {
             name: "antigravity-acp",
             title: "Google Antigravity",
@@ -414,7 +414,7 @@ export const AntigravityDriver: ProviderDriver<
             new ProviderDriverError({
               driver: DRIVER,
               instanceId,
-              detail: "Could not prepare the Antigravity provider status.",
+              detail: "无法准备 Antigravity 提供商状态。",
               cause,
             }),
         ),
@@ -478,7 +478,7 @@ export const AntigravityDriver: ProviderDriver<
               new ProviderDriverError({
                 driver: DRIVER,
                 instanceId,
-                detail: "Antigravity model refresh timed out. Try again or check Google sign-in.",
+                detail: "刷新 Antigravity 模型超时。请重试或检查 Google 登录状态。",
               }),
             ),
         }),
@@ -492,11 +492,11 @@ export const AntigravityDriver: ProviderDriver<
                 driver: DRIVER,
                 instanceId,
                 detail: isAntigravitySignInRequiredError(cause)
-                  ? "Sign in to Antigravity in provider settings before refreshing models."
+                  ? "刷新模型前，请先在提供商设置中登录 Antigravity。"
                   : cause._tag === "ProviderSetupError" &&
                       (cause.operation === "configure" || cause.operation === "start")
                     ? cause.detail
-                    : "Could not refresh Antigravity models. The previous model list is unchanged.",
+                    : "无法刷新 Antigravity 模型，原有模型列表未受影响。",
                 cause,
               }),
         ),
@@ -522,7 +522,7 @@ export const AntigravityDriver: ProviderDriver<
                     new ProviderDriverError({
                       driver: DRIVER,
                       instanceId,
-                      detail: "Could not read Antigravity workspace skills.",
+                      detail: "无法读取 Antigravity 工作区技能。",
                       cause,
                     }),
                 ),

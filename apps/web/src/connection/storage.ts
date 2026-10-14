@@ -583,7 +583,7 @@ export function makeBrowserGitHubRoutingPermissions(
         return Effect.fail(
           new ConnectionBlockedError({
             reason: "configuration",
-            detail: "This environment does not have a saved connection endpoint.",
+            detail: "此环境没有已保存的连接端点。",
           }),
         );
       return write(

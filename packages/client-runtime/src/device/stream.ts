@@ -439,10 +439,7 @@ export function createDeviceStreamClient(
   const connecting = (detail?: string) => {
     firstFrame = false;
     if (frameTimer === null) {
-      frameTimer = setTimeout(
-        () => fail("No video received from the device. Reconnect to try again."),
-        FIRST_FRAME_TIMEOUT_MS,
-      );
+      frameTimer = setTimeout(() => fail("未收到设备视频，请重连后再试。"), FIRST_FRAME_TIMEOUT_MS);
     }
     setStatus("connecting", detail);
   };
@@ -472,7 +469,7 @@ export function createDeviceStreamClient(
       }
     };
     const error = () => {
-      if (!released) fail("Could not receive the device stream. Reconnect to try again.");
+      if (!released) fail("无法接收设备视频流，请重连后再试。");
     };
     image.addEventListener("load", check);
     image.addEventListener("error", error);
@@ -513,7 +510,7 @@ export function createDeviceStreamClient(
       events.onScreen(screen);
     }
     if (!sink.present(source, width, height)) {
-      fail("Could not display the device stream. Reconnect to try again.");
+      fail("无法显示设备视频流，请重连后再试。");
       return;
     }
     frameReceived();
@@ -534,7 +531,7 @@ export function createDeviceStreamClient(
     if (platform === "ios") fallBackToMjpeg();
     else {
       closeDecoder();
-      connecting("Video decoder restarted.");
+      connecting("视频解码器已重启。");
       requestKeyframe();
     }
   };
@@ -578,7 +575,7 @@ export function createDeviceStreamClient(
     const support = await VideoDecoder.isConfigSupported(full).catch(() => ({ supported: false }));
     if (!isCurrent() || epoch !== decoderEpoch) return false;
     if (!support.supported) {
-      if (platform === "android") fail(`This browser cannot decode ${config.codec}.`);
+      if (platform === "android") fail(`此浏览器无法解码 ${config.codec}。`);
       return false;
     }
     try {
@@ -586,7 +583,7 @@ export function createDeviceStreamClient(
       videoDecoder.configure(full);
       return true;
     } catch (cause) {
-      if (platform === "android") fail(`Video decoder: ${(cause as Error).message}`);
+      if (platform === "android") fail(`视频解码器：${(cause as Error).message}`);
       return false;
     }
   };
@@ -670,7 +667,7 @@ export function createDeviceStreamClient(
       if (response.status === 401 || response.status === 403) return handleUnauthorized();
       if (target.panelId && [400, 404, 405, 410].includes(response.status)) {
         await response.body?.cancel();
-        setStatus("error", "This Device Hub does not provide fixed Duo display feeds.");
+        setStatus("error", "此 Device Hub 不提供固定的 Duo 显示画面。");
         return;
       }
       if (!response.ok || !response.body) throw new Error(`stream ${response.status}`);
@@ -679,7 +676,7 @@ export function createDeviceStreamClient(
         // An AVCC body can stay open after its helper stops producing frames.
         const timer = setTimeout(() => {
           if (!isCurrent()) return;
-          retryDetail = "Device stream stopped receiving video. Reconnecting…";
+          retryDetail = "设备视频流中断，正在重连…";
           videoController.abort();
         }, FIRST_FRAME_TIMEOUT_MS);
         videoReadTimer = timer;
@@ -721,7 +718,7 @@ export function createDeviceStreamClient(
                 if (target.videoOnly)
                   setStatus(
                     "error",
-                    `This browser cannot decode the Duo panel's ${avcCodecString(chunk.payload)} stream.`,
+                    `此浏览器无法解码 Duo 面板的 ${avcCodecString(chunk.payload)} 视频流。`,
                   );
                 else fallBackToMjpeg();
                 return;
@@ -738,7 +735,7 @@ export function createDeviceStreamClient(
     } catch (cause) {
       if (!isCurrent()) return;
       retryDetail ??= videoController.signal.aborted
-        ? "Video decoder fell behind. Reconnecting…"
+        ? "视频解码进度落后，正在重连…"
         : (cause as Error).message;
     }
     if (isCurrent()) {
@@ -844,7 +841,7 @@ export function createDeviceStreamClient(
             iosInputUnavailable = config.value.inputUnavailable === true;
             events.onInputConnected(
               iosInputAdmitted && !iosInputUnavailable,
-              iosInputUnavailable ? "Simulator input is unavailable" : undefined,
+              iosInputUnavailable ? "模拟器输入不可用" : undefined,
             );
             const previous = screen;
             screen = config.value;
@@ -887,7 +884,7 @@ export function createDeviceStreamClient(
       if (stopped) return;
       events.onInputConnected(
         false,
-        event.reason || (event.code === 1006 ? "input socket refused" : `closed ${event.code}`),
+        event.reason || (event.code === 1006 ? "输入连接被拒绝" : `已关闭 ${event.code}`),
       );
       // A rejected HTTP upgrade surfaces as 1006, including an expired stream ticket.
       if (
@@ -958,7 +955,7 @@ export function createDeviceStreamClient(
       socket = null;
       closeDecoder();
       if (stopped) return;
-      events.onInputConnected(false, event.reason || `closed ${event.code}`);
+      events.onInputConnected(false, event.reason || `已关闭 ${event.code}`);
       if (
         event.code === 1008 ||
         event.code === 4401 ||
@@ -987,7 +984,7 @@ export function createDeviceStreamClient(
     } else if (useWebCodecs) {
       connectAndroid();
     } else {
-      fail("This browser cannot decode the Android stream (WebCodecs unavailable).");
+      fail("此浏览器无法解码 Android 视频流（不支持 WebCodecs）。");
     }
   };
 

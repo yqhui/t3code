@@ -108,13 +108,13 @@ function summaryWindows(summary: typeof Summary.Type) {
       const family = bucket.bucketId.startsWith("gemini-")
         ? "Gemini"
         : bucket.bucketId.startsWith("3p-")
-          ? "Claude & GPT (shared)"
+          ? "Claude 与 GPT（共享）"
           : group.displayName?.trim() || bucket.bucketId;
       const weekly = bucket.window === "weekly";
       const session = bucket.window === "5h";
       const window = quotaWindow(
         bucket.bucketId,
-        `${family} · ${weekly ? "Weekly" : session ? "5-hour" : bucket.displayName?.trim() || "Quota"}`,
+        `${family} · ${weekly ? "每周" : session ? "5 小时" : bucket.displayName?.trim() || "配额"}`,
         bucket,
         weekly ? "weekly" : session ? "session" : "other",
         weekly ? 7 * 24 * 60 : session ? 5 * 60 : undefined,
@@ -145,7 +145,7 @@ function modelWindows(models: typeof Models.Type) {
       if (!quota) continue;
       const window = quotaWindow(
         `${family.toLowerCase()}-${suffix}`,
-        `${family} · ${suffix === "weekly" ? "Weekly" : "Reported quota"}`,
+        `${family} · ${suffix === "weekly" ? "每周" : "上报配额"}`,
         quota,
         suffix === "weekly" ? "weekly" : "other",
         suffix === "weekly" ? 7 * 24 * 60 : undefined,
@@ -202,7 +202,7 @@ export const makeAntigravityUsageProbe = Effect.fn("makeAntigravityUsageProbe")(
       return makeUnavailableUsageLimits({
         checkedAt,
         reason: "unsupported",
-        message: "Sign in with Google to see Antigravity limits.",
+        message: "登录 Google 后才能查看 Antigravity 限额。",
       });
     }
     const token = yield* fs.readFileString(tokenPath).pipe(Effect.flatMap(decodeTokenFile));
@@ -281,7 +281,7 @@ export const makeAntigravityUsageProbe = Effect.fn("makeAntigravityUsageProbe")(
       return makeUnavailableUsageLimits({
         checkedAt,
         reason: "probeFailed",
-        message: "Antigravity did not return usable quota information.",
+        message: "Antigravity 未返回可用的配额信息。",
       });
     }
     return { ...makeUsageLimits({ checkedAt, windows }), credentialFingerprint: account };
@@ -293,7 +293,7 @@ export const makeAntigravityUsageProbe = Effect.fn("makeAntigravityUsageProbe")(
         return makeUnavailableUsageLimits({
           checkedAt: DateTime.formatIso(yield* DateTime.now),
           reason: "probeFailed",
-          message: "Could not read Antigravity limits. Refresh provider status to retry.",
+          message: "无法读取 Antigravity 限额。请刷新提供商状态后重试。",
         });
       }),
     ),

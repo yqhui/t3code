@@ -17,18 +17,17 @@ export const SecretRequestAnswerInput = Schema.Struct({
 export type SecretRequestAnswerInput = typeof SecretRequestAnswerInput.Type;
 
 const SECRET_REQUEST_FAILURE_MESSAGES = {
-  load_failed: "Could not load the secret request.",
-  not_found: "This secret request no longer exists.",
-  already_answered: "This secret request was already answered.",
-  agent_stopped: "The agent that asked has stopped, so this secret can't be used.",
-  store_failed: "Could not store the secret.",
-  record_failed: "Saved the secret, but could not update the request.",
-  invalid_ref: "That secretRef is not valid.",
-  read_failed: "Could not read the secret.",
-  ref_unavailable:
-    "That secretRef was already used or does not exist. Ask the user again with request_secret.",
-  ref_expired: "That secretRef expired. Ask the user again with request_secret.",
-  consume_failed: "Could not use that secretRef. Try again.",
+  load_failed: "无法加载密钥请求。",
+  not_found: "该密钥请求已不存在。",
+  already_answered: "该密钥请求已被回答。",
+  agent_stopped: "发起请求的 Agent 已停止，该密钥无法使用。",
+  store_failed: "无法存储密钥。",
+  record_failed: "密钥已保存，但无法更新请求。",
+  invalid_ref: "该 secretRef 无效。",
+  read_failed: "无法读取密钥。",
+  ref_unavailable: "该 secretRef 已被使用或不存在。请通过 request_secret 再次向用户请求。",
+  ref_expired: "该 secretRef 已过期。请通过 request_secret 再次向用户请求。",
+  consume_failed: "无法使用该 secretRef，请重试。",
 } as const;
 
 export const SecretRequestFailureReason = Schema.Literals(

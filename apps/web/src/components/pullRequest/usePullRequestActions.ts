@@ -78,50 +78,45 @@ export function usePullRequestDefaultMergeMethodResolver(
 }
 
 const ACTION_SUCCESS_LABELS: Record<PullRequestAction, string> = {
-  merge: "Merge requested",
-  ready: "Marked ready for review",
-  draft: "Converted to draft",
-  close: "Pull request closed",
-  reopen: "Pull request reopened",
-  "update-branch": "Branch updated with the base branch",
-  "enable-auto-merge": "Auto-merge enabled",
-  "disable-auto-merge": "Auto-merge disabled",
-  revert: "Revert pull request opened",
-  "approve-workflows": "Workflows approved",
+  merge: "已请求合并",
+  ready: "已标记为可审查",
+  draft: "已转为草稿",
+  close: "拉取请求已关闭",
+  reopen: "拉取请求已重新打开",
+  "update-branch": "分支已同步基础分支",
+  "enable-auto-merge": "自动合并已启用",
+  "disable-auto-merge": "自动合并已禁用",
+  revert: "回退拉取请求已打开",
+  "approve-workflows": "工作流已批准",
 };
 
 /** Said as the thing that did not happen, rather than as the operation that returned an error. */
 const ACTION_FAILURE_LABELS: Record<PullRequestAction, string> = {
-  merge: "Could not merge this pull request",
-  ready: "Could not mark this ready for review",
-  draft: "Could not convert this to a draft",
-  close: "Could not close this pull request",
-  reopen: "Could not reopen this pull request",
-  "update-branch": "Could not update this branch",
-  "enable-auto-merge": "Could not enable auto-merge",
-  "disable-auto-merge": "Could not disable auto-merge",
-  revert: "Could not open a revert pull request",
-  "approve-workflows": "Could not approve workflows",
+  merge: "无法合并此拉取请求",
+  ready: "无法标记为可审查",
+  draft: "无法转为草稿",
+  close: "无法关闭此拉取请求",
+  reopen: "无法重新打开此拉取请求",
+  "update-branch": "无法更新此分支",
+  "enable-auto-merge": "无法启用自动合并",
+  "disable-auto-merge": "无法禁用自动合并",
+  revert: "无法打开回退拉取请求",
+  "approve-workflows": "无法批准工作流",
 };
 
 /** What to try, for the times the host says only that it refused. */
 const ACTION_FAILURE_HINTS: Record<PullRequestAction, string> = {
-  merge:
-    "The host refused the merge. Check that you have write access, that the checks it requires have passed, and that the branch is not conflicting.",
-  ready: "The host refused it. Check that you have write access to this repository.",
-  draft: "The host refused it. Check that you have write access to this repository.",
-  close: "The host refused it. Check that you have write access, or that you opened it.",
-  reopen:
-    "The host refused it. Check that you have write access, and that the branch still exists.",
-  "update-branch":
-    "The host refused it. Check that you have write access, and that the base branch has not diverged in a way the host cannot merge.",
-  "enable-auto-merge":
-    "The host refused it. Check that auto-merge is enabled for this repository and that you have write access.",
-  "disable-auto-merge": "The host refused it. Check that you have write access to this repository.",
-  revert:
-    "The host refused it. Check that you have write access and that this pull request was merged on the host.",
+  merge: "主机拒绝了合并。请确认你有写入权限，所需检查已通过，且分支没有冲突。",
+  ready: "主机拒绝了请求。请确认你有此仓库的写入权限。",
+  draft: "主机拒绝了请求。请确认你有此仓库的写入权限。",
+  close: "主机拒绝了请求。请确认你有写入权限，或该请求由你创建。",
+  reopen: "主机拒绝了请求。请确认你有写入权限，且分支仍存在。",
+  "update-branch": "主机拒绝了请求。请确认你有写入权限，且基础分支未发生主机无法合并的分叉。",
+  "enable-auto-merge": "主机拒绝了请求。请确认此仓库已启用自动合并，且你有写入权限。",
+  "disable-auto-merge": "主机拒绝了请求。请确认你有此仓库的写入权限。",
+  revert: "主机拒绝了请求。请确认你有写入权限，且此拉取请求已在主机上合并。",
   "approve-workflows":
-    "The host refused it. Check that you have Actions write access and that these workflow runs are still awaiting approval.",
+    "主机拒绝了请求。请确认你有 Actions 写入权限，且这些工作流运行仍在等待批准。",
 };
 
 /**
@@ -225,8 +220,8 @@ export function usePullRequestCloseBatch(onClosed: (entry: EnvironmentPullReques
         type: failures.length > 0 ? "error" : "success",
         title:
           failures.length > 0
-            ? `Closed ${closed} of ${batch.length} pull requests`
-            : `Closed ${closed} pull request${closed === 1 ? "" : "s"}`,
+            ? `${batch.length} 个拉取请求中已关闭 ${closed} 个`
+            : `已关闭 ${closed} 个拉取请求${closed === 1 ? "" : ""}`,
         ...(failures.length > 0 ? { description: failures.slice(0, 3).join("\n") } : {}),
       });
     },
@@ -329,20 +324,20 @@ export function usePullRequestHandoffs({
     if (opened === null) {
       toastManager.add({
         type: "error",
-        title: "Could not open a thread",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法打开会话",
+        description: "请从项目中重试，或先打开会话。",
       });
       return;
     }
     toastManager.add({
       type: "success",
-      title: "Asked in a thread",
+      title: "已在会话中提问",
       // "Ask" leaves the composer empty on purpose, so saying the question is in it would send
       // the reader looking for something that is not there. The chips are what landed.
       description:
         task.prompt.length > 0
-          ? "The question is in the composer — read it over, then send."
-          : "The pull request is in the composer — type your question, then send.",
+          ? "问题已放入输入框 — 请阅读后发送。"
+          : "拉取请求已放入输入框 — 请输入问题后发送。",
     });
   };
 
@@ -364,7 +359,7 @@ export function usePullRequestHandoffs({
     // never expires, and an explicit one would survive the update and pin the result on screen.
     const toastId = toastManager.add({
       type: "loading",
-      title: "Preparing the pull request checkout...",
+      title: "正在准备拉取请求检出…",
     });
     const projectRef = scopeProjectRef(environmentId, detail.projectId);
     // The thread is opened before the checkout rather than after it, because the project's setup
@@ -381,8 +376,8 @@ export function usePullRequestHandoffs({
       // working tree than to prepare a worktree nobody asked for.
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not open a thread for the checkout",
-        description: "Try again from the project, or open a thread first.",
+        title: "无法为检出打开会话",
+        description: "请从项目中重试，或先打开会话。",
       });
       return;
     }
@@ -399,7 +394,7 @@ export function usePullRequestHandoffs({
         prepareThread.error instanceof Error ? prepareThread.error.message : null;
       toastManager.update(toastId, {
         type: "error",
-        title: "Could not prepare the pull request checkout",
+        title: "无法准备拉取请求检出",
         ...(detailMessage ? { description: detailMessage } : {}),
       });
       return;
@@ -421,8 +416,8 @@ export function usePullRequestHandoffs({
       // outcome worth stopping for, since it reads as success and is not.
       toastManager.update(toastId, {
         type: "error",
-        title: "Checked out, but the thread stayed where it was",
-        description: `The checkout is ready on \`${prepared.value.branch}\`. Point a thread at it from the branch picker, then ask again.`,
+        title: "已检出，但会话仍在原位置",
+        description: `已在 \`${prepared.value.branch}\` 上准备好检出。请通过分支选择器将会话指向它，再重新提问。`,
       });
       return;
     }
@@ -434,9 +429,9 @@ export function usePullRequestHandoffs({
     // success, because everything else about the handoff did happen.
     const staleCheckoutToast = {
       type: "warning",
-      title: "Checked out, but not on the latest commits",
+      title: "已检出，但不是最新 Commit",
       description:
-        "The checkout could not be moved onto the pull request's latest commits, so the code there is older than the pull request. Uncommitted work or local commits keep it where it is.",
+        "无法将检出更新到拉取请求的最新 Commit，因此其中的代码较旧。未提交的更改或本地 Commit 阻止了更新。",
     } as const;
     if (task === null) {
       toastManager.update(
@@ -444,11 +439,11 @@ export function usePullRequestHandoffs({
         prepared.value.isOnPullRequestHead
           ? {
               type: "success",
-              title: mode === "local" ? "Checked out here" : "Checked out",
+              title: mode === "local" ? "已在此处检出" : "已检出",
               description:
                 mode === "local"
-                  ? "This repository is on the pull request's branch, with a thread open on it."
-                  : "The pull request is in its own worktree, with a thread open on it.",
+                  ? "此仓库已切换到拉取请求的分支，并打开了对应会话。"
+                  : "拉取请求位于独立 Worktree 中，并已打开对应会话。",
             }
           : staleCheckoutToast,
       );
@@ -460,8 +455,8 @@ export function usePullRequestHandoffs({
       prepared.value.isOnPullRequestHead
         ? {
             type: "success",
-            title: "Checkout ready",
-            description: "The task is in the composer — read it over, then send.",
+            title: "检出已就绪",
+            description: "任务已放入输入框 — 请阅读后发送。",
           }
         : staleCheckoutToast,
     );

@@ -1,39 +1,34 @@
 const legacyFailures = {
   subscription_sharing_v2_user_not_eligible: {
-    message:
-      "ChatGPT sharing is unavailable for this account or workspace. Use another provider or check its sharing policy.",
+    message: "此账户或工作区无法使用 ChatGPT 共享。请使用其他提供商，或检查共享策略。",
     revoke: false,
   },
   subscription_sharing_usage_limit_exceeded: {
-    message:
-      "Your ChatGPT usage limit was reached. Check ChatGPT Usage settings for your available allowance.",
+    message: "已达到 ChatGPT 用量限额。请在 ChatGPT 用量设置中查看可用额度。",
     revoke: false,
   },
   subscription_sharing_usage_unavailable: {
-    message: "ChatGPT usage is temporarily unavailable. Try again shortly.",
+    message: "ChatGPT 用量暂时不可用，请稍后重试。",
     revoke: false,
   },
   subscription_sharing_unsupported_capability: {
-    message:
-      "Codex used a feature that ChatGPT sharing does not support. Use another provider for this request.",
+    message: "Codex 使用了 ChatGPT 共享不支持的功能。请使用其他提供商处理此请求。",
     revoke: false,
   },
   subscription_sharing_v2_client_not_enabled: {
-    message:
-      "This app is not enabled for this ChatGPT connection. Use your existing CLI or another provider.",
+    message: "此 ChatGPT 连接未启用本应用。请使用现有 CLI 或其他提供商。",
     revoke: false,
   },
   subscription_sharing_v2_route_not_supported: {
-    message: "ChatGPT does not support this request route.",
+    message: "ChatGPT 不支持此请求路由。",
     revoke: false,
   },
   subscription_sharing_v2_invalid_user: {
-    message:
-      "ChatGPT could not validate this connection. Check the selected account and sharing permissions.",
+    message: "ChatGPT 无法验证此连接。请检查所选账户和共享权限。",
     revoke: false,
   },
   subscription_sharing_v2_user_unavailable: {
-    message: "ChatGPT is temporarily unavailable. Try again shortly.",
+    message: "ChatGPT 暂时不可用，请稍后重试。",
     revoke: false,
   },
 } as const;
@@ -45,13 +40,11 @@ const failures = {
   subscription_sharing_invalid_user: legacyFailures.subscription_sharing_v2_invalid_user,
   subscription_sharing_user_unavailable: legacyFailures.subscription_sharing_v2_user_unavailable,
   chatpass_v2_scope_not_authorized: {
-    message:
-      "This ChatGPT grant does not authorize the request. Check the connection's sharing permissions.",
+    message: "此 ChatGPT 授权不允许该请求。请检查连接的共享权限。",
     revoke: false,
   },
   chatpass_v2_invalid_authorization_context: {
-    message:
-      "ChatGPT could not authorize this connection. Check the client and sharing permissions.",
+    message: "ChatGPT 无法授权此连接。请检查客户端和共享权限。",
     revoke: false,
   },
 };
@@ -70,15 +63,13 @@ export function classifyCodexManagedError(value: unknown) {
         return {
           ...failure,
           code,
-          message:
-            "Codex sent a tool namespace that ChatGPT sharing does not support. Use another provider for this request.",
+          message: "Codex 发送了 ChatGPT 共享不支持的工具命名空间。请使用其他提供商处理此请求。",
         };
       if (text.includes("additional_tools"))
         return {
           ...failure,
           code,
-          message:
-            "Codex sent an input item that ChatGPT sharing does not support. Use another provider for this request.",
+          message: "Codex 发送了 ChatGPT 共享不支持的输入项。请使用其他提供商处理此请求。",
         };
     }
     return { ...failure, code };

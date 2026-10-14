@@ -39,10 +39,10 @@ export interface DescriptorPreset {
 }
 
 const EFFORT_CHOICES = [
-  { id: "low", label: "Low" },
-  { id: "medium", label: "Medium", isDefault: true },
-  { id: "high", label: "High" },
-  { id: "xhigh", label: "Extra High" },
+  { id: "low", label: "低" },
+  { id: "medium", label: "中", isDefault: true },
+  { id: "high", label: "高" },
+  { id: "xhigh", label: "极高" },
 ] as const;
 
 /**
@@ -54,66 +54,66 @@ export const DESCRIPTOR_PRESETS_BY_KIND: Partial<
   Record<ProviderDriverKind, ReadonlyArray<DescriptorPreset>>
 > = {
   [ProviderDriverKind.make("codex")]: [
-    { id: "reasoningEffort", label: "Reasoning", type: "select", choices: EFFORT_CHOICES },
+    { id: "reasoningEffort", label: "推理", type: "select", choices: EFFORT_CHOICES },
     {
       id: "serviceTier",
-      label: "Speed",
+      label: "速度",
       type: "select",
       choices: [
-        { id: "default", label: "Standard", isDefault: true },
-        { id: "fast", label: "Fast" },
+        { id: "default", label: "标准", isDefault: true },
+        { id: "fast", label: "快速" },
       ],
     },
   ],
   [ProviderDriverKind.make("claudeAgent")]: [
     {
       id: "effort",
-      label: "Reasoning",
+      label: "推理",
       type: "select",
       choices: [
-        { id: "low", label: "Low" },
-        { id: "medium", label: "Medium" },
-        { id: "high", label: "High", isDefault: true },
-        { id: "xhigh", label: "Extra High" },
-        { id: "max", label: "Max" },
+        { id: "low", label: "低" },
+        { id: "medium", label: "中" },
+        { id: "high", label: "高", isDefault: true },
+        { id: "xhigh", label: "极高" },
+        { id: "max", label: "最高" },
       ],
     },
-    { id: "fastMode", label: "Fast Mode", type: "boolean" },
-    { id: "thinking", label: "Thinking", type: "boolean" },
+    { id: "fastMode", label: "快速模式", type: "boolean" },
+    { id: "thinking", label: "思考", type: "boolean" },
   ],
   [ProviderDriverKind.make("cursor")]: [
-    { id: "reasoning", label: "Reasoning", type: "select", choices: EFFORT_CHOICES },
-    { id: "fastMode", label: "Fast Mode", type: "boolean" },
-    { id: "thinking", label: "Thinking", type: "boolean" },
+    { id: "reasoning", label: "推理", type: "select", choices: EFFORT_CHOICES },
+    { id: "fastMode", label: "快速模式", type: "boolean" },
+    { id: "thinking", label: "思考", type: "boolean" },
   ],
   [ProviderDriverKind.make("grok")]: [
-    { id: "reasoningEffort", label: "Reasoning", type: "select", choices: EFFORT_CHOICES },
+    { id: "reasoningEffort", label: "推理", type: "select", choices: EFFORT_CHOICES },
   ],
   [ProviderDriverKind.make("pi")]: [
     {
       id: "thinking",
-      label: "Thinking",
+      label: "思考",
       type: "select",
       choices: [
-        { id: "off", label: "Off" },
-        { id: "minimal", label: "Minimal" },
-        { id: "low", label: "Low" },
-        { id: "medium", label: "Medium", isDefault: true },
-        { id: "high", label: "High" },
-        { id: "xhigh", label: "Extra High" },
-        { id: "max", label: "Max" },
+        { id: "off", label: "关闭" },
+        { id: "minimal", label: "最低" },
+        { id: "low", label: "低" },
+        { id: "medium", label: "中", isDefault: true },
+        { id: "high", label: "高" },
+        { id: "xhigh", label: "极高" },
+        { id: "max", label: "最高" },
       ],
     },
   ],
   [ProviderDriverKind.make("opencode")]: [
-    { id: "variant", label: "Reasoning", type: "select", choices: EFFORT_CHOICES },
+    { id: "variant", label: "推理", type: "select", choices: EFFORT_CHOICES },
     {
       id: "agent",
       label: "Agent",
       type: "select",
       choices: [
-        { id: "build", label: "Build", isDefault: true },
-        { id: "plan", label: "Plan" },
+        { id: "build", label: "构建", isDefault: true },
+        { id: "plan", label: "规划" },
       ],
     },
   ],
@@ -211,20 +211,20 @@ export function descriptorsFromCapabilities(
 export function validateDraft(draft: CustomModelDraft): string | null {
   const seenIds = new Set<string>();
   for (const [index, descriptor] of draft.descriptors.entries()) {
-    const position = `Option ${index + 1}`;
+    const position = `选项 ${index + 1}`;
     const id = descriptor.id.trim();
-    if (!id) return `${position} needs an id.`;
-    if (seenIds.has(id)) return `${position}: id "${id}" is used twice.`;
+    if (!id) return `${position} 需要 ID。`;
+    if (seenIds.has(id)) return `${position}：ID「${id}」重复。`;
     seenIds.add(id);
-    if (!descriptor.label.trim()) return `${position} needs a label.`;
+    if (!descriptor.label.trim()) return `${position} 需要标签。`;
     if (descriptor.type !== "select") continue;
-    if (descriptor.choices.length === 0) return `${position} needs at least one choice.`;
+    if (descriptor.choices.length === 0) return `${position} 至少需要一个候选项。`;
     const seenChoices = new Set<string>();
     for (const choice of descriptor.choices) {
       const choiceId = choice.id.trim();
-      if (!choiceId) return `${position} has a choice without a value.`;
+      if (!choiceId) return `${position} 有一个候选项未填写值。`;
       if (seenChoices.has(choiceId)) {
-        return `${position}: choice "${choiceId}" is used twice.`;
+        return `${position}：候选值「${choiceId}」重复。`;
       }
       seenChoices.add(choiceId);
     }

@@ -108,11 +108,11 @@ export function whenAstToExpression(node: KeybindingWhenNode | undefined): strin
 }
 
 export function whenNodeRemoveLabel(node: KeybindingWhenNode, depth: number): string {
-  if (depth === 0) return "Clear all conditions";
+  if (depth === 0) return "清除所有条件";
   if (node.type === "identifier" || (node.type === "not" && node.node.type === "identifier")) {
-    return "Remove condition";
+    return "移除条件";
   }
-  return "Remove group and its conditions";
+  return "移除分组及其条件";
 }
 
 function wrapWhenExpression(node: KeybindingWhenNode): string {
@@ -130,7 +130,7 @@ export function parseWhenExpressionDraft(
   if (!ast) {
     return {
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: "可使用变量、!、&&、|| 和括号。",
     };
   }
 
@@ -211,17 +211,17 @@ export interface KeybindingGroup {
 const KEYBINDING_GROUPS = [
   {
     id: "navigation",
-    title: "Navigation",
+    title: "导航",
     prefixes: ["sidebar", "rightPanel", "commandPalette", "filePicker", "projectSearch", "editor"],
   },
-  { id: "threads", title: "Threads", prefixes: ["thread", "chat", "pullRequest"] },
-  { id: "composer", title: "Composer", prefixes: ["composer", "modelPicker"] },
-  { id: "terminal", title: "Terminal", prefixes: ["terminal"] },
-  { id: "preview", title: "Preview & diff", prefixes: ["preview", "diff"] },
-  { id: "appearance", title: "Appearance", prefixes: ["theme", "appearance", "themeEditor"] },
-  { id: "scripts", title: "Project scripts", prefixes: ["script"] },
+  { id: "threads", title: "会话", prefixes: ["thread", "chat", "pullRequest"] },
+  { id: "composer", title: "输入框", prefixes: ["composer", "modelPicker"] },
+  { id: "terminal", title: "终端", prefixes: ["terminal"] },
+  { id: "preview", title: "预览与 Diff", prefixes: ["preview", "diff"] },
+  { id: "appearance", title: "外观", prefixes: ["theme", "appearance", "themeEditor"] },
+  { id: "scripts", title: "项目脚本", prefixes: ["script"] },
 ] as const;
-const OTHER_KEYBINDING_GROUP = { id: "other", title: "Other" } as const;
+const OTHER_KEYBINDING_GROUP = { id: "other", title: "其他" } as const;
 
 function keybindingGroupFor(command: KeybindingCommand): { id: string; title: string } {
   const prefix = String(command).split(".")[0] ?? "";
@@ -358,22 +358,80 @@ export function buildKeybindingCommandOptions(
   return [...commands].toSorted((left, right) => compareCommands(left, right, commandLabel));
 }
 
+const COMMAND_LABELS: Partial<Record<KeybindingCommand, string>> = {
+  "sidebar.toggle": "侧栏：切换",
+  "navigation.back": "导航：后退",
+  "navigation.forward": "导航：前进",
+  "terminal.toggle": "终端：切换",
+  "terminal.split": "终端：拆分",
+  "terminal.splitVertical": "终端：垂直拆分",
+  "terminal.new": "终端：新建",
+  "terminal.close": "终端：关闭",
+  "rightPanel.toggle": "右侧面板：切换",
+  "rightPanel.new": "右侧面板：新建",
+  "rightPanel.toggleMaximized": "右侧面板：切换最大化",
+  "rightPanel.close": "右侧面板：关闭",
+  "threadPanel.toggle": "会话面板：切换",
+  "pullRequest.copyNumber": "拉取请求：复制编号",
+  "diff.toggle": "Diff：切换",
+  "preview.toggle": "预览：切换",
+  "preview.refresh": "预览：刷新",
+  "preview.zoomIn": "预览：放大",
+  "preview.zoomOut": "预览：缩小",
+  "preview.resetZoom": "预览：重置缩放",
+  "commandPalette.toggle": "命令面板：切换",
+  "filePicker.toggle": "文件选择器：切换",
+  "projectSearch.toggle": "项目搜索：切换",
+  "usage.open": "用量：打开",
+  "theme.select": "主题：选择",
+  "appearance.cycle": "外观：循环切换",
+  "themeEditor.toggle": "主题编辑器：切换",
+  "composer.stash": "输入框：暂存",
+  "composer.host": "输入框：选择主机",
+  "composer.cycleHost": "输入框：循环切换主机",
+  "composer.effort": "输入框：推理强度",
+  "composer.mode": "输入框：模式",
+  "composer.workspace": "输入框：工作区",
+  "composer.previousWorktree": "输入框：上一个 Worktree",
+  "composer.branch": "输入框：分支",
+  "chat.new": "对话：新建",
+  "chat.newLocal": "对话：新建本地会话",
+  "chat.newWithoutProject": "对话：新建无项目会话",
+  "chat.find": "对话：查找",
+  "editor.openFavorite": "编辑器：打开收藏",
+  "modelPicker.toggle": "模型选择器：切换",
+  "modelPicker.previousProvider": "模型选择器：上一个提供商",
+  "modelPicker.nextProvider": "模型选择器：下一个提供商",
+  "thread.stop": "会话：停止",
+  "thread.previous": "会话：上一个",
+  "thread.next": "会话：下一个",
+  "thread.settle": "会话：标记为已处理",
+  "thread.pin": "会话：置顶",
+  "thread.undo": "会话：撤销",
+};
+
 export function commandLabel(command: KeybindingCommand): string {
-  if (command === "composer.sendAlternate") return "Composer: Opposite Queue or Steer Action";
-  if (command === "composer.sendBackground") return "Composer: Start in Background";
-  if (command === "composer.sendAndNewThread") return "Composer: Send and Start New Thread";
-  if (command === "thread.steerQueuedMessage") return "Queue: Send First Queued Message as Steer";
-  if (command === "thread.editQueuedMessage") return "Queue: Edit Last Queued Message";
-  if (command === "thread.copyReference") return "Pull Request: Copy Link or Thread ID";
+  const label = COMMAND_LABELS[command];
+  if (label) return label;
+  if (command.startsWith("thread.jump."))
+    return `会话：跳转到 ${command.slice("thread.jump.".length)}`;
+  if (command.startsWith("modelPicker.jump."))
+    return `模型选择器：跳转到 ${command.slice("modelPicker.jump.".length)}`;
+  if (command === "composer.sendAlternate") return "输入框：切换排队或引导行为";
+  if (command === "composer.sendBackground") return "输入框：在后台启动";
+  if (command === "composer.sendAndNewThread") return "输入框：发送并新建会话";
+  if (command === "thread.steerQueuedMessage") return "队列：发送首条排队消息以引导运行";
+  if (command === "thread.editQueuedMessage") return "队列：编辑最后一条排队消息";
+  if (command === "thread.copyReference") return "拉取请求：复制链接或会话 ID";
   const usageMetric = METRIC_OPTIONS.find((option) => option.command === command);
-  if (usageMetric) return `Usage: ${usageMetric.label}`;
+  if (usageMetric) return `用量：${usageMetric.label}`;
   const usagePeriod = WINDOW_OPTIONS.find((option) => option.command === command);
-  if (usagePeriod) return `Usage: Period: ${usagePeriod.label}`;
-  if (command === "view.reopenClosed") return "Reopen Closed Tab";
-  if (command === "preview.focusUrl") return "Preview: Focus URL";
+  if (usagePeriod) return `用量：周期：${usagePeriod.label}`;
+  if (command === "view.reopenClosed") return "重新打开已关闭的标签页";
+  if (command === "preview.focusUrl") return "预览：聚焦 URL";
   const raw = String(command);
   if (raw.startsWith("script.") && raw.endsWith(".run")) {
-    return `Run Script: ${titleCaseCommandSegment(raw.slice("script.".length, -".run".length))}`;
+    return `运行脚本：${titleCaseCommandSegment(raw.slice("script.".length, -".run".length))}`;
   }
   return raw.split(".").map(titleCaseCommandSegment).join(": ");
 }

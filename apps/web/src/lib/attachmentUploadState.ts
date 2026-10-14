@@ -45,12 +45,10 @@ export function attachmentUploadBlockReason(input: {
   }
 
   if (failed > 0) {
-    return failed === 1
-      ? "Retry or remove the failed attachment"
-      : "Retry or remove the failed attachments";
+    return failed === 1 ? "请重试或移除失败的附件" : "请重试或移除失败的附件";
   }
   if (pending > 0) {
-    return pending === 1 ? "Attachment still uploading" : "Attachments still uploading";
+    return pending === 1 ? "附件正在上传中" : "附件正在上传中";
   }
   return null;
 }

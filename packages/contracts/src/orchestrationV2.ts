@@ -1322,7 +1322,7 @@ export class OrchestrationV2CheckpointUnavailableError extends Schema.TaggedErro
   },
 ) {
   override get message(): string {
-    return `Rollback target ${this.target} is unavailable for thread ${this.threadId}.`;
+    return `会话 ${this.threadId} 的回退目标 ${this.target} 不可用。`;
   }
 }
 
@@ -3568,13 +3568,13 @@ export class OrchestrationV2StopWorkflowError extends Schema.TaggedError<Orchest
   override get message(): string {
     switch (this.reason) {
       case "not-running":
-        return "This workflow is no longer running.";
+        return "该工作流已不再运行。";
       case "unsupported":
-        return "This provider cannot stop a workflow.";
+        return "此提供商无法停止工作流。";
       case "unavailable":
-        return "This workflow has no live provider task.";
+        return "该工作流没有正在运行的提供商任务。";
       case "stop-failed":
-        return "Failed to stop the workflow.";
+        return "停止工作流失败。";
     }
   }
 }
@@ -3742,7 +3742,7 @@ export class OrchestrationV2SearchThreadError extends Schema.TaggedError<Orchest
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Could not search this thread. Please retry.";
+    return "无法搜索此会话，请重试。";
   }
 }
 

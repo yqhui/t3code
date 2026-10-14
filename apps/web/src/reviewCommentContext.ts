@@ -70,11 +70,11 @@ export function buildFileReviewComment(input: {
   return {
     id: input.id,
     sectionId: `file:${input.filePath}`,
-    sectionTitle: "File comment",
+    sectionTitle: "文件评论",
     filePath: input.filePath,
     startIndex: startLine - 1,
     endIndex: endLine - 1,
-    rangeLabel: startLine === endLine ? `L${startLine}` : `L${startLine} to L${endLine}`,
+    rangeLabel: startLine === endLine ? `L${startLine}` : `L${startLine} 至 L${endLine}`,
     text: input.text.trim(),
     diff: selectedLines.join("\n"),
     fenceLanguage: inferReviewCommentFenceLanguage(input.filePath),
@@ -386,7 +386,7 @@ function formatDiffReviewRangeLabel(lines: ReadonlyArray<DiffReviewLine>): strin
   const firstNumber = firstLine.newLineNumber ?? firstLine.oldLineNumber;
   const lastNumber = lastLine.newLineNumber ?? lastLine.oldLineNumber;
   if (firstNumber === null || lastNumber === null) {
-    return lines.length === 1 ? "line" : `${lines.length} lines`;
+    return lines.length === 1 ? "行" : `${lines.length} 行`;
   }
 
   const firstMarker = getDiffChangeMarker(firstLine.change).trim();

@@ -142,12 +142,12 @@ export function grokApprovalOptions(
         option.kind === kind && (optionId === undefined || option.optionId.trim() === optionId),
     );
   return [
-    { decision: "cancel", label: "Cancel" },
-    ...(has("reject_once") ? [{ decision: "decline", label: "Decline" } as const] : []),
+    { decision: "cancel", label: "取消" },
+    ...(has("reject_once") ? [{ decision: "decline", label: "拒绝" } as const] : []),
     ...(has("allow_always", GROK_ALLOW_EDITS_SESSION_OPTION_ID)
-      ? [{ decision: "acceptForSession", label: "Allow all edits this session" } as const]
+      ? [{ decision: "acceptForSession", label: "本会话内允许所有编辑" } as const]
       : []),
-    ...(has("allow_once") ? [{ decision: "accept", label: "Approve" } as const] : []),
+    ...(has("allow_once") ? [{ decision: "accept", label: "批准" } as const] : []),
   ];
 }
 

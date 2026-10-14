@@ -29,13 +29,13 @@ export function resolveEnvironmentIconPickerLock(input: {
   readonly operateAccess: "granted" | "denied" | "pending";
 }): string | null {
   if (input.serverConfig === null) {
-    return "Connect to this environment to change its icon.";
+    return "请连接此环境以更改图标。";
   }
   if (input.serverConfig.environment.capabilities.environmentIcon !== true) {
-    return "This environment's server is too old to keep an icon. Update it to choose one.";
+    return "此环境的服务器版本过旧，无法保存图标。请更新后选择图标。";
   }
   if (input.operateAccess !== "granted") {
-    return "Your session on this environment cannot change its settings.";
+    return "你在此环境中的会话无权更改其设置。";
   }
   return null;
 }
@@ -68,7 +68,7 @@ export function EnvironmentIconMenu({
     <MenuSub>
       <MenuSubTrigger>
         <EnvironmentMachineIcon kind={resolved} />
-        Icon
+        图标
       </MenuSubTrigger>
       <MenuSubPopup>
         {lock !== null ? (

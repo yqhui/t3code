@@ -166,7 +166,18 @@ export function SubagentTooltipContent(props: {
           )}
         >
           <StatusIcon aria-hidden className="size-3 shrink-0" />
-          {props.status.replaceAll("_", " ")}
+          {
+            {
+              idle: "空闲",
+              pending: "等待中",
+              running: "运行中",
+              completed: "已完成",
+              failed: "已失败",
+              cancelled: "已取消",
+              interrupted: "已中断",
+              waiting: "等待中",
+            }[props.status]
+          }
         </span>
         {props.elapsed}
       </div>
@@ -175,7 +186,15 @@ export function SubagentTooltipContent(props: {
         return (
           <div key={label} className="flex min-w-0 items-center gap-2">
             <Icon aria-hidden className="size-3 shrink-0" />
-            <span className="sr-only">{label}</span>
+            <span className="sr-only">
+              {label === "Branch"
+                ? "分支"
+                : label === "Project"
+                  ? "项目"
+                  : label === "Workspace"
+                    ? "工作区"
+                    : label}
+            </span>
             <MiddleTruncate value={value} className="flex" showTitle={false} />
           </div>
         );

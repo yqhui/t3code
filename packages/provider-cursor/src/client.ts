@@ -16,9 +16,9 @@ export const cursorClient = defineProviderClient({
   environmentFields: [
     {
       name: "CURSOR_API_KEY",
-      label: "Cursor API key",
-      description: "Optional. Overrides browser sign-in for this provider.",
-      placeholder: "Paste API key",
+      label: "Cursor API 密钥",
+      description: "可选。替代此提供商的浏览器登录。",
+      placeholder: "粘贴 API 密钥",
       sensitive: true,
     },
   ],

@@ -140,26 +140,22 @@ export const BrowserImportResult = Schema.Struct({
 export type BrowserImportResult = typeof BrowserImportResult.Type;
 
 const BROWSER_IMPORT_UNAVAILABLE_COPY: Readonly<Record<BrowserImportUnavailableReason, string>> = {
-  notInstalled: "Not installed on this machine.",
-  needsKeychainApproval: "Needs Keychain access to read its cookies.",
-  keychainItemMissing:
-    "No encryption key in your Keychain — sign in to that browser once, then retry.",
-  needsFullDiskAccess:
-    "Give T3 Code Full Disk Access in System Settings → Privacy & Security, then retry.",
-  browserRunning: "Quit the browser first so its cookie database can be read.",
-  unsupportedPlatform: "Importing from this browser isn't possible on this platform.",
+  notInstalled: "此机器上未安装。",
+  needsKeychainApproval: "需要访问钥匙串才能读取其 Cookie。",
+  keychainItemMissing: "钥匙串中没有加密密钥——请先在该浏览器中登录一次，然后重试。",
+  needsFullDiskAccess: "请在系统设置 → 隐私与安全性中授予 T3 Code 完全磁盘访问权限，然后重试。",
+  browserRunning: "请先退出该浏览器，以便读取其 Cookie 数据库。",
+  unsupportedPlatform: "此平台不支持从该浏览器导入。",
 };
 
 /** What to tell the user when an attempted import fails. */
 export const BROWSER_IMPORT_FAILURE_COPY: Readonly<Record<BrowserImportFailureReason, string>> = {
   ...BROWSER_IMPORT_UNAVAILABLE_COPY,
-  keychainUnavailable:
-    "The system keyring could not be accessed. Make sure your desktop keyring is running and unlocked, then retry.",
-  unknownSource: "That browser is no longer available to import from.",
-  unknownSourceProfile: "That browser profile no longer exists.",
-  sessionUnavailable: "The target profile could not be opened.",
-  profileNotSaved: "The cookies were imported, but the new profile couldn't be saved. Try again.",
-  profileLimitReached:
-    "You've reached the profile limit. Delete a profile or import into an existing one.",
-  readFailed: "The browser's cookie database could not be read.",
+  keychainUnavailable: "无法访问系统密钥环。请确保桌面密钥环正在运行且已解锁，然后重试。",
+  unknownSource: "该浏览器已无法导入。",
+  unknownSourceProfile: "该浏览器配置文件已不存在。",
+  sessionUnavailable: "无法打开目标配置文件。",
+  profileNotSaved: "Cookie 已导入，但无法保存新配置文件。请重试。",
+  profileLimitReached: "已达配置文件数量上限。请删除一个配置文件，或导入到现有配置文件中。",
+  readFailed: "无法读取该浏览器的 Cookie 数据库。",
 };

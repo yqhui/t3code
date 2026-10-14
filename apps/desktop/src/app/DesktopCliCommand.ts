@@ -129,12 +129,12 @@ export const make = Effect.gen(function* () {
     );
   const readUserPath = powershell({}).pipe(
     Effect.map((encoded) => Buffer.from(encoded.trim(), "base64").toString("utf8")),
-    Effect.mapError(() => fail("Could not read your PATH, so it was left unchanged.")),
+    Effect.mapError(() => fail("无法读取你的 PATH，已保持不变。")),
   );
   const writeUserPath = (value: string) =>
     powershell({ T3_SET: "1", T3_PATH: value }).pipe(
       Effect.asVoid,
-      Effect.mapError(() => fail("Could not update your PATH.")),
+      Effect.mapError(() => fail("无法更新你的 PATH。")),
     );
 
   /** The `t3` a new shell runs, by PATH order, or none. */
@@ -193,14 +193,14 @@ export const make = Effect.gen(function* () {
     Effect.provideService(FileSystem.FileSystem, fs),
     Effect.flatMap(
       Option.match({
-        onNone: () => Effect.fail(fail(`Could not set up the t3 launcher at ${launcher}.`)),
+        onNone: () => Effect.fail(fail(`无法在 ${launcher} 设置 t3 启动器。`)),
         onSome: () => Effect.void,
       }),
     ),
   );
 
   const install: DesktopCliCommand["Service"]["install"] = Effect.gen(function* () {
-    if (!environment.isPackaged) return yield* fail("The t3 command needs an installed app.");
+    if (!environment.isPackaged) return yield* fail("t3 命令需要已安装的应用。");
     yield* ensureLauncher;
     if (windows) {
       const entries = pathEntries(yield* readUserPath, ";");
@@ -208,7 +208,7 @@ export const make = Effect.gen(function* () {
         yield* writeUserPath([...entries, binDirectory].join(";"));
         yield* fs
           .writeFileString(ownedPathMarker, `${binDirectory}\n`)
-          .pipe(Effect.mapError(() => fail("Added t3 to your PATH but could not record it.")));
+          .pipe(Effect.mapError(() => fail("已将 t3 添加到你的 PATH，但无法记录该更改。")));
       }
       return yield* state;
     }
@@ -219,13 +219,13 @@ export const make = Effect.gen(function* () {
       // A link to a previous T3 home's launcher: point it at this one instead.
       yield* fs
         .remove(existing.value)
-        .pipe(Effect.mapError(() => fail(`Could not replace ${existing.value}.`)));
+        .pipe(Effect.mapError(() => fail(`无法替换 ${existing.value}。`)));
     }
     // A link behind another `t3` never runs, so installing one would only hide the problem.
     const shadowedBy = yield* foreignFirstOnPath;
     if (Option.isSome(shadowedBy)) {
       return yield* fail(
-        `Another t3 at ${shadowedBy.value} runs first in a new terminal. Remove it, or run the launcher directly at ${launcher}.`,
+        `另一个位于 ${shadowedBy.value} 的 t3 会在新终端中优先运行。请移除它，或直接运行位于 ${launcher} 的启动器。`,
       );
     }
     const onPath = pathEntries(process.env.PATH, ":");
@@ -251,7 +251,7 @@ export const make = Effect.gen(function* () {
       if (linked) return yield* state;
     }
     return yield* fail(
-      `Another t3 command is already installed, or no folder on your PATH is writable. Run the launcher directly at ${launcher}.`,
+      `已安装了另一个 t3 命令，或你的 PATH 中没有可写的文件夹。请直接运行位于 ${launcher} 的启动器。`,
     );
   }).pipe(Effect.withSpan("desktop.cliCommand.install"));
 
@@ -268,7 +268,7 @@ export const make = Effect.gen(function* () {
     for (const directory of unixCandidates(environment.homeDirectory, environment.platform)) {
       const link = path.join(directory, "t3");
       if (yield* isOurLink(link)) {
-        yield* fs.remove(link).pipe(Effect.mapError(() => fail(`Could not remove ${link}.`)));
+        yield* fs.remove(link).pipe(Effect.mapError(() => fail(`无法移除 ${link}。`)));
       }
     }
     return yield* state;

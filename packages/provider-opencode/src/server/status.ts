@@ -79,7 +79,7 @@ function formatOpenCodeProbeError(input: {
     ) {
       return {
         installed: true,
-        message: "OpenCode server rejected authentication. Check the server URL and password.",
+        message: "OpenCode 服务器拒绝认证。请检查服务器 URL 和密码。",
       };
     }
 
@@ -94,20 +94,20 @@ function formatOpenCodeProbeError(input: {
     ) {
       return {
         installed: true,
-        message: `Couldn't reach the configured OpenCode server at ${input.serverUrl}. Check that the server is running and the URL is correct.`,
+        message: `无法访问配置的 OpenCode 服务器 ${input.serverUrl}。请检查服务器是否正在运行，以及 URL 是否正确。`,
       };
     }
 
     return {
       installed: true,
-      message: detail ?? "Failed to connect to the configured OpenCode server.",
+      message: detail ?? "无法连接配置的 OpenCode 服务器。",
     };
   }
 
   if (lower.includes("enoent") || lower.includes("notfound")) {
     return {
       installed: false,
-      message: "OpenCode CLI (`opencode`) is not installed or not on PATH.",
+      message: "未安装 OpenCode CLI（`opencode`），或它不在 PATH 中。",
     };
   }
 
@@ -115,7 +115,7 @@ function formatOpenCodeProbeError(input: {
     return {
       installed: true,
       message:
-        "macOS is blocking the OpenCode binary (quarantine). Run `xattr -d com.apple.quarantine $(which opencode)` to fix this.",
+        "macOS 正在阻止 OpenCode 可执行文件（隔离）。请运行 `xattr -d com.apple.quarantine $(which opencode)` 以修复。",
     };
   }
 
@@ -123,17 +123,15 @@ function formatOpenCodeProbeError(input: {
     return {
       installed: true,
       message:
-        "macOS killed the OpenCode process due to an invalid code signature. The binary may be corrupted — try reinstalling OpenCode.",
+        "macOS 因代码签名无效而终止了 OpenCode 进程。可执行文件可能已损坏，请尝试重新安装 OpenCode。",
     };
   }
 
   const failureLabel =
-    input.phase === "inventory"
-      ? "Failed to load OpenCode provider inventory"
-      : "Failed to execute OpenCode CLI health check";
+    input.phase === "inventory" ? "无法加载 OpenCode 提供商列表" : "无法执行 OpenCode CLI 健康检查";
   return {
     installed: true,
-    message: detail ? `${failureLabel}: ${detail}` : `${failureLabel}.`,
+    message: detail ? `${failureLabel}：${detail}` : `${failureLabel}。`,
   };
 }
 
@@ -145,6 +143,19 @@ function titleCaseSlug(value: string): string {
     }
   }
   return segments.join(" ");
+}
+
+function reasoningVariantLabel(value: string): string {
+  const labels: Record<string, string> = {
+    none: "无",
+    minimal: "最低",
+    low: "低",
+    medium: "中",
+    high: "高",
+    xhigh: "极高",
+    max: "最高",
+  };
+  return labels[value] ?? titleCaseSlug(value);
 }
 
 function inferDefaultVariant(
@@ -171,13 +182,13 @@ const DEFAULT_OPENCODE_MODEL_CAPABILITIES: ModelCapabilities = createModelCapabi
   optionDescriptors: [
     {
       id: "variant",
-      label: "Reasoning",
+      label: "推理",
       type: "select",
       options: [
-        { id: "low", label: "Low" },
-        { id: "medium", label: "Medium", isDefault: true },
-        { id: "high", label: "High" },
-        { id: "xhigh", label: "Extra High" },
+        { id: "low", label: "低" },
+        { id: "medium", label: "中", isDefault: true },
+        { id: "high", label: "高" },
+        { id: "xhigh", label: "极高" },
       ],
       currentValue: "medium",
     },
@@ -210,8 +221,8 @@ function openCodeCapabilitiesForModel(input: {
   const defaultVariant = inferDefaultVariant(input.providerID, variantValues);
   const variantOptions = variantValues.map((value) =>
     defaultVariant === value
-      ? { id: value, label: titleCaseSlug(value), isDefault: true as const }
-      : { id: value, label: titleCaseSlug(value) },
+      ? { id: value, label: reasoningVariantLabel(value), isDefault: true as const }
+      : { id: value, label: reasoningVariantLabel(value) },
   );
   const primaryAgents = input.agents.filter(
     (agent) => !agent.hidden && (agent.mode === "primary" || agent.mode === "all"),
@@ -228,7 +239,7 @@ function openCodeCapabilitiesForModel(input: {
         ? [
             {
               id: "variant",
-              label: "Reasoning",
+              label: "推理",
               type: "select" as const,
               options: variantOptions,
               ...(defaultVariant ? { currentValue: defaultVariant } : {}),
@@ -357,8 +368,8 @@ export const makePendingOpenCodeProvider = (
           auth: { status: "unknown" },
           message:
             openCodeSettings.serverUrl.trim().length > 0
-              ? "OpenCode is disabled in T3 Code settings. A server URL is configured."
-              : "OpenCode is disabled in T3 Code settings.",
+              ? "T3 Code 设置中已禁用 OpenCode。已配置服务器 URL。"
+              : "T3 Code 设置中已禁用 OpenCode。",
         },
       });
     }
@@ -373,7 +384,7 @@ export const makePendingOpenCodeProvider = (
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "OpenCode provider status has not been checked in this session yet.",
+        message: "本会话尚未检查 OpenCode 提供商状态。",
       },
     });
   });
@@ -519,11 +530,11 @@ function openCode2ModelCapabilities(model: OpenCode2Model): ModelCapabilities {
         : [
             {
               id: "variant",
-              label: "Reasoning",
+              label: "推理",
               type: "select",
               options: variants.map((id) => ({
                 id,
-                label: titleCaseSlug(id),
+                label: reasoningVariantLabel(id),
                 ...(id === defaultVariant ? { isDefault: true } : {}),
               })),
               ...(defaultVariant === undefined ? {} : { currentValue: defaultVariant }),
@@ -560,7 +571,7 @@ const checkOpenCode2 = Effect.fn("checkOpenCode2")(function* (
       ),
       // Compaction does not depend on the model catalog.
       slashCommands: [COMPACT_SLASH_COMMAND],
-      probe: probe("error", "OpenCode could not load its model list."),
+      probe: probe("error", "OpenCode 无法加载模型列表。"),
     });
   }
   const models = providerModelsFromSettings(
@@ -658,8 +669,8 @@ export const checkOpenCodeProviderStatus = Effect.fn("checkOpenCodeProviderStatu
         status: "warning",
         auth: { status: "unknown" },
         message: isExternalServer
-          ? "OpenCode is disabled in T3 Code settings. A server URL is configured."
-          : "OpenCode is disabled in T3 Code settings.",
+          ? "T3 Code 设置中已禁用 OpenCode。已配置服务器 URL。"
+          : "T3 Code 设置中已禁用 OpenCode。",
       },
     });
   }
@@ -768,8 +779,8 @@ export const checkOpenCodeProviderStatus = Effect.fn("checkOpenCodeProviderStatu
         connectedCount > 0
           ? `${connectedCount} upstream provider${connectedCount === 1 ? "" : "s"} connected through ${isExternalServer ? "the configured OpenCode server" : "OpenCode"}.`
           : isExternalServer
-            ? "Connected to the configured OpenCode server, but it did not report any connected upstream providers."
-            : "OpenCode is available, but it did not report any connected upstream providers.",
+            ? "已连接配置的 OpenCode 服务器，但它未报告任何已连接的上游提供商。"
+            : "OpenCode 可用，但未报告任何已连接的上游提供商。",
     },
   });
 });

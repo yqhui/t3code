@@ -242,7 +242,7 @@ export function buildInitialPiProviderSnapshot(
           version: null,
           status: "warning",
           auth: { status: "unknown" },
-          message: "Pi is disabled in T3 Code settings.",
+          message: "T3 Code 设置中已禁用 Pi。",
         },
       });
     }
@@ -256,7 +256,7 @@ export function buildInitialPiProviderSnapshot(
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Checking Pi CLI availability...",
+        message: "正在检查 Pi CLI 是否可用…",
       },
     });
   });
@@ -281,7 +281,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Pi is disabled in T3 Code settings.",
+        message: "T3 Code 设置中已禁用 Pi。",
       },
     });
   }
@@ -305,8 +305,8 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         status: "error",
         auth: { status: "unknown" },
         message: isCommandMissingCause(error)
-          ? "Pi CLI (`pi`) is not installed or not on PATH. Install with `npm install -g --ignore-scripts @earendil-works/pi-coding-agent`."
-          : "Failed to execute Pi CLI health check.",
+          ? "未安装 Pi CLI（`pi`），或它不在 PATH 中。请使用 `npm install -g --ignore-scripts @earendil-works/pi-coding-agent` 安装。"
+          : "无法执行 Pi CLI 健康检查。",
       },
     });
   }
@@ -322,7 +322,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         version: null,
         status: "error",
         auth: { status: "unknown" },
-        message: "Pi CLI is installed but timed out while running `pi --version`.",
+        message: "已安装 Pi CLI，但运行 `pi --version` 超时。",
       },
     });
   }
@@ -340,7 +340,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         version,
         status: "error",
         auth: { status: "unknown" },
-        message: "Pi CLI is installed but failed to run.",
+        message: "已安装 Pi CLI，但运行失败。",
       },
     });
   }
@@ -414,8 +414,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         version,
         status: "ready",
         auth: { status: "unknown" },
-        message:
-          "Pi is available, but T3 Code could not refresh its models and commands. The live session will retry startup.",
+        message: "Pi 可用，但 T3 Code 无法刷新模型和命令。实际会话将重试启动。",
       },
     });
   }
@@ -430,8 +429,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         version,
         status: "ready",
         auth: { status: "unknown" },
-        message:
-          "Pi is available, but model and command discovery needs interactive input. The live session will handle it.",
+        message: "Pi 可用，但发现模型和命令需要交互输入。实际会话将处理此情况。",
       },
     });
   }
@@ -454,7 +452,7 @@ export const checkPiProviderStatus = Effect.fn("checkPiProviderStatus")(function
         ? {}
         : {
             message:
-              "Pi has no usable models. Run `pi` in a terminal and use /login, or configure an API key in ~/.pi/agent.",
+              "Pi 没有可用模型。请在终端运行 `pi` 并使用 /login，或在 ~/.pi/agent 中配置 API 密钥。",
           }),
     },
   });

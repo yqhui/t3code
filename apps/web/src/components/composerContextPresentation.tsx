@@ -177,7 +177,7 @@ function ContextChip(props: {
 
 function uploadStatusSuffix(upload: AttachmentUploadState | undefined): string | null {
   if (upload?.status === "uploading") return formatAttachmentUploadProgress(upload.progress);
-  if (upload?.status === "failed") return "upload failed";
+  if (upload?.status === "failed") return "上传失败";
   return null;
 }
 
@@ -222,7 +222,7 @@ function FileContextChip(props: {
   const actions = use(ComposerContextActionsContext);
   const { resolvedTheme } = useTheme();
   const needsReattach = composerFileNeedsReattach(props.record);
-  const suffix = needsReattach ? "attach again" : uploadStatusSuffix(props.upload);
+  const suffix = needsReattach ? "重新附加" : uploadStatusSuffix(props.upload);
   const size = formatAttachmentSize(props.record.sizeBytes);
   const isVideo = videoMimeType(props.record) !== null;
   return (
@@ -234,7 +234,7 @@ function FileContextChip(props: {
       error={props.upload?.status === "failed"}
       unresolved={needsReattach}
       suffix={suffix}
-      accessibleLabel={`${isVideo && !needsReattach ? "Preview video" : "File"} attachment, ${props.record.name}, ${size}`}
+      accessibleLabel={`${isVideo && !needsReattach ? "预览视频" : "文件"}附件，${props.record.name}，${size}`}
       onOpen={
         !needsReattach
           ? () =>
@@ -243,7 +243,7 @@ function FileContextChip(props: {
       }
       tooltip={
         needsReattach
-          ? `${props.record.name} was not saved with this draft. Attach it again to send it.`
+          ? `${props.record.name} 未随此草稿保存。请重新附加后再发送。`
           : attachmentTooltip(props.record, props.upload)
       }
     />
@@ -270,14 +270,14 @@ function previewAnnotationTooltip(annotation: PreviewAnnotationPayload): string 
   const lines = [annotation.pageTitle?.trim() || annotation.pageUrl];
   if (annotation.comment.trim()) lines.push("", annotation.comment.trim());
   const targets: string[] = [];
-  const plural = (count: number, noun: string) => `${count} ${noun}${count === 1 ? "" : "s"}`;
-  if (annotation.elements.length > 0) targets.push(plural(annotation.elements.length, "element"));
-  if (annotation.regions.length > 0) targets.push(plural(annotation.regions.length, "region"));
-  if (annotation.strokes.length > 0) targets.push(plural(annotation.strokes.length, "drawing"));
+  const plural = (count: number, noun: string) => `${count} ${noun}`;
+  if (annotation.elements.length > 0) targets.push(plural(annotation.elements.length, "个元素"));
+  if (annotation.regions.length > 0) targets.push(plural(annotation.regions.length, "个区域"));
+  if (annotation.strokes.length > 0) targets.push(plural(annotation.strokes.length, "处绘制"));
   if (annotation.styleChanges.length > 0) {
-    targets.push(plural(annotation.styleChanges.length, "style change"));
+    targets.push(plural(annotation.styleChanges.length, "处样式更改"));
   }
-  if (targets.length > 0) lines.push("", targets.join(", "));
+  if (targets.length > 0) lines.push("", targets.join("，"));
   return lines.join("\n");
 }
 
@@ -315,12 +315,12 @@ function ComposerPreviewAnnotationDetails({
       {screenshotUrl ? (
         <img
           src={screenshotUrl}
-          alt="Annotated preview crop"
+          alt="标注的预览截图"
           className="max-h-64 w-full border-border/70 border-b bg-muted object-contain"
         />
       ) : (
         <div className="border-border/70 border-b bg-muted/40 px-3 py-2 text-secondary-label text-xs">
-          Screenshot unavailable
+          截图不可用
         </div>
       )}
       <div className="whitespace-pre-wrap wrap-break-word px-3 py-2.5 text-sm text-foreground">
@@ -331,12 +331,7 @@ function ComposerPreviewAnnotationDetails({
 }
 
 function UnresolvedContextChip(props: { label: string }) {
-  return (
-    <UnresolvedChip
-      label={props.label}
-      tooltip="This context is no longer available. Remove it or attach it again."
-    />
-  );
+  return <UnresolvedChip label={props.label} tooltip="此上下文已不可用。请移除或重新附加。" />;
 }
 
 interface ComposerContextRenderContext {
@@ -404,7 +399,7 @@ const composerContextPresentationRegistry = createContextPresentationRegistry<
           <ContextChip
             icon={isPullRequest ? <PullRequestGlyph.pullRequest /> : <MessageCircleIcon />}
             label={reviewCommentContextLabel(entry.record)}
-            kindLabel={isPullRequest ? pullRequestContextKindLabel(entry.record) : "Review comment"}
+            kindLabel={isPullRequest ? pullRequestContextKindLabel(entry.record) : "审查评论"}
             details={<ComposerReviewCommentDetails comment={entry.record} />}
             detailsMode={definition.capabilities.details}
             kind={isPullRequest ? PULL_REQUEST_CHIP_KINDS[pullRequestState] : "review-comment"}
@@ -420,7 +415,7 @@ const composerContextPresentationRegistry = createContextPresentationRegistry<
           <ContextChip
             icon={<MousePointerClickIcon />}
             label={previewAnnotationContextLabel(entry.record)}
-            kindLabel="Preview annotation"
+            kindLabel="预览批注"
             details={
               <ComposerPreviewAnnotationDetails
                 annotation={entry.record}

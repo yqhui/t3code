@@ -31,7 +31,7 @@ export function isJavaScriptReplTool(toolName: string | null | undefined): boole
 
 export const COMPUTER_USE_TOOL_SOURCE = {
   key: "computer-use",
-  name: "Computer Use",
+  name: "电脑操作",
   kind: "computer",
 } as const;
 
@@ -378,19 +378,19 @@ export function formatSearchToolLabel(
   const glob = firstInputString(input, SEARCH_GLOB_KEYS);
   const target = searchTargetName(firstInputString(input, SEARCH_TARGET_KEYS));
   if (query && target) {
-    return `Searched ${query} in ${target}`;
+    return `已在 ${target} 中搜索 ${query}`;
   }
   if (glob && target) {
-    return `Searched files ${glob} in ${target}`;
+    return `已在 ${target} 中搜索文件 ${glob}`;
   }
   if (glob) {
-    return `Searched files ${glob}`;
+    return `已搜索文件 ${glob}`;
   }
   if (query) {
-    return `Searched ${query}`;
+    return `已搜索 ${query}`;
   }
   if (target) {
-    return `Searched in ${target}`;
+    return `已在 ${target} 中搜索`;
   }
   return undefined;
 }
@@ -398,11 +398,11 @@ export function formatSearchToolLabel(
 /** Work-log heading for a file read: verb plus the structured path, never the path alone. */
 export function formatReadToolLabel(path: string, extraCount = 0): string {
   const trimmed = path.trim();
-  const suffix = extraCount > 0 ? ` +${extraCount} more` : "";
+  const suffix = extraCount > 0 ? `，另有 ${extraCount} 个` : "";
   if (!trimmed) {
-    return `Read file${suffix}`;
+    return `已读取文件${suffix}`;
   }
-  return `Read ${trimmed}${suffix}`;
+  return `已读取 ${trimmed}${suffix}`;
 }
 
 export interface ToolActivityPresentationInput {
@@ -435,7 +435,7 @@ export function deriveToolActivityPresentation(
 
   if (action === "command") {
     return {
-      summary: "Ran command",
+      summary: "已运行命令",
       ...(command ? { detail: command } : {}),
     };
   }
@@ -447,13 +447,13 @@ export function deriveToolActivityPresentation(
       };
     }
     return {
-      summary: "Read file",
+      summary: "已读取文件",
     };
   }
 
   if (action === "file_change") {
     return {
-      summary: "Changed files",
+      summary: "已更改文件",
       ...(primaryPath ? { detail: primaryPath } : {}),
     };
   }
@@ -464,7 +464,7 @@ export function deriveToolActivityPresentation(
       return { summary: searchLabel };
     }
     return {
-      summary: "Searched files",
+      summary: "已搜索文件",
     };
   }
 

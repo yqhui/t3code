@@ -75,7 +75,7 @@ export class EnvironmentNotRegisteredError extends Schema.TaggedError<Environmen
   },
 ) {
   override get message(): string {
-    return `Environment ${this.environmentId} is not registered.`;
+    return `环境 ${this.environmentId} 未注册。`;
   }
 }
 
@@ -86,7 +86,7 @@ export class PlatformEnvironmentRemovalError extends Schema.TaggedError<Platform
   },
 ) {
   override get message(): string {
-    return `Platform-managed environment ${this.environmentId} cannot be removed.`;
+    return `平台托管的环境 ${this.environmentId} 无法移除。`;
   }
 }
 
@@ -990,7 +990,7 @@ export const make = Effect.gen(function* () {
         if (reordered.length !== routes.length || new Set(routeIds).size !== routes.length) {
           return yield* new ConnectionBlockedError({
             reason: "configuration",
-            detail: "The route order must list every saved route once.",
+            detail: "路由顺序必须包含每个已保存的路由，且各仅出现一次。",
           });
         }
         if (reordered.every((route, index) => route === routes[index])) return;

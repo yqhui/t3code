@@ -62,12 +62,12 @@ import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
 
 const SCRIPT_ICONS: Array<{ id: ProjectScriptIcon; label: string }> = [
-  { id: "play", label: "Play" },
-  { id: "test", label: "Test" },
+  { id: "play", label: "运行" },
+  { id: "test", label: "测试" },
   { id: "lint", label: "Lint" },
-  { id: "configure", label: "Configure" },
-  { id: "build", label: "Build" },
-  { id: "debug", label: "Debug" },
+  { id: "configure", label: "配置" },
+  { id: "build", label: "构建" },
+  { id: "debug", label: "调试" },
 ];
 
 export function ScriptIcon({
@@ -243,24 +243,24 @@ export function ProjectScriptEditorDialog({
     event.preventDefault();
     if (!request || pendingSubmissionRef.current !== null) return;
     if (!readEnvironmentScope(environmentId, editScope)) {
-      setValidationError("This connection cannot change project actions.");
+      setValidationError("此连接无法更改项目操作。");
       return;
     }
     const changesKeybinding =
       (keybinding.trim() || null) !== (request.initial.keybinding?.trim() || null);
     const canChangeKeybinding = readEnvironmentScope(environmentId, AuthSettingsWriteScope);
     if (changesKeybinding && !canChangeKeybinding) {
-      setValidationError("This connection cannot change keyboard shortcuts.");
+      setValidationError("此连接无法更改键盘快捷键。");
       return;
     }
     const trimmedName = name.trim();
     const trimmedCommand = command.trim();
     if (trimmedName.length === 0) {
-      setValidationError("Name is required.");
+      setValidationError("名称不能为空。");
       return;
     }
     if (trimmedCommand.length === 0) {
-      setValidationError("Command is required.");
+      setValidationError("命令不能为空。");
       return;
     }
 
@@ -292,7 +292,7 @@ export function ProjectScriptEditorDialog({
         autoOpenPreview: trimmedPreviewUrl.length > 0 ? autoOpenPreview : false,
       } satisfies NewProjectScriptInput;
     } catch (error) {
-      setValidationError(error instanceof Error ? error.message : "Failed to save action.");
+      setValidationError(error instanceof Error ? error.message : "保存操作失败。");
       return;
     }
 
@@ -306,7 +306,7 @@ export function ProjectScriptEditorDialog({
         if (result._tag === "Failure") {
           if (!isAtomCommandInterrupted(result)) {
             const error = squashAtomCommandFailure(result);
-            setValidationError(error instanceof Error ? error.message : "Failed to save action.");
+            setValidationError(error instanceof Error ? error.message : "保存操作失败。");
           }
         } else {
           close();
@@ -314,7 +314,7 @@ export function ProjectScriptEditorDialog({
       }
     } catch (error) {
       if (pendingSubmissionRef.current === submission) {
-        setValidationError(error instanceof Error ? error.message : "Failed to save action.");
+        setValidationError(error instanceof Error ? error.message : "保存操作失败。");
       }
     }
     if (pendingSubmissionRef.current === submission) {
@@ -335,16 +335,16 @@ export function ProjectScriptEditorDialog({
       >
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Action" : "Add Action"}</DialogTitle>
+            <DialogTitle>{isEditing ? "编辑操作" : "添加操作"}</DialogTitle>
             <DialogDescription>
-              Actions are project-scoped commands you can run from the top bar or keybindings.
+              操作是项目内的命令，可以通过顶部栏或键盘快捷键运行。
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
             <form id={formId} onSubmit={submit}>
               <fieldset className="space-y-4" disabled={isSaving || !canEditActions}>
                 <div className="space-y-1.5">
-                  <Label htmlFor="script-name">Name</Label>
+                  <Label htmlFor="script-name">名称</Label>
                   <div className="flex items-center gap-2">
                     <Popover onOpenChange={setIconPickerOpen} open={iconPickerOpen}>
                       <PopoverTrigger
@@ -353,7 +353,7 @@ export function ProjectScriptEditorDialog({
                             type="button"
                             variant="outline"
                             className="size-9 shrink-0"
-                            aria-label="Choose icon"
+                            aria-label="选择图标"
                           />
                         }
                       >
@@ -388,29 +388,29 @@ export function ProjectScriptEditorDialog({
                     <Input
                       id="script-name"
                       autoFocus
-                      placeholder="Test"
+                      placeholder="测试"
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                     />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="script-keybinding">Keybinding</Label>
+                  <Label htmlFor="script-keybinding">键盘快捷键</Label>
                   <Input
                     disabled={!canWriteSettings}
                     id="script-keybinding"
-                    placeholder="Press shortcut"
+                    placeholder="按下快捷键"
                     value={keybinding}
                     readOnly
                     onKeyDown={captureKeybinding}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Press a shortcut. Use <code>Backspace</code> to clear. Shortcuts are
-                    environment-wide. Projects using the same action share its shortcut.
+                    按下快捷键。使用 <code>Backspace</code> 清除。快捷键在整个
+                    环境中生效。使用相同操作的项目共用快捷键。
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="script-command">Command</Label>
+                  <Label htmlFor="script-command">命令</Label>
                   <Textarea
                     id="script-command"
                     placeholder="bun test"
@@ -419,7 +419,7 @@ export function ProjectScriptEditorDialog({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="script-preview-url">Preview URL (optional)</Label>
+                  <Label htmlFor="script-preview-url">预览 URL（可选）</Label>
                   <Input
                     id="script-preview-url"
                     placeholder="http://localhost:5173"
@@ -427,11 +427,11 @@ export function ProjectScriptEditorDialog({
                     onChange={(event) => setPreviewUrl(event.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Open this URL in the in-app preview when this action runs.
+                    运行此操作时在应用内预览中打开此 URL。
                   </p>
                 </div>
                 <label className="flex items-center justify-between gap-3 rounded-md border border-border/70 px-3 py-2 text-sm dark:border-transparent dark:bg-white/[0.035]">
-                  <span>Run automatically on worktree creation</span>
+                  <span>创建 Worktree 时自动运行</span>
                   <Switch
                     checked={runOnWorktreeCreate}
                     onCheckedChange={(checked) => setRunOnWorktreeCreate(Boolean(checked))}
@@ -442,7 +442,7 @@ export function ProjectScriptEditorDialog({
                     runOnWorktreeCreate ? "" : "opacity-60"
                   }`}
                 >
-                  <span>Wait for it to finish before the agent starts</span>
+                  <span>等待其完成后再启动 Agent</span>
                   <Switch
                     checked={waitForSetup}
                     disabled={!runOnWorktreeCreate}
@@ -450,7 +450,7 @@ export function ProjectScriptEditorDialog({
                   />
                 </label>
                 <label className="flex items-center justify-between gap-3 rounded-md border border-border/70 px-3 py-2 text-sm dark:border-transparent dark:bg-white/[0.035]">
-                  <span>Run in the thread's worktree when the thread settles</span>
+                  <span>会话归结时在其 Worktree 中运行</span>
                   <Switch
                     checked={runOnSettle}
                     onCheckedChange={(checked) => setRunOnSettle(Boolean(checked))}
@@ -461,7 +461,7 @@ export function ProjectScriptEditorDialog({
                     previewUrl.trim().length === 0 ? "opacity-60" : ""
                   }`}
                 >
-                  <span>Open preview automatically when this action runs</span>
+                  <span>运行此操作时自动打开预览</span>
                   <Switch
                     checked={autoOpenPreview}
                     disabled={previewUrl.trim().length === 0}
@@ -481,14 +481,14 @@ export function ProjectScriptEditorDialog({
                 disabled={isSaving || !canEditActions}
                 onClick={() => setDeleteConfirmOpen(true)}
               >
-                Delete
+                删除
               </Button>
             )}
             <Button type="button" variant="outline" onClick={close}>
-              Cancel
+              取消
             </Button>
             <Button form={formId} type="submit" disabled={isSaving || !canEditActions}>
-              {isSaving ? "Saving…" : isEditing ? "Save changes" : "Save action"}
+              {isSaving ? "正在保存…" : isEditing ? "保存更改" : "保存操作"}
             </Button>
           </DialogFooter>
         </DialogPopup>
@@ -497,18 +497,18 @@ export function ProjectScriptEditorDialog({
       <AlertDialog open={deleteConfirmOpen && canEditActions} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete action "{name}"?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>删除操作 "{name}"？</AlertDialogTitle>
+            <AlertDialogDescription>此操作无法撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
             <Button
               variant="destructive"
               disabled={isSaving || !canEditActions}
               onClick={() => {
                 if (!request?.scriptId) return;
                 if (!readEnvironmentScope(environmentId, editScope)) {
-                  setValidationError("This connection cannot change project actions.");
+                  setValidationError("此连接无法更改项目操作。");
                   return;
                 }
                 setDeleteConfirmOpen(false);
@@ -516,7 +516,7 @@ export function ProjectScriptEditorDialog({
                 onDelete(request.scriptId);
               }}
             >
-              Delete action
+              删除操作
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

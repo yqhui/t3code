@@ -61,7 +61,7 @@ export function grokUsageResponseToLimits(
   const window: ServerProviderUsageWindow = {
     id: "subscription",
     kind,
-    label: kind === "weekly" ? "Weekly" : kind === "monthly" ? "Monthly" : "Subscription",
+    label: kind === "weekly" ? "每周" : kind === "monthly" ? "每月" : "订阅",
     usedPercent: clampPercent(usedPercent),
     ...(Option.isSome(reset) ? { resetsAt: DateTime.formatIso(reset.value) } : {}),
   };
@@ -149,7 +149,7 @@ export const readGrokAccount = Effect.fn("readGrokAccount")(function* (
   const probeFailed = makeUnavailableUsageLimits({
     checkedAt,
     reason: "probeFailed",
-    message: "Grok could not read usage limits.",
+    message: "Grok 无法读取用量限额。",
   });
   const credential = yield* Effect.option(
     readGrokCredential(environment).pipe(Effect.timeout("10 seconds")),

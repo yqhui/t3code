@@ -28,7 +28,7 @@ export class PreferredEditorEnvironmentRequiredError extends Schema.TaggedError<
   },
 ) {
   override get message(): string {
-    return `Cannot open ${this.targetPath} because no environment is selected.`;
+    return `无法打开 ${this.targetPath}，因为未选择环境。`;
   }
 }
 
@@ -41,7 +41,7 @@ export class PreferredEditorUnavailableError extends Schema.TaggedError<Preferre
   },
 ) {
   override get message(): string {
-    return `No available editor can open ${this.targetPath} in environment ${this.environmentId}.`;
+    return `环境 ${this.environmentId} 中没有可用编辑器能打开 ${this.targetPath}。`;
   }
 }
 
@@ -100,7 +100,7 @@ export function useOpenInPreferredEditor(
           Cause.fail(
             new EnvironmentAuthorizationError({
               requiredScope: AuthOrchestrationOperateScope,
-              message: "This connection cannot open an editor on this environment.",
+              message: "此连接无法在该环境中打开编辑器。",
             }),
           ),
         );

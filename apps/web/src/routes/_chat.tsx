@@ -152,8 +152,8 @@ function ChatRouteGlobalShortcuts() {
           toastManager.add(
             stackedThreadToast({
               type: "info",
-              title: "Preview is desktop-only",
-              description: "Open T3 Code in the desktop app to use the in-app preview.",
+              title: "预览仅限桌面端",
+              description: "请在桌面应用中打开 T3 Code 以使用应用内预览。",
             }),
           );
           return;

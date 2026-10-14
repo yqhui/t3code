@@ -133,17 +133,13 @@ export function ProjectSettingsPanel({
   if (!selected) {
     return (
       <div className="flex flex-1 items-center justify-center p-8 text-sm text-muted-foreground">
-        {groups.length === 0
-          ? "Add a project from the sidebar to configure it here."
-          : "This project is no longer available."}
+        {groups.length === 0 ? "请先从侧栏添加项目，然后在此配置。" : "此项目已不可用。"}
       </div>
     );
   }
   if (members.length === 0)
     return (
-      <p className="p-8 text-sm text-muted-foreground">
-        This checkout is no longer available in the selected project and environment.
-      </p>
+      <p className="p-8 text-sm text-muted-foreground">此检出目录在选定项目和环境中已不可用。</p>
     );
   const scopedGroup = {
     ...selected,
@@ -210,7 +206,7 @@ function ProjectDetail({
       stackedThreadToast({
         type: "error",
         title,
-        description: error instanceof Error ? error.message : "An error occurred.",
+        description: error instanceof Error ? error.message : "发生错误。",
       }),
     );
   }, []);
@@ -222,11 +218,7 @@ function ProjectDetail({
       );
       if (!denied) return null;
       const result = AsyncResult.failure<void, Error>(
-        Cause.fail(
-          new Error(
-            `This connection cannot change projects in ${denied.environmentLabel ?? "this environment"}.`,
-          ),
-        ),
+        Cause.fail(new Error(`此连接无权更改 ${denied.environmentLabel ?? "此环境"} 中的项目。`)),
       );
       reportFailure(failureTitle, result);
       return result;
@@ -252,9 +244,7 @@ function ProjectDetail({
         return environment?.connection.phase !== "connected" || !environment.serverConfig;
       });
       if (unavailable) {
-        const error = new Error(
-          `Connect ${unavailable.environmentLabel ?? "the selected environment"} and try again.`,
-        );
+        const error = new Error(`请连接 ${unavailable.environmentLabel ?? "选定环境"} 后重试。`);
         const result: AtomCommandResult<void, unknown> = AsyncResult.failure(Cause.fail(error));
         reportFailure(failureTitle, result);
         return result;
@@ -274,7 +264,7 @@ function ProjectDetail({
           // write. Name the environment so the user knows where it stopped.
           reportFailure(
             group.memberProjects.length > 1
-              ? `${failureTitle} on ${member.environmentLabel ?? "the current environment"}`
+              ? `${failureTitle}（${member.environmentLabel ?? "当前环境"}）`
               : failureTitle,
             result,
           );
@@ -290,7 +280,7 @@ function ProjectDetail({
     async (nextTitle: string, wasEdited: boolean) => {
       const title = nextTitle.trim();
       if (!title) {
-        toastManager.add({ type: "warning", title: "Project title cannot be empty" });
+        toastManager.add({ type: "warning", title: "项目名称不能为空" });
         return;
       }
       if (
@@ -302,7 +292,7 @@ function ProjectDetail({
       ) {
         return;
       }
-      await updateAllMembers({ title }, "Failed to rename project");
+      await updateAllMembers({ title }, "重命名项目失败");
     },
     [group.memberProjects, updateAllMembers],
   );
@@ -318,7 +308,7 @@ function ProjectDetail({
       savingFaviconRef.current = true;
       setIsSavingFavicon(true);
       try {
-        await updateAllMembers(input, "Failed to update project icon");
+        await updateAllMembers(input, "更新项目图标失败");
       } finally {
         savingFaviconRef.current = false;
         setIsSavingFavicon(false);
@@ -331,7 +321,7 @@ function ProjectDetail({
 
   const removeMembers = useCallback(
     async (members: ReadonlyArray<SidebarProjectGroupMember>) => {
-      if (checkProjectAccess(members, "Failed to remove project")) return;
+      if (checkProjectAccess(members, "移除项目失败")) return;
       const api = readLocalApi();
       if (!api) return;
 
@@ -340,42 +330,40 @@ function ProjectDetail({
         memberKeys.has(`${thread.environmentId}:${thread.projectId}`),
       );
       const isWholeGroup = members.length === group.memberProjects.length;
-      const targetKind = hasOtherMembers || !isWholeGroup ? "checkout" : "project";
+      const targetKind = hasOtherMembers || !isWholeGroup ? "检出目录" : "项目";
       const singleMember = members.length === 1 ? members[0]! : null;
       const targetLabel = singleMember?.title ?? group.displayName;
       const confirmed = await settlePromise(() =>
         api.dialogs.confirm(
           [
             projectThreads.length > 0
-              ? `Remove ${targetKind} "${targetLabel}" and delete its ${projectThreads.length} thread${projectThreads.length === 1 ? "" : "s"}?`
-              : `Remove ${targetKind} "${targetLabel}"?`,
+              ? `移除${targetKind}“${targetLabel}”并删除其 ${projectThreads.length} 个会话？`
+              : `移除${targetKind}“${targetLabel}”？`,
             ...(singleMember
               ? [
-                  `Path: ${singleMember.workspaceRoot}`,
+                  `路径：${singleMember.workspaceRoot}`,
                   ...(singleMember.environmentLabel
-                    ? [`Environment: ${singleMember.environmentLabel}`]
+                    ? [`环境：${singleMember.environmentLabel}`]
                     : []),
                 ]
-              : [`This removes ${members.length} grouped project entries.`]),
+              : [`这会移除 ${members.length} 个分组项目条目。`]),
             ...(projectThreads.length > 0
-              ? [
-                  "This permanently clears conversation history for those threads and any archived threads.",
-                ]
-              : ["This permanently clears any archived conversation history."]),
+              ? ["这会永久清除这些会话及所有已归档会话的对话历史。"]
+              : ["这会永久清除所有已归档的对话历史。"]),
             isWholeGroup && !hasOtherMembers
-              ? "This removes only the project entries, not the files on disk."
-              : "Other entries in this grouped project are unaffected.",
-            "This action cannot be undone.",
+              ? "仅移除项目条目，不会删除磁盘上的文件。"
+              : "此分组项目中的其他条目不受影响。",
+            "此操作无法撤销。",
           ].join("\n"),
           { variant: "destructive" },
         ),
       );
       if (confirmed._tag === "Failure" || !confirmed.value) return;
-      if (checkProjectAccess(members, "Failed to remove project")) return;
+      if (checkProjectAccess(members, "移除项目失败")) return;
 
       const draftStore = useComposerDraftStore.getState();
       for (const member of members) {
-        if (checkProjectAccess([member], "Failed to remove project")) return;
+        if (checkProjectAccess([member], "移除项目失败")) return;
         const memberThreads = projectThreads.filter(
           (thread) =>
             thread.environmentId === member.environmentId && thread.projectId === member.id,
@@ -391,7 +379,7 @@ function ProjectDetail({
           () => undefined,
         );
         if (result._tag === "Failure") {
-          reportFailure(`Failed to remove "${member.title}"`, result);
+          reportFailure(`移除“${member.title}”失败`, result);
           return;
         }
         const projectRef = scopeProjectRef(member.environmentId, member.id);
@@ -424,11 +412,11 @@ function ProjectDetail({
   );
 
   const checkoutChoices = (
-    <SettingsSection title="Checkouts">
+    <SettingsSection title="检出目录">
       {group.memberProjects.map((member) => (
         <SettingsRow
           key={member.physicalProjectKey}
-          title={member.environmentLabel ?? "Environment"}
+          title={member.environmentLabel ?? "环境"}
           description={member.workspaceRoot}
           control={
             <Button
@@ -436,9 +424,9 @@ function ProjectDetail({
               variant="outline"
               disabled={!editableIds.has(member.environmentId)}
               onClick={() => void removeMembers([member])}
-              aria-label={`Remove checkout ${member.workspaceRoot}`}
+              aria-label={`移除检出目录 ${member.workspaceRoot}`}
             >
-              Remove
+              移除
             </Button>
           }
         />
@@ -451,27 +439,25 @@ function ProjectDetail({
       <SettingsPageContainer className="gap-6">
         <Alert variant="info">
           <InfoIcon aria-hidden />
-          <AlertDescription>
-            Can't find a setting? Keep this project picked above and hop to any other settings page.
-          </AlertDescription>
+          <AlertDescription>找不到设置？请保持上方选中的项目，前往其他设置页面。</AlertDescription>
         </Alert>
-        <SettingsSection id="project-overview" title="Project" hideTitle>
+        <SettingsSection id="project-overview" title="项目" hideTitle>
           {!canEditGroup ? (
             <p className="px-3 py-2 text-sm text-muted-foreground sm:px-4">
               {group.memberProjects.length > 1
-                ? "Shared settings require permission to change every checkout in this group."
-                : "This connection cannot change this project."}
+                ? "共享设置要求拥有更改此分组中每个检出目录的权限。"
+                : "此连接无权更改此项目。"}
             </p>
           ) : null}
           <SettingsRow
-            title="Name"
-            description="The shared name for this project group in the sidebar and thread lists."
+            title="名称"
+            description="此项目分组在侧栏和会话列表中的共享名称。"
             control={
               <Input
                 key={`${group.projectKey}:${group.displayName}`}
                 size="sm"
                 className="w-full sm:w-64"
-                aria-label="Project name"
+                aria-label="项目名称"
                 disabled={!canEditGroup}
                 defaultValue={group.displayName}
                 onChange={() => {
@@ -489,7 +475,7 @@ function ProjectDetail({
             }
           />
           <SettingsRow
-            title="Project icon"
+            title="项目图标"
             description={
               projectIcon?.kind === "lucide"
                 ? `${projectIcon.name} · ${projectIcon.color}`
@@ -497,14 +483,14 @@ function ProjectDetail({
                   ? `${projectIcon.text} · ${projectIcon.color}`
                   : projectIcon?.kind === "emoji"
                     ? projectIcon.emoji
-                    : (faviconPath ?? "Automatic")
+                    : (faviconPath ?? "自动")
             }
             resetAction={
               group.memberProjects.some(
                 (member) => member.faviconPath != null || member.projectIcon != null,
               ) ? (
                 <SettingResetButton
-                  label="project icon"
+                  label="项目图标"
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => void setProjectIcon({ faviconPath: null, projectIcon: null })}
                 />
@@ -517,21 +503,21 @@ function ProjectDetail({
                   size="sm"
                   variant="outline"
                   type="button"
-                  aria-label="Choose a project icon"
+                  aria-label="选择项目图标"
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => setIconPickerOpen(true)}
                 >
-                  Choose icon
+                  选择图标
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
                   type="button"
-                  aria-label="Choose a project icon file"
+                  aria-label="选择项目图标文件"
                   disabled={isSavingFavicon || !canEditGroup}
                   onClick={() => setFaviconPickerOpen(true)}
                 >
-                  Choose file
+                  选择文件
                 </Button>
               </div>
             }
@@ -540,21 +526,21 @@ function ProjectDetail({
         <ProjectDefaultsSettings category="project" />
         <ProjectActionsSettings />
         {hasMultipleCheckouts ? checkoutChoices : null}
-        <SettingsSection title="Danger">
+        <SettingsSection title="危险操作">
           <SettingsRow
             title={
               hasOtherMembers
-                ? "Remove checkout"
+                ? "移除检出目录"
                 : group.memberProjects.length > 1
-                  ? "Remove this project everywhere"
-                  : "Remove project"
+                  ? "从所有位置移除此项目"
+                  : "移除项目"
             }
             description={
               hasOtherMembers
-                ? "Deletes the selected machine's checkout entries and their threads. Other machines and files on disk are not touched."
+                ? "删除选定机器上的检出条目及其会话。其他机器和磁盘文件不受影响。"
                 : group.memberProjects.length > 1
-                  ? `Deletes all ${group.memberProjects.length} checkout entries and their threads on every machine. Files on disk are not touched.`
-                  : "Deletes the project entry and its threads. Files on disk are not touched."
+                  ? `删除所有机器上的 ${group.memberProjects.length} 个检出条目及其会话，不会删除磁盘文件。`
+                  : "删除项目条目及其会话，不会删除磁盘文件。"
             }
             control={
               <Button
@@ -565,10 +551,10 @@ function ProjectDetail({
               >
                 <Trash2Icon />
                 {hasOtherMembers
-                  ? "Remove checkout"
+                  ? "移除检出目录"
                   : group.memberProjects.length > 1
-                    ? "Remove all entries"
-                    : "Remove project"}
+                    ? "移除所有条目"
+                    : "移除项目"}
               </Button>
             }
           />

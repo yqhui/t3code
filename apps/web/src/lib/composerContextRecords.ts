@@ -73,7 +73,7 @@ export function reviewCommentContextLabel(comment: ReviewCommentPresentation): s
   }
   const diffRange = /^([+-])(\d+)(?: to \1(\d+))?$/u.exec(comment.rangeLabel);
   const rangeLabel = diffRange
-    ? `L${diffRange[2]}${diffRange[3] ? ` to L${diffRange[3]}` : ""}${diffRange[1] === "-" ? " (before)" : ""}`
+    ? `L${diffRange[2]}${diffRange[3] ? ` 至 L${diffRange[3]}` : ""}${diffRange[1] === "-" ? "（修改前）" : ""}`
     : comment.rangeLabel;
   return `${basename(comment.filePath)} ${rangeLabel}`;
 }
@@ -105,8 +105,16 @@ export function pullRequestContextDisplayState(
 
 export function pullRequestContextKindLabel(comment: ReviewCommentPresentation): string {
   const state = pullRequestContextDisplayState(comment);
-  if (state === null) return "Pull request";
-  return `${state[0]!.toUpperCase()}${state.slice(1)} pull request`;
+  if (state === null) return "拉取请求";
+  const stateLabel =
+    state === "open"
+      ? "打开的"
+      : state === "draft"
+        ? "草稿"
+        : state === "merged"
+          ? "已合并的"
+          : "已关闭的";
+  return `${stateLabel} PR`;
 }
 
 export function previewAnnotationContextLabel(annotation: PreviewAnnotationPayload): string {
@@ -116,7 +124,7 @@ export function previewAnnotationContextLabel(annotation: PreviewAnnotationPaylo
       ? `${comment.slice(0, PREVIEW_LABEL_MAX_CHARS - 1)}…`
       : comment;
   }
-  return annotation.pageTitle?.trim() || "Preview annotation";
+  return annotation.pageTitle?.trim() || "预览标注";
 }
 
 export function terminalContextReference(context: TerminalContextDraft): ComposerContextReference {

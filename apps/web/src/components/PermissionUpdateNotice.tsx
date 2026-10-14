@@ -48,13 +48,12 @@ function EnvironmentPermissionNotice({
       toastManager.close(id);
     };
     const id = toastManager.add({
-      title: `Permissions have changed for ${label}`,
-      description:
-        "This connection still uses the old permissions, so some actions may no longer be available. Pair again using a new link with the permissions you need.",
+      title: `${label} 的权限已更改`,
+      description: "此连接仍使用旧权限，部分操作可能不再可用。请使用具备所需权限的新链接重新配对。",
       timeout: 0,
       onClose: persistDismissal,
       actionProps: {
-        children: "Open Connections",
+        children: "打开连接设置",
         onClick: () => {
           dismiss();
           void navigate({ to: "/settings/connections" });

@@ -39,9 +39,9 @@ import { reviewCommentContextId } from "~/lib/composerContextRecords";
 import { removeInlineContextReference } from "~/lib/composerContextReferences";
 
 export const PULL_REQUEST_MERGE_METHOD_LABELS: Record<PullRequestMergeMethod, string> = {
-  merge: "Merge",
-  squash: "Squash and merge",
-  rebase: "Rebase and merge",
+  merge: "合并",
+  squash: "压缩并合并",
+  rebase: "变基并合并",
 };
 
 /** Old environments keep their existing actions; new ones must finish stack discovery first. */
@@ -256,14 +256,14 @@ export function threadPullRequestPanelTarget(thread: {
 export function pullRequestHandoffLabels(inThisThread: boolean) {
   return inThisThread
     ? {
-        fixFinding: "Fix in this thread",
-        fixCheck: "Fix in this thread",
-        fixFindings: "Fix findings in this thread",
+        fixFinding: "在此会话中修复",
+        fixCheck: "在此会话中修复",
+        fixFindings: "在此会话中修复审查发现",
       }
     : {
-        fixFinding: "Fix in a thread",
-        fixCheck: "Fix",
-        fixFindings: "Fix findings in a thread",
+        fixFinding: "在会话中修复",
+        fixCheck: "修复",
+        fixFindings: "在会话中修复审查发现",
       };
 }
 
@@ -360,7 +360,7 @@ export function classifyPullRequestChecks(
  * what a reader does next.
  */
 export function describePullRequestChecks(checks: ReadonlyArray<PullRequestCheck>): string {
-  if (checks.length === 0) return "No checks reported";
+  if (checks.length === 0) return "未报告任何检查";
   const failed = checks.filter(
     (check) => check.status === "failure" || check.status === "cancelled",
   ).length;
@@ -368,13 +368,13 @@ export function describePullRequestChecks(checks: ReadonlyArray<PullRequestCheck
   const actionRequired = checks.filter((check) => check.status === "action-required").length;
   const passed = checks.filter((check) => check.status === "success").length;
   const parts: string[] = [];
-  if (pending > 0) parts.push(`${pending} of ${checks.length} running`);
-  if (actionRequired > 0) parts.push(`${actionRequired} of ${checks.length} awaiting action`);
+  if (pending > 0) parts.push(`${pending}/${checks.length} 运行中`);
+  if (actionRequired > 0) parts.push(`${actionRequired}/${checks.length} 等待操作`);
   if (failed > 0) {
-    parts.push(parts.length > 0 ? `${failed} failed` : `${failed} of ${checks.length} failing`);
+    parts.push(parts.length > 0 ? `${failed} 项失败` : `${failed}/${checks.length} 失败`);
   }
   if (parts.length === 0) {
-    return passed === checks.length ? "All checks passed" : `${passed} of ${checks.length} passing`;
+    return passed === checks.length ? "所有检查均已通过" : `${passed}/${checks.length} 已通过`;
   }
   return parts.join(" · ");
 }
@@ -625,7 +625,7 @@ export function buildPullRequestTimeline(
       id: "created",
       at: detail.createdAt,
       kind: "opened" as const,
-      title: "opened this pull request",
+      title: "打开了此拉取请求",
       body: null,
       markdown: false,
       url: null,
@@ -657,7 +657,7 @@ export function buildPullRequestTimeline(
       id: comment.id,
       at: comment.createdAt,
       kind: comment.kind === "review" ? ("review" as const) : ("comment" as const),
-      title: comment.kind === "review" ? "reviewed" : "commented",
+      title: comment.kind === "review" ? "进行了审查" : "发表了评论",
       body: visibleBody(comment.body),
       markdown: true,
       url: comment.url,
@@ -675,7 +675,7 @@ export function buildPullRequestTimeline(
             id: "merged",
             at: detail.mergedAt,
             kind: "merged" as const,
-            title: "Pull request merged",
+            title: "拉取请求已合并",
             body: null,
             markdown: false,
             url: null,
@@ -695,7 +695,7 @@ export function buildPullRequestTimeline(
             id: "closed",
             at: detail.closedAt,
             kind: "closed" as const,
-            title: "Pull request closed",
+            title: "拉取请求已关闭",
             body: null,
             markdown: false,
             url: null,
@@ -747,7 +747,9 @@ function reviewThreadContext(
     endIndex: lineIndex,
     // A left-side line numbers the file before the change, so the same number means another line.
     rangeLabel:
-      thread.line === null ? "file" : `L${thread.line}${thread.side === "left" ? " (before)" : ""}`,
+      thread.line === null
+        ? "文件"
+        : `L${thread.line}${thread.side === "left" ? "（更改前）" : ""}`,
     // Bot bookkeeping lives in HTML comments and would otherwise eat the length bound before
     // the finding itself got any of it.
     text: bounded(
@@ -1220,7 +1222,7 @@ export function buildAskAboutGuideStopHandoff(input: {
         id: `pull-request-guide-stop:${input.number}:${stop.index}`,
         sectionId: `pull-request:${input.number}`,
         sectionTitle: `PR #${input.number} review guide`,
-        filePath: `Guide stop ${stop.index + 1}`,
+        filePath: `指南第 ${stop.index + 1} 站`,
         startIndex: 0,
         endIndex: 0,
         rangeLabel: boundedField(stop.title),

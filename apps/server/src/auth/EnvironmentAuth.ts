@@ -386,7 +386,7 @@ export class ServerAuthMissingCredentialError extends Schema.TaggedError<ServerA
   {},
 ) {
   override get message(): string {
-    return "Server authentication credential is missing.";
+    return "缺少服务器认证凭据。";
   }
 }
 
@@ -399,7 +399,7 @@ export class ServerAuthInvalidCredentialError extends Schema.TaggedError<ServerA
   },
 ) {
   override get message(): string {
-    return "Server authentication credential is invalid.";
+    return "服务器认证凭据无效。";
   }
 }
 
@@ -424,7 +424,7 @@ export class ServerAuthInvalidScopeError extends Schema.TaggedError<ServerAuthIn
   {},
 ) {
   override get message(): string {
-    return "The requested authentication scope is invalid.";
+    return "请求的认证权限范围无效。";
   }
 }
 
@@ -433,7 +433,7 @@ export class ServerAuthScopeNotGrantedError extends Schema.TaggedError<ServerAut
   {},
 ) {
   override get message(): string {
-    return "The requested authentication scope was not granted.";
+    return "尚未授予请求的认证权限范围。";
   }
 }
 
@@ -454,10 +454,10 @@ export class ServerAuthMcpApprovalCodeError extends Schema.TaggedError<ServerAut
 ) {
   override get message(): string {
     return this.reason === "insufficient_scope"
-      ? "That pairing code cannot grant this access, and it is now used up. Create one with the standard scopes, or choose Read only with a new code."
+      ? "此配对码无法授予该权限，且已被使用。请创建具有标准权限范围的配对码，或使用新配对码并选择只读访问。"
       : this.reason === "not_a_pairing_code"
-        ? "That is not a one-time pairing code."
-        : "That pairing code is unknown, expired, or already used.";
+        ? "这不是一次性配对码。"
+        : "此配对码不存在、已过期或已被使用。";
   }
 }
 
@@ -466,7 +466,7 @@ export class ServerAuthForbiddenOperationError extends Schema.TaggedError<Server
   {},
 ) {
   override get message(): string {
-    return "The current authentication session cannot revoke itself.";
+    return "当前认证会话不能撤销自身。";
   }
 }
 

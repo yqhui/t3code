@@ -40,7 +40,7 @@ function reportFailure(title: string, result: AtomCommandResult<unknown, unknown
   toastManager.add({
     type: "error",
     title,
-    description: error instanceof Error ? error.message : "The ACP operation failed.",
+    description: error instanceof Error ? error.message : "该 ACP 操作失败。",
   });
 }
 
@@ -121,7 +121,7 @@ export function AcpSessionManagementSection(props: {
       setNextCursor(result.value.nextCursor);
       return;
     }
-    reportFailure("Could not list ACP sessions", result);
+    reportFailure("无法列出 ACP 会话", result);
   };
 
   const importNativeSession = async (session: AcpRegistrySession) => {
@@ -153,18 +153,18 @@ export function AcpSessionManagementSection(props: {
       );
       toastManager.add({
         type: "success",
-        title: result.value.imported ? "ACP session imported" : "ACP session already imported",
+        title: result.value.imported ? "ACP 会话已导入" : "ACP 会话此前已导入",
       });
       return;
     }
-    reportFailure("Could not import ACP session", result);
+    reportFailure("无法导入 ACP 会话", result);
   };
 
   const deleteNativeSession = async (session: AcpRegistrySession) => {
     if (projectId === null || deletingSessionId !== null || session.importedThreadId !== null)
       return;
     const confirmed = await ensureLocalApi().dialogs.confirm(
-      `Permanently delete native ACP session "${session.title ?? session.sessionId}"?`,
+      `永久删除原生 ACP 会话 "${session.title ?? session.sessionId}"？`,
       { variant: "destructive" },
     );
     if (!confirmed || !readEnvironmentScope(props.environmentId, AuthOrchestrationOperateScope))
@@ -179,10 +179,10 @@ export function AcpSessionManagementSection(props: {
       setSessions((current) =>
         current.filter((candidate) => candidate.sessionId !== session.sessionId),
       );
-      toastManager.add({ type: "success", title: "ACP session deleted" });
+      toastManager.add({ type: "success", title: "ACP 会话已删除" });
       return;
     }
-    reportFailure("Could not delete ACP session", result);
+    reportFailure("无法删除 ACP 会话", result);
   };
 
   const loadProviders = async () => {
@@ -209,7 +209,7 @@ export function AcpSessionManagementSection(props: {
       );
       return;
     }
-    reportFailure("Could not list ACP providers", result);
+    reportFailure("无法列出 ACP 提供商", result);
   };
 
   const saveProvider = async (provider: AcpRegistryConfigurableProvider) => {
@@ -231,14 +231,14 @@ export function AcpSessionManagementSection(props: {
           Array.isArray(parsed) ||
           !Object.values(parsed).every((value) => typeof value === "string")
         ) {
-          throw new Error("Headers must be a JSON object with string values.");
+          throw new Error("Headers 必须是值为字符串的 JSON 对象。");
         }
         headers = parsed as Record<string, string>;
       } catch (error) {
         toastManager.add({
           type: "error",
-          title: "Invalid provider headers",
-          description: error instanceof Error ? error.message : "Headers must be valid JSON.",
+          title: "提供商 Headers 无效",
+          description: error instanceof Error ? error.message : "Headers 必须是有效的 JSON。",
         });
         return;
       }
@@ -257,17 +257,17 @@ export function AcpSessionManagementSection(props: {
     });
     setSavingProviderId(null);
     if (result._tag === "Success") {
-      toastManager.add({ type: "success", title: "ACP provider configured" });
+      toastManager.add({ type: "success", title: "ACP 提供商已配置" });
       await loadProviders();
       return;
     }
-    reportFailure("Could not configure ACP provider", result);
+    reportFailure("无法配置 ACP 提供商", result);
   };
 
   const disableConfiguredProvider = async (provider: AcpRegistryConfigurableProvider) => {
     if (projectId === null || savingProviderId !== null || provider.required) return;
     const confirmed = await ensureLocalApi().dialogs.confirm(
-      `Disable ACP provider "${provider.providerId}"?`,
+      `禁用 ACP 提供商 "${provider.providerId}"？`,
       { variant: "destructive" },
     );
     if (!confirmed || !readEnvironmentScope(props.environmentId, AuthProvidersManageScope)) return;
@@ -278,11 +278,11 @@ export function AcpSessionManagementSection(props: {
     });
     setSavingProviderId(null);
     if (result._tag === "Success") {
-      toastManager.add({ type: "success", title: "ACP provider disabled" });
+      toastManager.add({ type: "success", title: "ACP 提供商已禁用" });
       await loadProviders();
       return;
     }
-    reportFailure("Could not disable ACP provider", result);
+    reportFailure("无法禁用 ACP 提供商", result);
   };
 
   const logoutProvider = async () => {
@@ -296,22 +296,18 @@ export function AcpSessionManagementSection(props: {
     if (result._tag === "Success") {
       setSessions([]);
       setNextCursor(null);
-      toastManager.add({ type: "success", title: "Logged out of ACP agent" });
+      toastManager.add({ type: "success", title: "已登出 ACP Agent" });
       return;
     }
-    reportFailure("Could not log out of ACP agent", result);
+    reportFailure("无法登出 ACP Agent", result);
   };
 
   return (
     <div className="grid gap-3">
       <SettingsRow
-        title="Native sessions"
-        description="Resume agent-owned conversations as T3 threads."
-        status={
-          canList && props.projects.length === 0
-            ? "Add a project before importing sessions."
-            : undefined
-        }
+        title="原生会话"
+        description="将 Agent 自有的对话恢复为 T3 会话。"
+        status={canList && props.projects.length === 0 ? "导入会话前请先添加项目。" : undefined}
         control={
           <div className="flex flex-wrap items-center gap-2">
             {canLogout ? (
@@ -322,7 +318,7 @@ export function AcpSessionManagementSection(props: {
                 disabled={props.readOnly || loggingOut}
                 onClick={() => void logoutProvider()}
               >
-                {loggingOut ? "Logging out" : "Log out"}
+                {loggingOut ? "正在登出" : "登出"}
               </Button>
             ) : null}
             {canList && props.projects.length > 0 ? (
@@ -339,7 +335,7 @@ export function AcpSessionManagementSection(props: {
                     setProviderDrafts({});
                   }}
                 >
-                  <SelectTrigger aria-label="Project for ACP sessions" className="w-40" size="sm">
+                  <SelectTrigger aria-label="ACP 会话所属项目" className="w-40" size="sm">
                     <SelectValue>
                       {props.projects.find((project) => project.id === projectId)?.title}
                     </SelectValue>
@@ -359,7 +355,7 @@ export function AcpSessionManagementSection(props: {
                   disabled={!canRead || loading || projectId === null}
                   onClick={() => void loadSessions()}
                 >
-                  {loading ? "Loading" : sessions.length === 0 ? "List sessions" : "Refresh"}
+                  {loading ? "加载中" : sessions.length === 0 ? "列出会话" : "刷新"}
                 </Button>
               </>
             ) : null}
@@ -397,10 +393,10 @@ export function AcpSessionManagementSection(props: {
                         onClick={() => void importNativeSession(session)}
                       >
                         {session.importedThreadId !== null
-                          ? "Imported"
+                          ? "已导入"
                           : importingSessionId === session.sessionId
-                            ? "Importing"
-                            : "Import"}
+                            ? "正在导入"
+                            : "导入"}
                       </Button>
                       {canDelete ? (
                         <Button
@@ -414,7 +410,7 @@ export function AcpSessionManagementSection(props: {
                           }
                           onClick={() => void deleteNativeSession(session)}
                         >
-                          {deletingSessionId === session.sessionId ? "Deleting" : "Delete"}
+                          {deletingSessionId === session.sessionId ? "正在删除" : "删除"}
                         </Button>
                       ) : null}
                     </div>
@@ -432,7 +428,7 @@ export function AcpSessionManagementSection(props: {
                 disabled={!canRead || loading}
                 onClick={() => void loadSessions(nextCursor)}
               >
-                {loading ? "Loading" : "Load more"}
+                {loading ? "加载中" : "加载更多"}
               </Button>
             ) : null}
           </>
@@ -443,9 +439,9 @@ export function AcpSessionManagementSection(props: {
         <div className="grid gap-3 border-t border-border/60 px-3 py-3 sm:px-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-medium text-foreground">Agent providers</p>
+              <p className="text-xs font-medium text-foreground">Agent 提供商</p>
               <p className="text-xs text-muted-foreground">
-                Configure non-secret routing. Headers are write-only.
+                配置非机密路由。Headers 仅写入、不回显。
               </p>
             </div>
             <Button
@@ -455,7 +451,7 @@ export function AcpSessionManagementSection(props: {
               disabled={!canRead || loadingProviders || projectId === null}
               onClick={() => void loadProviders()}
             >
-              {loadingProviders ? "Loading" : providers.length === 0 ? "List providers" : "Refresh"}
+              {loadingProviders ? "加载中" : providers.length === 0 ? "列出提供商" : "刷新"}
             </Button>
           </div>
 
@@ -470,7 +466,7 @@ export function AcpSessionManagementSection(props: {
                 setProviderDrafts({});
               }}
             >
-              <SelectTrigger aria-label="Project for ACP providers" className="min-w-48" size="xs">
+              <SelectTrigger aria-label="ACP 提供商所属项目" className="min-w-48" size="xs">
                 <SelectValue>
                   {props.projects.find((project) => project.id === projectId)?.title}
                 </SelectValue>
@@ -506,8 +502,8 @@ export function AcpSessionManagementSection(props: {
                           {provider.providerId}
                         </p>
                         <p className="text-3xs text-muted-foreground">
-                          {provider.current === null ? "Disabled" : "Configured"}
-                          {provider.required ? " · Required" : ""}
+                          {provider.current === null ? "已禁用" : "已配置"}
+                          {provider.required ? " · 必需" : ""}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -523,7 +519,7 @@ export function AcpSessionManagementSection(props: {
                           }
                           onClick={() => void saveProvider(provider)}
                         >
-                          {savingProviderId === provider.providerId ? "Saving" : "Save"}
+                          {savingProviderId === provider.providerId ? "正在保存" : "保存"}
                         </Button>
                         {!provider.required && provider.current !== null ? (
                           <Button
@@ -533,7 +529,7 @@ export function AcpSessionManagementSection(props: {
                             disabled={props.readOnly || savingProviderId !== null}
                             onClick={() => void disableConfiguredProvider(provider)}
                           >
-                            Disable
+                            禁用
                           </Button>
                         ) : null}
                       </div>
@@ -546,7 +542,7 @@ export function AcpSessionManagementSection(props: {
                           if (value !== null) updateDraft({ apiType: value });
                         }}
                       >
-                        <SelectTrigger aria-label={`${provider.providerId} protocol`} size="sm">
+                        <SelectTrigger aria-label={`${provider.providerId} 协议`} size="sm">
                           <SelectValue>{draft.apiType}</SelectValue>
                         </SelectTrigger>
                         <SelectPopup>
@@ -560,7 +556,7 @@ export function AcpSessionManagementSection(props: {
                       <Input
                         size="sm"
                         type="url"
-                        aria-label={`${provider.providerId} base URL`}
+                        aria-label={`${provider.providerId} 基础 URL`}
                         placeholder="https://api.example.com"
                         value={draft.baseUrl}
                         disabled={props.readOnly || savingProviderId !== null}
@@ -570,8 +566,8 @@ export function AcpSessionManagementSection(props: {
                     <Input
                       size="sm"
                       type="password"
-                      aria-label={`${provider.providerId} write-only headers JSON`}
-                      placeholder='Write-only headers JSON, e.g. {"Authorization":"Bearer …"}'
+                      aria-label={`${provider.providerId} 只写 Headers JSON`}
+                      placeholder='只写 Headers JSON，例如 {"Authorization":"Bearer …"}'
                       value={draft.headers}
                       disabled={props.readOnly || savingProviderId !== null}
                       onValueChange={(value) => updateDraft({ headers: value })}

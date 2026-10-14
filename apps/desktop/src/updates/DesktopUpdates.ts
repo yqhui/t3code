@@ -313,16 +313,16 @@ function getAutoUpdateDisabledReason(args: {
   hasUpdateFeedConfig: boolean;
 }): string | null {
   if (!args.hasUpdateFeedConfig) {
-    return "Automatic updates are not available because no update feed is configured.";
+    return "尚未配置更新源，自动更新不可用。";
   }
   if (args.isDevelopment || !args.isPackaged) {
-    return "Automatic updates are only available in packaged production builds.";
+    return "自动更新仅适用于打包后的生产版本。";
   }
   if (args.disabledByEnv) {
-    return "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.";
+    return "T3CODE_DISABLE_AUTO_UPDATE 设置已禁用自动更新。";
   }
   if (args.platform === "linux" && !args.appImage && !args.isDebPackage) {
-    return "Automatic updates on Linux require the AppImage or the .deb package.";
+    return "Linux 上的自动更新需要 AppImage 或 .deb 安装包。";
   }
   return null;
 }

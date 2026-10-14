@@ -310,10 +310,10 @@ export function planScopedSettingsPatch(
       : scope.kind === "unavailable"
         ? scope.message
         : unscopableKeys.length > 0
-          ? "This setting is environment-wide and cannot be overridden by a project."
+          ? "此设置为环境级，无法被项目覆盖。"
           : isProjectScope
-            ? "Connect the selected checkouts, or update their environments, to save a project override."
-            : `Connect ${scope.kind === "environment" ? scope.label : "an environment"} to save this setting.`;
+            ? "请连接所选检出，或更新其环境，以保存项目覆盖。"
+            : `请连接 ${scope.kind === "environment" ? scope.label : "环境"}以保存此设置。`;
   return { clientPatch, hasClientWrite, serverWrites, unavailableReason };
 }
 
@@ -334,9 +334,7 @@ export function planScopedSettingsClear(
     hasClientWrite: false,
     serverWrites,
     unavailableReason:
-      serverWrites.length > 0
-        ? null
-        : "Connect the selected checkouts, or update their environments, to reset this override.",
+      serverWrites.length > 0 ? null : "请连接所选检出，或更新其环境，以重置此覆盖。",
   };
 }
 
@@ -397,8 +395,7 @@ export function planProjectOverridesClear(
     clientPatch: {} as ClientSettingsPatch,
     hasClientWrite: false,
     serverWrites,
-    unavailableReason:
-      serverWrites.length > 0 ? null : "Connect the environments to reset these overrides.",
+    unavailableReason: serverWrites.length > 0 ? null : "请连接环境以重置这些覆盖。",
   };
 }
 
@@ -475,7 +472,7 @@ export async function persistScopedSettingsPatch(
       return [
         {
           ...environment,
-          message: "This environment does not support this setting. Update T3 Code on it.",
+          message: "此环境不支持该设置。请在其上更新 T3 Code。",
         },
       ];
     }
@@ -488,10 +485,7 @@ export async function persistScopedSettingsPatch(
     return [
       {
         ...environment,
-        message:
-          error instanceof Error
-            ? error.message
-            : "The save failed. Try reconnecting and saving again.",
+        message: error instanceof Error ? error.message : "保存失败。请重新连接后再保存一次。",
       },
     ];
   });

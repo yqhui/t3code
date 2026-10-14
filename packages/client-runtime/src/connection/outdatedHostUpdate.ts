@@ -77,7 +77,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
     ) {
       return yield* new OutdatedHostUpdateError({
         environmentId,
-        message: `Update T3 Code on ${descriptor.label} manually; it cannot update itself.`,
+        message: `请手动更新 ${descriptor.label} 上的 T3 Code；它无法自行更新。`,
       });
     }
 
@@ -189,7 +189,7 @@ export const updateOutdatedHost = Effect.fn("clientRuntime.connection.updateOutd
     if (Option.isNone(resumed)) {
       return yield* new OutdatedHostUpdateError({
         environmentId,
-        message: `${descriptor.label} did not come back on a compatible T3 Code version.`,
+        message: `${descriptor.label} 未以兼容的 T3 Code 版本重新连接。`,
       });
     }
 

@@ -8,7 +8,7 @@
  * fence line, where it shows as its own entry.
  */
 export const CODE_BLOCK_LANGUAGES = [
-  { id: "", label: "Plain text" },
+  { id: "", label: "纯文本" },
   { id: "bash", label: "Bash" },
   { id: "c", label: "C" },
   { id: "cpp", label: "C++" },

@@ -87,10 +87,10 @@ export function createDuoControl(options: {
     queued = null;
     const id = active.requestId;
     timer = setTimeout(() => {
-      if (active?.requestId === id) clear("Device control timed out. Its position is unknown.");
+      if (active?.requestId === id) clear("设备控制超时，当前位置未知。");
     }, options.timeoutMs ?? 5_000);
     publish();
-    if (!options.send(active)) clear("Device is disconnected.");
+    if (!options.send(active)) clear("设备已断开连接。");
   };
   return {
     enqueue(command: DuoCommand) {
@@ -109,7 +109,7 @@ export function createDuoControl(options: {
       timer = null;
       active = null;
       if (!reply.ok) {
-        clear(reply.error ?? "Device control failed. Its position is unknown.");
+        clear(reply.error ?? "设备控制失败，当前位置未知。");
         return;
       }
       if (queued) drain();

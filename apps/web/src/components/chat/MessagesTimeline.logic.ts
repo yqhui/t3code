@@ -206,6 +206,10 @@ export function threadReadTargetTitle(
  * `Read thread “Title”`), keeping the label's tense. Null keeps the generic label.
  */
 export function threadReadLabelPrefix(label: string) {
+  const localizedObject = " T3 会话";
+  if (label.endsWith(localizedObject)) {
+    return `${label.slice(0, -localizedObject.length)}会话`;
+  }
   return label.endsWith(THREAD_READ_OBJECT)
     ? `${label.slice(0, -THREAD_READ_OBJECT.length)} thread`
     : null;
@@ -1622,7 +1626,7 @@ export function deriveMessagesTimelineRows(input: {
         createdAt: supersededFold.createdAt,
         runId: supersededFold.runId,
         attemptId: supersededFold.attemptId,
-        label: "Superseded attempt",
+        label: "已被替代的尝试",
         expanded: input.expandedAttemptIds?.has(supersededFold.attemptId) ?? false,
       });
     }

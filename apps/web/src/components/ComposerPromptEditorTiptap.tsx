@@ -267,7 +267,7 @@ function ComposerMentionNodeView({ node }: NodeViewProps) {
       kind="mention"
       render={<button type="button" />}
       onClick={() => actions.openMention(path)}
-      aria-label={`Preview ${path}`}
+      aria-label={`预览 ${path}`}
       contentEditable={false}
       spellCheck={false}
       data-composer-mention-chip="true"
@@ -338,14 +338,10 @@ function ComposerSkillNodeView({ node }: NodeViewProps) {
       >
         <div className="space-y-3 p-2 text-sm">
           <p className="font-medium">{skillLabel}</p>
-          <p>
-            {skill?.description ??
-              skillDescription ??
-              "No description is available for this skill."}
-          </p>
+          <p>{skill?.description ?? skillDescription ?? "此技能暂无描述。"}</p>
           {skill?.path ? (
             <Button variant="outline" size="sm" onClick={() => actions.openMention(skill.path)}>
-              View instructions
+              查看说明
             </Button>
           ) : null}
         </div>

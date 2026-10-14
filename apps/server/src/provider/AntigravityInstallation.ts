@@ -189,10 +189,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
   ) {
     const info = yield* fs.stat(filePath);
     if (info.type !== "File" || Number(info.size) > RECORD_MAX_BYTES) {
-      return yield* installationError(
-        "resolve",
-        "The managed runtime record is invalid. Reinstall Antigravity.",
-      );
+      return yield* installationError("resolve", "托管运行时记录无效。请重新安装 Antigravity。");
     }
     const contents = yield* fs.readFileString(filePath);
     return yield* Schema.decodeEffect(Schema.fromJsonString(schema))(contents);
@@ -228,10 +225,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       !(yield* executableFile(path.join(directory, names.executable), record.executable.bytes)) ||
       !(yield* executableFile(path.join(directory, names.harness), record.harness.bytes))
     ) {
-      return yield* installationError(
-        "resolve",
-        "The managed Antigravity runtime is incomplete. Reinstall it.",
-      );
+      return yield* installationError("resolve", "托管的 Antigravity 运行时不完整。请重新安装。");
     }
     return {
       executablePath: path.join(directory, names.executable),
@@ -297,7 +291,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         }
         return yield* installationError(
           "resolve",
-          "The custom Antigravity executable or its localharness_external sibling is missing or not executable.",
+          "自定义 Antigravity 可执行文件或同目录的 localharness_external 缺失，或没有执行权限。",
         );
       }
       if (yield* fs.exists(activePath)) {
@@ -311,14 +305,14 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       return yield* installationError(
         "resolve",
         releaseAsset
-          ? "Antigravity is not installed. Install it in this environment or set a custom executable path."
-          : `Google does not publish an Antigravity runtime for ${platform}-${arch}. Use a supported environment or a custom executable.`,
+          ? "尚未安装 Antigravity。请在此环境中安装，或设置自定义可执行文件路径。"
+          : `Google 未发布适用于 ${platform}-${arch} 的 Antigravity 运行时。请使用受支持的环境或自定义可执行文件。`,
       );
     },
     Effect.mapError(
       wrapFailure(
         "resolve",
-        "Could not read the Antigravity installation. Reinstall it or set a custom executable path.",
+        "无法读取 Antigravity 安装信息。请重新安装，或设置自定义可执行文件路径。",
       ),
     ),
   );
@@ -385,7 +379,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         ) {
           return yield* installationError(
             "verify",
-            "The downloaded runtime did not identify as the expected Google Antigravity release.",
+            "下载的运行时与预期的 Google Antigravity 发布版本不符。",
           );
         }
       },
@@ -393,12 +387,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       Effect.provideService(Path.Path, path),
       Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
       Effect.provideService(Crypto.Crypto, crypto),
-      Effect.mapError(
-        wrapFailure(
-          "verify",
-          "The downloaded Antigravity runtime could not start in this environment.",
-        ),
-      ),
+      Effect.mapError(wrapFailure("verify", "下载的 Antigravity 运行时无法在此环境中启动。")),
     );
 
   const install = Effect.fn("AntigravityInstallation.install")(
@@ -445,7 +434,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         Effect.mapError(
           wrapFailure(
             "activate",
-            "Could not activate Antigravity. The previous runtime is unchanged. Check for locked files and try again.",
+            "无法启用 Antigravity，原有运行时未受影响。请检查文件是否被占用后重试。",
           ),
         ),
         Effect.uninterruptible,
@@ -454,10 +443,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       if (yield* fs.exists(destination)) {
         const existing = yield* completedRelease(asset.sha256);
         if (existing.version !== asset.version) {
-          return yield* installationError(
-            "verify",
-            "The existing managed release has the wrong version. Remove it before reinstalling.",
-          );
+          return yield* installationError("verify", "现有托管运行时版本不正确。请移除后重新安装。");
         }
         yield* report("verifying", "Checking the installed runtime.");
         yield* validate(existing, asset.version).pipe(
@@ -479,7 +465,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       ) {
         return yield* installationError(
           "download",
-          `Antigravity needs at least ${Math.ceil(required / 1024 / 1024)} MiB of free space to install.`,
+          `安装 Antigravity 至少需要 ${Math.ceil(required / 1024 / 1024)} MiB 可用空间。`,
         );
       }
       const staging = yield* fs.makeTempDirectoryScoped({
@@ -507,10 +493,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
           contentLength !== undefined &&
           Number(contentLength) !== asset.archiveBytes
         ) {
-          return yield* installationError(
-            "download",
-            "The Antigravity download size did not match the pinned release.",
-          );
+          return yield* installationError("download", "下载的 Antigravity 大小与指定版本不符。");
         }
         yield* response.stream.pipe(
           Stream.tap((chunk) =>
@@ -519,7 +502,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
               if (downloadedBytes > asset.archiveBytes) {
                 return yield* installationError(
                   "download",
-                  "The Antigravity download exceeded the pinned release size.",
+                  "下载的 Antigravity 超出了指定版本的大小。",
                 );
               }
               hash.update(chunk);
@@ -539,7 +522,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
       if (downloadedBytes !== asset.archiveBytes || hash.digest("hex") !== asset.sha256) {
         return yield* installationError(
           "download",
-          "The Antigravity download failed its size or SHA-256 check. Nothing was installed.",
+          "下载的 Antigravity 未通过大小或 SHA-256 校验。未安装任何内容。",
         );
       }
 
@@ -551,7 +534,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         if (archive.entryCount !== 2) {
           return yield* installationError(
             "extract",
-            "The archive must contain exactly the Antigravity executable and its harness.",
+            "压缩包只能包含 Antigravity 可执行文件及其 harness。",
           );
         }
         const seen = new Set<string>();
@@ -575,7 +558,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
           ) {
             return yield* installationError(
               "extract",
-              "The archive contains an unexpected, unsafe, or incorrectly sized member.",
+              "压缩包包含意外、不安全或大小不正确的条目。",
             );
           }
           seen.add(entry.fileName);
@@ -584,16 +567,13 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
             let extractedBytes = 0;
             yield* EffectNodeStream.fromReadable<Uint8Array, AntigravityInstallationError>({
               evaluate: () => readable,
-              onError: wrapFailure("extract", "Could not extract the Antigravity runtime."),
+              onError: wrapFailure("extract", "无法解压 Antigravity 运行时。"),
             }).pipe(
               Stream.tap((chunk) =>
                 Effect.gen(function* () {
                   extractedBytes += chunk.byteLength;
                   if (extractedBytes > expected.bytes) {
-                    return yield* installationError(
-                      "extract",
-                      "An archive member exceeded its pinned size.",
-                    );
+                    return yield* installationError("extract", "压缩包条目超出了指定大小。");
                   }
                 }),
               ),
@@ -609,7 +589,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         if (!seen.has(asset.executable.name) || !seen.has(asset.harness.name)) {
           return yield* installationError(
             "extract",
-            "The archive is missing the Antigravity executable or its harness.",
+            "压缩包缺少 Antigravity 可执行文件或其 harness。",
           );
         }
       }).pipe(Effect.scoped);
@@ -650,16 +630,13 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
                     Effect.timeout(VALIDATION_TIMEOUT),
                   )
                 : Effect.fail(
-                    installationError(
-                      "activate",
-                      "Another installation published a different Antigravity release.",
-                    ),
+                    installationError("activate", "另一个安装过程写入了不同的 Antigravity 版本。"),
                   ),
             ),
             Effect.mapError(() =>
               installationError(
                 "activate",
-                "Could not publish the Antigravity runtime. The previous release is unchanged. Try again.",
+                "无法保存 Antigravity 运行时，原有版本未受影响。请重试。",
                 cause,
               ),
             ),
@@ -670,10 +647,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
     },
     Effect.scoped,
     Effect.mapError(
-      wrapFailure(
-        "install",
-        "Could not install Antigravity. Check free disk space and directory access, then try again.",
-      ),
+      wrapFailure("install", "无法安装 Antigravity。请检查可用磁盘空间和目录访问权限后重试。"),
     ),
   );
 
@@ -685,7 +659,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         if (!releaseAsset) {
           return yield* installationError(
             "start",
-            `Google does not publish an Antigravity runtime for ${platform}-${arch}. Use a supported remote environment or a custom executable.`,
+            `Google 未发布适用于 ${platform}-${arch} 的 Antigravity 运行时。请使用受支持的远程环境或自定义可执行文件。`,
           );
         }
         const operationId = yield* crypto.randomUUIDv4;
@@ -698,7 +672,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
           version: releaseAsset.version,
           installedVersion: current.installedVersion,
           canRemove: current.canRemove,
-          message: "Downloading Google's official Antigravity runtime.",
+          message: "正在下载 Google 官方 Antigravity 运行时。",
         };
         yield* SubscriptionRef.set(state, next);
         const work = install(releaseAsset).pipe(
@@ -713,10 +687,10 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
                     ...value,
                     phase: cancelled ? "cancelled" : "failed",
                     message: cancelled
-                      ? "Installation cancelled. The previous runtime is unchanged."
+                      ? "安装已取消，原有运行时未受影响。"
                       : Option.isSome(error)
                         ? error.value.detail
-                        : "Could not finish the Antigravity installation. Check disk space and directory access.",
+                        : "无法完成 Antigravity 安装。请检查磁盘空间和目录访问权限。",
                   } satisfies ProviderInstallState;
                 })
               : Effect.void,
@@ -733,17 +707,14 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
         return next;
       }).pipe(Effect.uninterruptible),
     )
-    .pipe(Effect.mapError(wrapFailure("start", "Could not start the Antigravity installation.")));
+    .pipe(Effect.mapError(wrapFailure("start", "无法启动 Antigravity 安装。")));
 
   const cancel = Effect.fn("AntigravityInstallation.cancel")(function* (operationId: string) {
     return yield* gate.withPermit(
       Effect.gen(function* () {
         const current = yield* SubscriptionRef.get(state);
         if (current.operationId !== operationId) {
-          return yield* installationError(
-            "cancel",
-            "This installation is no longer current. Refresh its status before cancelling.",
-          );
+          return yield* installationError("cancel", "此安装已不再是当前安装。请刷新状态后再取消。");
         }
         if (running?.operationId === operationId && isRunning(current)) {
           yield* Fiber.interrupt(running.fiber);
@@ -760,7 +731,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
           if (isRunning(yield* SubscriptionRef.get(state)) || leases.size > 0) {
             return yield* installationError(
               "remove",
-              "Stop Antigravity sessions and sign-in flows before removing its managed runtime.",
+              "请先停止 Antigravity 会话和登录流程，再移除其托管运行时。",
             );
           }
           const realManaged = yield* fs.realPath(managedDirectory).pipe(Effect.option);
@@ -771,7 +742,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
               if (Option.isSome(selected) && selected.value.managedVersionDirectory) {
                 return yield* installationError(
                   "remove",
-                  "A provider instance has a custom path inside this managed runtime. Clear that path before removing it.",
+                  "某个提供商实例的自定义路径位于此托管运行时中。请先清除该路径，再进行移除。",
                 );
               }
               const resolved = yield* fs.realPath(binaryPath).pipe(Effect.option);
@@ -779,7 +750,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
               if (candidate.startsWith(`${realManaged.value}${path.sep}`)) {
                 return yield* installationError(
                   "remove",
-                  "A provider instance has a custom path inside this managed runtime. Clear that path before removing it.",
+                  "某个提供商实例的自定义路径位于此托管运行时中。请先清除该路径，再进行移除。",
                 );
               }
             }
@@ -804,7 +775,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
     Effect.mapError(
       wrapFailure(
         "remove",
-        "Could not remove the managed Antigravity runtime. Check for open processes and try again.",
+        "无法移除托管的 Antigravity 运行时。请检查是否有进程正在使用它，然后重试。",
       ),
     ),
   );
@@ -827,7 +798,7 @@ export const makeAntigravityInstallation = Effect.fn("AntigravityInstallation.ma
           ({
             ...current,
             phase: "failed",
-            message: "The managed Antigravity runtime is incomplete. Remove it and reinstall.",
+            message: "托管的 Antigravity 运行时不完整。请移除后重新安装。",
           }) satisfies ProviderInstallState,
       ),
     ),

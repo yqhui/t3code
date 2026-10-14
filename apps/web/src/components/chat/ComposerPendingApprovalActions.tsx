@@ -23,10 +23,10 @@ interface ComposerPendingApprovalActionsProps {
 }
 
 const DEFAULT_APPROVAL_OPTIONS = [
-  { decision: "cancel", label: "Cancel" },
-  { decision: "decline", label: "Decline" },
-  { decision: "acceptForSession", label: "Always allow this session" },
-  { decision: "accept", label: "Approve" },
+  { decision: "cancel", label: "取消" },
+  { decision: "decline", label: "拒绝" },
+  { decision: "acceptForSession", label: "本会话内始终允许" },
+  { decision: "accept", label: "批准" },
 ] satisfies ReadonlyArray<ProviderApprovalOption>;
 
 export const ComposerPendingApprovalActions = memo(function ComposerPendingApprovalActions({
@@ -77,7 +77,7 @@ export const ComposerPendingApprovalActions = memo(function ComposerPendingAppro
         <Menu>
           <MenuTrigger
             disabled={disabled || isResponding}
-            render={<Button size="icon-xs" variant="outline" aria-label="More approval options" />}
+            render={<Button size="icon-xs" variant="outline" aria-label="更多批准选项" />}
           >
             <EllipsisIcon />
           </MenuTrigger>

@@ -41,7 +41,7 @@ export function usageAliasCell(targets: readonly UsagePriceTarget[], model: stri
     return { value: "", placeholder: "Unavailable" };
   const values = targets.map((target) => modelAlias(target, model) ?? "");
   if (values.some((value) => value !== values[0])) return { value: "", placeholder: "Mixed" };
-  return { value: values[0] ?? "", placeholder: "None" };
+  return { value: values[0] ?? "", placeholder: "无" };
 }
 
 export function usagePriceCell(
@@ -58,7 +58,7 @@ export function usagePriceCell(
   if (values.some((value) => value !== values[0])) return { value: "", placeholder: "Mixed" };
   return {
     value: values[0] ?? "",
-    placeholder: values[0] === null ? "Automatic" : optional ? "Input rate" : "0.00",
+    placeholder: values[0] === null ? "自动" : optional ? "输入费率" : "0.00",
   };
 }
 
@@ -81,8 +81,8 @@ export function usagePriceTableChanges(
     // A mapped model is priced as its target, so mapping it drops its own price.
     const alias = (draft.alias ?? currentAlias ?? "").trim();
     if (alias !== "") {
-      if (model === "") errors.set(draft.id, "Enter a model ID.");
-      else if (alias === model) errors.set(draft.id, "Map to a different model.");
+      if (model === "") errors.set(draft.id, "请输入模型 ID。");
+      else if (alias === model) errors.set(draft.id, "请映射到不同的模型。");
       else {
         if (alias !== currentAlias) changes.push({ model, alias });
         if (modelPrice(target, model)) changes.push({ model, price: null });
@@ -108,10 +108,10 @@ export function usagePriceTableChanges(
       errors.set(
         draft.id,
         model === ""
-          ? "Enter a model ID."
+          ? "请输入模型 ID。"
           : missing
-            ? `${missing.label} is required on ${target.label}.`
-            : "Use non-negative numbers for prices.",
+            ? `${target.label} 必须填写${missing.label}。`
+            : "价格必须为非负数。",
       );
       continue;
     }

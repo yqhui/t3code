@@ -73,10 +73,10 @@ export function GitHubTokenSettings({
       {/* Locked while saving: a successful save clears the draft, which would drop edits made mid-request. */}
       <fieldset disabled={saving} className="contents">
         <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
-          A token saved here is used before{" "}
-          <code className="rounded bg-muted px-1 py-px text-2xs">GH_TOKEN</code> and the{" "}
-          <code className="rounded bg-muted px-1 py-px text-2xs">gh</code> login, so GitHub works
-          without the GitHub CLI. Give it read and write access to pull requests and contents.{" "}
+          此处保存的 Token 优先于{" "}
+          <code className="rounded bg-muted px-1 py-px text-2xs">GH_TOKEN</code> 和{" "}
+          <code className="rounded bg-muted px-1 py-px text-2xs">gh</code> 登录，因此无需 GitHub CLI
+          即可使用 GitHub。请授予该 Token 对拉取请求和内容的读写权限。{" "}
           <InlineButton
             render={
               <a
@@ -86,13 +86,13 @@ export function GitHubTokenSettings({
               />
             }
           >
-            Create a token
+            创建 Token
             <ExternalLinkIcon aria-hidden className="size-3" />
           </InlineButton>
         </p>
         <div className="grid gap-3 sm:grid-cols-[12rem_1fr]">
           <div className="grid gap-1.5">
-            <Label htmlFor={`github-token-host-${environmentId}`}>Host</Label>
+            <Label htmlFor={`github-token-host-${environmentId}`}>主机</Label>
             <Input
               id={`github-token-host-${environmentId}`}
               autoComplete="off"
@@ -116,8 +116,8 @@ export function GitHubTokenSettings({
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             {savedHosts.length === 0
-              ? "No token saved; the server uses GH_TOKEN or the gh login."
-              : `Saved for ${savedHosts.join(", ")}.`}
+              ? "未保存 Token；服务器使用 GH_TOKEN 或 gh 登录。"
+              : `已为 ${savedHosts.join(", ")} 保存。`}
           </p>
           <div className="flex shrink-0 gap-2">
             {isSaved ? (
@@ -127,11 +127,11 @@ export function GitHubTokenSettings({
                 disabled={saving}
                 onClick={() => void save(normalizedHost, "")}
               >
-                Remove
+                移除
               </Button>
             ) : null}
             <Button type="submit" size="xs" disabled={!normalizedHost || !draft.trim() || saving}>
-              Save
+              保存
             </Button>
           </div>
         </div>

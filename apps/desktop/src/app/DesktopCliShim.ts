@@ -117,7 +117,7 @@ export const renderCliShim = (input: {
     "done",
     // Without FUSE the runtime cannot mount (it prints why and exits); extracting the image still works.
     'if [ -z "$mount" ]; then',
-    '  (cd "$work" && "$app" --appimage-extract >/dev/null) || { echo "Could not open $app." >&2; exit 1; }',
+    '  (cd "$work" && "$app" --appimage-extract >/dev/null) || { echo "无法打开 $app。" >&2; exit 1; }',
     '  mount="$work/squashfs-root"',
     "fi",
     run("$mount"),

@@ -89,7 +89,7 @@ export function buildInitialGrokProviderSnapshot(
           version: null,
           status: "warning",
           auth: { status: "unknown" },
-          message: "Grok is disabled in T3 Code settings.",
+          message: "T3 Code 设置中已禁用 Grok。",
         },
       });
     }
@@ -104,7 +104,7 @@ export function buildInitialGrokProviderSnapshot(
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Checking Grok CLI availability...",
+        message: "正在检查 Grok CLI 是否可用…",
       },
     });
   });
@@ -168,7 +168,20 @@ function grokReasoningOptionsFromModel(model: EffectAcpSchema.ModelInfo): {
     const description = nonEmptyString(entry.description);
     options.push({
       value,
-      label: nonEmptyString(entry.label) ?? value,
+      label:
+        (
+          {
+            none: "无",
+            minimal: "最低",
+            low: "低",
+            medium: "中",
+            high: "高",
+            xhigh: "极高",
+            max: "最高",
+          } as Record<string, string>
+        )[value] ??
+        nonEmptyString(entry.label) ??
+        value,
       ...(description ? { description } : {}),
       advertisedDefault: entry.default === true || entry.isDefault === true,
     });
@@ -200,7 +213,7 @@ export function buildGrokModelCapabilities(model: EffectAcpSchema.ModelInfo): Mo
         optionDescriptors: [
           {
             id: "reasoningEffort",
-            label: "Reasoning",
+            label: "推理",
             type: "select",
             options: reasoning.options.map((option) => ({
               id: option.value,
@@ -393,7 +406,7 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
         version: null,
         status: "warning",
         auth: { status: "unknown" },
-        message: "Grok is disabled in T3 Code settings.",
+        message: "T3 Code 设置中已禁用 Grok。",
       },
     });
   }
@@ -419,8 +432,8 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
         status: "error",
         auth: { status: "unknown" },
         message: isCommandMissingCause(error)
-          ? "Grok CLI (`grok`) is not installed or not on PATH."
-          : "Failed to execute Grok CLI health check.",
+          ? "未安装 Grok CLI（`grok`），或它不在 PATH 中。"
+          : "无法执行 Grok CLI 健康检查。",
       },
     });
   }
@@ -436,7 +449,7 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
         version: null,
         status: "error",
         auth: { status: "unknown" },
-        message: "Grok CLI is installed but timed out while running `grok --version`.",
+        message: "已安装 Grok CLI，但运行 `grok --version` 超时。",
       },
     });
   }
@@ -459,7 +472,7 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
         version,
         status: "error",
         auth: { status: "unknown" },
-        message: "Grok CLI is installed but failed to run.",
+        message: "已安装 Grok CLI，但运行失败。",
       },
     });
   }
@@ -491,9 +504,9 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
   }
 
   const auth: ServerProviderAuth = environment[GROK_API_KEY_ENV]?.trim()
-    ? { status: "authenticated", type: "api_key", label: "xAI API key" }
+    ? { status: "authenticated", type: "api_key", label: "xAI API 密钥" }
     : cliModels.authenticated === true
-      ? { status: "authenticated", type: "cached_token", label: "Grok account" }
+      ? { status: "authenticated", type: "cached_token", label: "Grok 账户" }
       : cliModels.authenticated === false
         ? { status: "unauthenticated" }
         : { status: "unknown" };
@@ -534,7 +547,7 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
         version,
         status: "error",
         auth,
-        message: "Grok CLI is installed but not logged in. Run `grok login`.",
+        message: "已安装 Grok CLI，但尚未登录。请运行 `grok login`。",
       },
     });
   }
@@ -554,8 +567,7 @@ export const checkGrokProviderStatus = Effect.fn("checkGrokProviderStatus")(func
       auth,
       ...(acpFailed
         ? {
-            message:
-              "Grok CLI is installed but ACP initialize failed. Model options may be incomplete.",
+            message: "已安装 Grok CLI，但 ACP 初始化失败。模型选项可能不完整。",
           }
         : {}),
     },

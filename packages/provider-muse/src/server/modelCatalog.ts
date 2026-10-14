@@ -9,14 +9,14 @@ import { createMuseSdkHost, createMuseSdkHostEffect, type MuseSdkHost } from "./
 type MuseReasoningEffort = NonNullable<SendUserTurnOptions<never>["reasoningEffort"]>;
 
 const REASONING_EFFORT_LABELS = {
-  none: "None",
-  minimal: "Minimal",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  xhigh: "Extra High",
-  max: "Max",
-  ultra: "Ultra",
+  none: "无",
+  minimal: "最低",
+  low: "低",
+  medium: "中",
+  high: "高",
+  xhigh: "极高",
+  max: "最高",
+  ultra: "超高",
 } satisfies Record<MuseReasoningEffort, string>;
 
 const isMuseReasoningEffort = (tier: string): tier is MuseReasoningEffort =>
@@ -60,7 +60,7 @@ export function museModelCapabilities(
     optionDescriptors: [
       {
         id: "reasoningEffort",
-        label: "Reasoning",
+        label: "推理",
         type: "select",
         currentValue: defaultValue,
         options: efforts.map((id) => {

@@ -89,7 +89,7 @@ export function resolveLinkPullRequestInput(input: {
   const url = parseChangeRequestUrl(parsed);
   if (url !== null) {
     if (!input.hasProject({ ...url, url: parsed })) {
-      return { error: `No project in this environment can read ${url.host}/${url.repository}.` };
+      return { error: `此环境中没有项目可以读取 ${url.host}/${url.repository}。` };
     }
     return {
       link: { host: url.host, repository: url.repository, number: url.number, url: parsed },
@@ -98,12 +98,12 @@ export function resolveLinkPullRequestInput(input: {
   const number = Number(parsed);
   if (!Number.isSafeInteger(number) || number < 1) return null;
   if (input.project === null) {
-    return { error: "Paste a full URL to link a pull request from another repository." };
+    return { error: "请粘贴完整 URL 以关联其他仓库的拉取请求。" };
   }
   const webUrl = input.project.webUrl(number);
   const webReference = webUrl === null ? null : parseChangeRequestUrl(webUrl);
   if (webUrl === null || webReference === null) {
-    return { error: "Paste a full URL; this project's host has no known pull request URL." };
+    return { error: "请粘贴完整 URL；此项目的托管平台没有已知的拉取请求 URL。" };
   }
   return {
     link: { ...webReference, url: webUrl },
@@ -178,7 +178,7 @@ function LinkPullRequestDialog({
     try {
       await linking.changeLink(threadRef, resolved.link.url, true);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Could not link the pull request.");
+      setSubmitError(error instanceof Error ? error.message : "无法关联该拉取请求。");
       return;
     } finally {
       setPending(false);
@@ -189,9 +189,9 @@ function LinkPullRequestDialog({
   const validation = !dirty
     ? null
     : reference.trim().length === 0
-      ? "Paste a pull request URL or enter 123 / #123."
+      ? "请粘贴拉取请求 URL，或输入 123 / #123。"
       : resolved === null
-        ? "Use a pull request URL, 123, or #123."
+        ? "请使用拉取请求 URL、123 或 #123。"
         : "error" in resolved
           ? resolved.error
           : null;
@@ -200,16 +200,15 @@ function LinkPullRequestDialog({
     <Dialog open={open} onOpenChange={(next) => (pending ? undefined : onOpenChange(next))}>
       <DialogPopup className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Link pull request</DialogTitle>
+          <DialogTitle>关联拉取请求</DialogTitle>
           <DialogDescription>
-            Attach a pull request to this thread by its URL, or by its number for this thread's
-            repository.
+            通过 URL 将拉取请求附加到此会话，或使用此会话所属仓库对应的编号。
           </DialogDescription>
         </DialogHeader>
         <DialogPanel>
           <Input
             ref={inputRef}
-            placeholder="Pull request URL or #42"
+            placeholder="拉取请求 URL 或 #42"
             value={reference}
             onChange={(event) => {
               setDirty(true);
@@ -238,7 +237,7 @@ function LinkPullRequestDialog({
             onClick={() => onOpenChange(false)}
             disabled={pending}
           >
-            Cancel
+            取消
           </Button>
           <Button
             type="button"
@@ -246,7 +245,7 @@ function LinkPullRequestDialog({
             onClick={() => void submit()}
             disabled={pending || resolved === null || "error" in resolved}
           >
-            {pending ? "Linking..." : "Link"}
+            {pending ? "正在关联…" : "关联"}
           </Button>
         </DialogFooter>
       </DialogPopup>

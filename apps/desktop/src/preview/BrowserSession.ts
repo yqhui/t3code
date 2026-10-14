@@ -246,11 +246,11 @@ export const make = Effect.gen(function* BrowserSessionMake() {
         .showMessageBox(
           {
             type: "question",
-            buttons: ["Open", "Cancel"],
+            buttons: ["打开", "取消"],
             defaultId: 0,
             cancelId: 1,
-            message: `Open this ${new URL(url).protocol.slice(0, -1)} link?`,
-            detail: `A page in the browser wants to open another application:\n\n${shownUrl}`,
+            message: `打开此 ${new URL(url).protocol.slice(0, -1)} 链接？`,
+            detail: `浏览器中的页面想要打开另一个应用：\n\n${shownUrl}`,
           },
           previewHostWindow(requester),
         )

@@ -89,28 +89,28 @@ function UpdateEverythingDialogContent({
     ),
   );
   const running = stopped + continuing;
-  const threads = `${running} running ${running === 1 ? "thread" : "threads"}`;
+  const threads = `${running} 个正在运行的会话`;
 
   return (
     <>
       <AlertDialogHeader>
-        <AlertDialogTitle>{summary}?</AlertDialogTitle>
+        <AlertDialogTitle>{summary}？</AlertDialogTitle>
         <AlertDialogDescription className="whitespace-pre-line">
           {lines.join("\n")}
         </AlertDialogDescription>
         {running > 0 ? (
           <p className="pt-2 text-sm">
             {stopped === 0
-              ? `${threads} will be interrupted and can resume after the restart.`
+              ? `${threads}将被中断，并可在重启后恢复。`
               : continuing === 0
-                ? `${threads} will be interrupted.`
-                : `${threads} will be interrupted. ${continuing} can resume after the restart.`}
+                ? `${threads}将被中断。`
+                : `${threads}将被中断。其中 ${continuing} 个可在重启后恢复。`}
           </p>
         ) : null}
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-        <Button onClick={onConfirm}>Update</Button>
+        <AlertDialogClose render={<Button variant="outline" />}>取消</AlertDialogClose>
+        <Button onClick={onConfirm}>更新</Button>
       </AlertDialogFooter>
     </>
   );

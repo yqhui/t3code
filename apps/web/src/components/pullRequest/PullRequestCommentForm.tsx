@@ -74,7 +74,7 @@ export function PullRequestCommentForm({
     });
     if (result._tag === "Failure") {
       setSubmitting(null);
-      toastManager.add({ type: "error", title: "Could not post the comment" });
+      toastManager.add({ type: "error", title: "无法发布评论" });
       return;
     }
     setBody("");
@@ -92,8 +92,8 @@ export function PullRequestCommentForm({
         disabled={submitting !== null || actionPending}
         value={body}
         rows={3}
-        placeholder="Leave a comment"
-        aria-label="Comment on this pull request"
+        placeholder="留下评论"
+        aria-label="对此拉取请求发表评论"
         onChange={(event) => setBody(event.target.value)}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -124,11 +124,11 @@ export function PullRequestCommentForm({
             )}
             {submitting === followUpAction
               ? followUpAction === "close"
-                ? "Closing..."
-                : "Reopening..."
+                ? "正在关闭…"
+                : "正在重新打开…"
               : followUpAction === "close"
-                ? "Close with comment"
-                : "Reopen with comment"}
+                ? "评论并关闭"
+                : "评论并重新打开"}
           </Button>
         )}
         <Button
@@ -138,7 +138,7 @@ export function PullRequestCommentForm({
           onClick={() => void submit("comment")}
         >
           <SendIcon className="size-3.5" />
-          {submitting === "comment" ? "Posting..." : "Comment"}
+          {submitting === "comment" ? "正在发布…" : "评论"}
         </Button>
       </div>
     </div>

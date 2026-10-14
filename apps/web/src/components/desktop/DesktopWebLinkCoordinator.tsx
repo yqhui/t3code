@@ -71,9 +71,7 @@ export function DesktopWebLinkCoordinator() {
     primaryEnvironment.serverConfig !== null;
 
   const reportFailure = (url: string, description = url) =>
-    toastManager.add(
-      stackedThreadToast({ type: "error", title: "Could not open the link", description }),
-    );
+    toastManager.add(stackedThreadToast({ type: "error", title: "无法打开链接", description }));
 
   // The OS hands each link over once, so a thread that could not start says so.
   const startThread = async (url: string): Promise<ScopedThreadRef | null> => {
@@ -83,7 +81,7 @@ export function DesktopWebLinkCoordinator() {
       return null;
     }
     // Reports its own failure.
-    const project = await openScratchProject(environmentId, "Could not open the link");
+    const project = await openScratchProject(environmentId, "无法打开链接");
     if (!project) return null;
     const opened = await openThread(scopeProjectRef(project.environmentId, project.id));
     if (!opened) {

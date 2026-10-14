@@ -132,7 +132,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
   ) {
     const url = yield* Effect.try({
       try: () => new URL(`/v0/management/${path}`, config.url).toString(),
-      catch: () => new UsageLimitSourceError({ detail: "The hub URL is not valid." }),
+      catch: () => new UsageLimitSourceError({ detail: "Hub URL 无效。" }),
     });
     const request = (
       body === undefined ? HttpClientRequest.get(url) : HttpClientRequest.post(url)
@@ -143,9 +143,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
         Effect.flatMap(HttpClientResponse.filterStatusOk),
         Effect.flatMap((response) => response.json),
         Effect.timeout("15 seconds"),
-        Effect.mapError(
-          () => new UsageLimitSourceError({ detail: "The hub management request failed." }),
-        ),
+        Effect.mapError(() => new UsageLimitSourceError({ detail: "Hub 管理请求失败。" })),
       );
     return response;
   });
@@ -183,7 +181,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
     const response = yield* decodeApiResponse(raw);
     if (response.status_code < 200 || response.status_code >= 300) {
       return yield* new UsageLimitSourceError({
-        detail: `The provider refused the hub request (HTTP ${response.status_code}).`,
+        detail: `提供商拒绝了 Hub 请求（HTTP ${response.status_code}）。`,
       });
     }
     return response.body;
@@ -299,7 +297,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
         usageLimits: makeUnavailableUsageLimits({
           checkedAt,
           reason: "probeFailed",
-          message: "The hub could not read this account's usage.",
+          message: "Hub 无法读取此账户的用量。",
         }),
       })),
     );
@@ -309,9 +307,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
     config: UsageLimitSourceConfig,
   ): Effect.fn.Return<ReadonlyArray<UsageLimitSourceAccount>, UsageLimitSourceError> {
     const accounts = yield* authFiles(config).pipe(
-      Effect.mapError(
-        () => new UsageLimitSourceError({ detail: "The hub could not list accounts." }),
-      ),
+      Effect.mapError(() => new UsageLimitSourceError({ detail: "Hub 无法列出账户。" })),
     );
     return yield* Effect.forEach(
       accounts.filter(
@@ -332,7 +328,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
       const account = (yield* authFiles(config)).find((account) => account.id === accountId);
       if (!account || account.disabled || account.provider !== "codex") {
         return yield* new UsageLimitSourceError({
-          detail: "The Codex hub account is missing or disabled.",
+          detail: "Codex Hub 账户缺失或已被禁用。",
         });
       }
       const body = yield* apiCall(config, account, `${CREDIT_URL}/consume`, {
@@ -360,7 +356,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
         ...(cleared._tag === "Failure"
           ? {
               warning:
-                "Credit redeemed, but the hub cooldown could not be cleared. Routing may resume after its cooldown expires.",
+                "重置额度已兑换，但无法清除 Hub 冷却时间。路由可能会在其冷却时间到期后恢复。",
             }
           : {}),
       } as const;
@@ -370,7 +366,7 @@ export const makeCliproxyApi = Effect.gen(function* () {
         isUsageLimitSourceError(error)
           ? error
           : new UsageLimitSourceError({
-              detail: "The hub returned an unexpected reset-credit response.",
+              detail: "Hub 返回了意外的重置额度响应。",
             }),
       ),
     );

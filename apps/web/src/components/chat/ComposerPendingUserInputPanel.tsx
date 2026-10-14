@@ -1,5 +1,6 @@
 import { type RuntimeRequestId, type ScopedThreadRef } from "@t3tools/contracts";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { isClaudeResumeCompactionQuestion } from "@t3tools/shared/claudeCompaction";
 import { type PendingUserInput } from "../../session-logic";
 import {
   derivePendingUserInputProgress,
@@ -194,6 +195,14 @@ const ComposerPendingUserInputCard = memo(function ComposerPendingUserInputCard(
   }
 
   const customAnswerActive = progress.customAnswer.trim().length > 0;
+  const isResumeCompaction = isClaudeResumeCompactionQuestion(activeQuestion.question);
+  const displayQuestion = isResumeCompaction
+    ? activeQuestion.question.replace(
+        /^This session is (.+) old and uses ([\d,]+) tokens\. Compact it before continuing\?$/u,
+        (_, age: string, tokens: string) =>
+          `此会话已过去 ${age.replace(/h/g, " 小时").replace(/m/g, " 分钟")}，使用了 ${tokens} Token。继续前要压缩上下文吗？`,
+      )
+    : activeQuestion.question;
 
   return (
     <Collapsible
@@ -204,20 +213,16 @@ const ComposerPendingUserInputCard = memo(function ComposerPendingUserInputCard(
     >
       <CollapsibleTrigger
         render={<ComposerBanner.Row render={<button type="button" />} />}
-        title={
-          isCollapsed ? "Show the question and its options" : "Hide the question and its options"
-        }
+        title={isCollapsed ? "显示问题及其选项" : "隐藏问题及其选项"}
         data-pending-user-input-toggle={isCollapsed ? "collapsed" : "expanded"}
       >
         <ComposerBanner.Icon />
         <ComposerBanner.Content>
           <span className="shrink-0 font-medium text-muted-foreground">
-            {activeQuestion.header}
+            {isResumeCompaction ? "恢复会话" : activeQuestion.header}
           </span>
           {isCollapsed ? (
-            <span className="min-w-0 flex-1 truncate text-secondary-label">
-              {activeQuestion.question}
-            </span>
+            <span className="min-w-0 flex-1 truncate text-secondary-label">{displayQuestion}</span>
           ) : null}
         </ComposerBanner.Content>
         <ComposerBanner.Actions>
@@ -232,8 +237,8 @@ const ComposerPendingUserInputCard = memo(function ComposerPendingUserInputCard(
             // the disclosure. Dismiss closes the question without a reply.
             <ComposerBanner.Dismiss
               render={<span role="button" tabIndex={0} />}
-              aria-label="Dismiss question without answering"
-              title="Dismiss question without answering"
+              aria-label="关闭问题而不作答"
+              title="关闭问题而不作答"
               disabled={isResponding}
               data-pending-user-input-dismiss
               onClick={(event) => {
@@ -255,17 +260,26 @@ const ComposerPendingUserInputCard = memo(function ComposerPendingUserInputCard(
         <ComposerBanner.Scroll>
           <ComposerBanner.Body className="pe-1 pb-1 wrap-anywhere">
             <ChatMarkdown
-              text={activeQuestion.question}
+              text={displayQuestion}
               cwd={cwd}
               threadRef={threadRef}
               className="text-foreground/85"
             />
             {activeQuestion.multiSelect ? (
-              <p className="mt-1 text-secondary-label text-xs">Select one or more options.</p>
+              <p className="mt-1 text-secondary-label text-xs">选择一个或多个选项。</p>
             ) : null}
             <div className="mt-2 space-y-0.5">
               {activeQuestion.options.map((option, index) => {
                 const optionValue = option.value ?? option.label;
+                const resumeOption = isResumeCompaction
+                  ? option.label === "Compact and continue"
+                    ? { label: "压缩并继续", description: "使用摘要恢复会话，减少 Token 用量。" }
+                    : option.label === "Keep full history"
+                      ? { label: "保留完整历史", description: "恢复会话，不更改对话内容。" }
+                      : option.label === "Don't ask again"
+                        ? { label: "不再询问", description: "保留完整历史，并跳过后续恢复提示。" }
+                        : null
+                  : null;
                 const isOptimisticallySelected =
                   optimisticSingleSelect?.questionId === activeQuestion.id &&
                   optimisticSingleSelect.optionValue === optionValue;
@@ -284,9 +298,13 @@ const ComposerPendingUserInputCard = memo(function ComposerPendingUserInputCard(
                 const content = (
                   <>
                     <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-                      <span className="text-sm font-medium">{option.label}</span>
+                      <span className="text-sm font-medium">
+                        {resumeOption?.label ?? option.label}
+                      </span>
                       {option.description && option.description !== option.label ? (
-                        <span className="text-secondary-label text-2xs">{option.description}</span>
+                        <span className="text-secondary-label text-2xs">
+                          {resumeOption?.description ?? option.description}
+                        </span>
                       ) : null}
                     </div>
                     {isSelected ? (

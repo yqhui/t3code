@@ -34,7 +34,7 @@ export function GuideRail({
           <>
             {stop.attention !== null ? (
               <Badge size="sm" variant="warning">
-                Look closely
+                需要细看
               </Badge>
             ) : null}
             <span>{stopSubline(stop)}</span>
@@ -45,10 +45,10 @@ export function GuideRail({
   );
 
   return (
-    <nav aria-label="Review tour" className="flex min-h-0 flex-col gap-4">
+    <nav aria-label="审查导览" className="flex min-h-0 flex-col gap-4">
       {/* Beside the stop only; narrow, the stop's own header says where the reader is. */}
       <p className="text-xs text-muted-foreground tabular-nums @max-[56rem]/guide:hidden">
-        {reviewed} of {stops.length} read
+        已读 {reviewed}/{stops.length} 站
       </p>
       <div className="flex flex-col gap-4">
         <ol className="flex flex-col gap-0.5">{stops.map(renderStop)}</ol>
@@ -102,7 +102,7 @@ function StopBullet({ number, seen }: { number: number; seen: boolean }) {
         seen ? "border-success/40 text-success-foreground" : "border-border text-muted-foreground",
       )}
     >
-      {seen ? <CheckIcon aria-label={`Stop ${number}, read`} className="size-3" /> : number}
+      {seen ? <CheckIcon aria-label={`第 ${number} 站，已读`} className="size-3" /> : number}
     </span>
   );
 }

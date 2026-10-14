@@ -17,12 +17,12 @@ import { FoldedSettingsSection } from "./FoldedSettingsSection";
 import { searchableSetting } from "./settingsSearch";
 
 const options: ReadonlyArray<{ value: GitHubRoutingPermission; label: string }> = [
-  { value: "off", label: "Off" },
-  { value: "read", label: "Read PRs" },
-  { value: "read-write", label: "Read and act" },
+  { value: "off", label: "关闭" },
+  { value: "read", label: "读取 PR" },
+  { value: "read-write", label: "读取并操作" },
 ];
 
-const summaryLabels = { "read-write": "read and act", read: "read PRs" } as const;
+const summaryLabels = { "read-write": "读取并操作", read: "读取 PR" } as const;
 
 /**
  * Closed-header summary: the machines that share, grouped by permission.
@@ -69,13 +69,12 @@ export function GitHubRoutingSettings({
             label: environment.label,
             permission: gitHubRoutingPermissionFor(environment.entry, permissions),
           })),
-        ) ?? "Off"
+        ) ?? "关闭"
       }
     >
       <p className="px-3 py-2.5 text-xs text-muted-foreground sm:px-4">
-        Machines you trust here can read PR data through each other's GitHub access. Enable both
-        machines. Read and act may use broader permissions than the machine that owns them. This
-        applies only to this device.
+        在此信任的机器可通过彼此的 GitHub 访问权限读取 PR
+        数据。请在两台机器上都启用此功能。“读取并操作”可能使用比凭据所属机器更广的权限。此设置仅应用于当前设备。
       </p>
       {environments.map((environment) => (
         <EnvironmentRow
@@ -99,7 +98,7 @@ export function GitHubRoutingSettings({
                   if (result._tag === "Failure")
                     toastManager.add({
                       type: "error",
-                      title: "Could not save GitHub routing permission",
+                      title: "无法保存 GitHub 路由权限",
                     });
                 },
               );
@@ -108,7 +107,7 @@ export function GitHubRoutingSettings({
             <SelectTrigger
               size="xs"
               className="w-32"
-              aria-label={`${environment.label} GitHub routing`}
+              aria-label={`${environment.label} 的 GitHub 路由`}
             >
               <SelectValue />
             </SelectTrigger>

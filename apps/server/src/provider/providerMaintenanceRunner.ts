@@ -113,7 +113,7 @@ const runProviderMaintenanceCommandWithSpawner = Effect.fn("ProviderMaintenanceR
             Effect.mapError(
               (cause) =>
                 new ProviderMaintenanceCommandError({
-                  message: `Failed to run update command ${input.command}: ${cause.message}`,
+                  message: `无法运行更新命令 ${input.command}：${cause.message}`,
                   cause,
                 }),
             ),
@@ -167,7 +167,7 @@ const runProviderMaintenanceCommandWithSpawner = Effect.fn("ProviderMaintenanceR
           Effect.mapError(
             (cause) =>
               new ProviderMaintenanceCommandError({
-                message: cause instanceof Error ? cause.message : "Update command failed to run.",
+                message: cause instanceof Error ? cause.message : "更新命令未能运行。",
                 cause,
               }),
           ),
@@ -253,12 +253,12 @@ function commandOutput(result: ProviderMaintenanceCommandResult): string | null 
 
 function failureMessage(result: ProviderMaintenanceCommandResult): string {
   if (result.timedOut) {
-    return "Update timed out.";
+    return "更新超时。";
   }
   if (result.exitCode !== null && result.exitCode !== 0) {
-    return `Update command exited with code ${result.exitCode}.`;
+    return `更新命令以退出码 ${result.exitCode} 结束。`;
   }
-  return "Update command failed.";
+  return "更新命令失败。";
 }
 
 function isOutdatedProvider(provider: ServerProvider | undefined): boolean {
@@ -307,7 +307,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
     makeAlreadyRunningError: () =>
       new ServerProviderUpdateError({
         provider: ProviderDriverKind.make("unknown"),
-        reason: "An update is already running for this provider.",
+        reason: "该提供商的更新已在进行中。",
       }),
   });
 
@@ -399,7 +399,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
     if (!update) {
       return yield* new ServerProviderUpdateError({
         provider,
-        reason: "This provider does not support one-click updates.",
+        reason: "此提供商不支持一键更新。",
       });
     }
 
@@ -414,7 +414,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
         status: "queued",
         startedAt: null,
         finishedAt: null,
-        message: "Waiting for another provider update to finish.",
+        message: "正在等待另一个提供商更新完成。",
       }),
     ).pipe(Effect.asVoid);
 
@@ -437,7 +437,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                   message,
                 }),
               ).pipe(Effect.asVoid);
-            yield* setRunningMessage("Checking for the latest version");
+            yield* setRunningMessage("正在检查最新版本");
 
             // The cached capabilities chose the lock; re-derive ownership
             // now so the command that runs matches the executable as it is
@@ -453,7 +453,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                   status: "failed",
                   startedAt,
                   finishedAt: yield* nowIso,
-                  message: "Provider installation changed. Refresh and try again.",
+                  message: "提供商安装状态已变化，请刷新后重试。",
                 }),
               );
             }
@@ -493,12 +493,12 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                   finishedAt: yield* nowIso,
                   message:
                     targetVersion !== undefined
-                      ? "This version is no longer recommended or this installer cannot install a specific version. Refresh provider settings."
-                      : "The latest provider version is incompatible with this T3 Code release. Review provider settings.",
+                      ? "此版本已不再推荐，或此安装器无法安装指定版本。请刷新提供商设置。"
+                      : "提供商的最新版本与此 T3 Code 版本不兼容。请查看提供商设置。",
                 }),
               );
             }
-            yield* setRunningMessage(`Running ${describeCommand(command)}`);
+            yield* setRunningMessage(`正在运行 ${describeCommand(command)}`);
             const result = yield* runMaintenanceCommand(command, setRunningMessage);
             const finishedAt = yield* nowIso;
             if (result.timedOut || result.exitCode !== 0) {
@@ -513,7 +513,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
               );
             }
 
-            yield* setRunningMessage("Verifying the installed version");
+            yield* setRunningMessage("正在验证已安装的版本");
             // Homebrew's "latest" moves once the upgrade lands; read it again.
             const verified = yield* providerRegistry.getProviderMaintenanceCapabilitiesForInstance(
               instanceId,
@@ -546,10 +546,10 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                 startedAt,
                 finishedAt,
                 message: couldNotVerify
-                  ? "Update command completed, but T3 Code could not verify the provider version."
+                  ? "更新命令已完成，但 T3 Code 无法验证提供商版本。"
                   : stillOutdated
-                    ? "Update command completed, but T3 Code still detects an outdated provider version."
-                    : "Provider updated.",
+                    ? "更新命令已完成，但 T3 Code 仍检测到提供商版本过旧。"
+                    : "提供商已更新。",
                 output: commandOutput(result),
               }),
             );
@@ -565,7 +565,7 @@ export const make = Effect.fn("ProviderMaintenanceRunner.make")(function* () {
                 status: "failed",
                 startedAt,
                 finishedAt: yield* nowIso,
-                message: failure instanceof Error ? failure.message : "Update command failed.",
+                message: failure instanceof Error ? failure.message : "更新命令失败。",
                 output: null,
               }),
             );
