@@ -7253,7 +7253,7 @@ export default function ChatView(props: ChatViewProps) {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "取消会话完成状态失败",
+            title: "恢复为待处理失败",
             description: error instanceof Error ? error.message : "发生错误。",
           }),
         );
@@ -7705,10 +7705,10 @@ export default function ChatView(props: ChatViewProps) {
         icon={<CheckCircle2Icon />}
         label={
           activeThreadShell?.settledAt
-            ? `已完成 ${formatRelativeTimeLabel(activeThreadShell.settledAt)}`
-            : "已完成"
+            ? `已处理 · ${formatRelativeTimeLabel(activeThreadShell.settledAt)}`
+            : "已处理"
         }
-        actionLabel={isUnsettling ? "正在取消完成…" : "取消完成"}
+        actionLabel={isUnsettling ? "正在恢复待处理…" : "恢复为待处理"}
         actionDisabled={!canOperateThread || isUnsettling}
         onAction={() => void handleUnsettleActiveThread()}
       />

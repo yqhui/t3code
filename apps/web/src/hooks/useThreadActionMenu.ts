@@ -226,10 +226,10 @@ export function useThreadActionMenu(input: {
             return;
           }
           case "settle":
-            await reportFailure("完结会话失败", () => settleThread(threadRef));
+            await reportFailure("标记为已处理失败", () => settleThread(threadRef));
             return;
           case "unsettle":
-            await reportFailure("取消完结失败", () => unsettleThread(threadRef));
+            await reportFailure("恢复为待处理失败", () => unsettleThread(threadRef));
             return;
           case "unsnooze":
             await reportFailure("唤醒会话失败", () => unsnoozeThread(threadRef));
@@ -243,7 +243,7 @@ export function useThreadActionMenu(input: {
           }
           case "auto-settle:enabled":
           case "auto-settle:disabled":
-            await reportFailure("更新自动完结设置失败", () =>
+            await reportFailure("更新自动处理设置失败", () =>
               setThreadAutoSettle(threadRef, action === "auto-settle:enabled"),
             );
             return;

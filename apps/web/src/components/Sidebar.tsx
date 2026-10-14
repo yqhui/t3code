@@ -1088,13 +1088,13 @@ const dropVerbBadge: Record<SidebarDropVerb, ReactNode> = {
   settle: (
     <>
       <CircleCheckIcon aria-hidden className="size-3" />
-      归结
+      已处理
     </>
   ),
   unsettle: (
     <>
       <Undo2Icon aria-hidden className="size-3" />
-      取消归结
+      恢复待处理
     </>
   ),
   wake: (
@@ -1911,7 +1911,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                       render={
                         <button
                           type="button"
-                          aria-label="取消归结会话"
+                          aria-label="恢复为待处理"
                           onClick={handleUnsettleClick}
                           onPointerDown={handleActionPointerDown}
                           className={cn(
@@ -1923,12 +1923,12 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                     >
                       <Undo2Icon className="mb-px size-3.5" />
                     </TooltipTrigger>
-                    <TooltipPopup side="top">取消归结会话</TooltipPopup>
+                    <TooltipPopup side="top">恢复为待处理</TooltipPopup>
                   </Tooltip>
                 ) : (
                   <button
                     type="button"
-                    aria-label="归结会话"
+                    aria-label="标记为已处理"
                     onClick={handleSettleClick}
                     onPointerDown={handleActionPointerDown}
                     className={cn(
@@ -2124,7 +2124,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                             render={
                               <button
                                 type="button"
-                                aria-label="归结会话"
+                                aria-label="标记为已处理"
                                 onClick={handleSettleClick}
                                 onPointerDown={handleActionPointerDown}
                                 className="-mr-1 inline-flex cursor-pointer items-center gap-1 rounded-md bg-transparent px-1.5 text-xs text-muted-foreground hover:text-foreground"
@@ -2132,9 +2132,9 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                             }
                           >
                             <CheckIcon className="size-3.5" />
-                            归结
+                            已处理
                           </TooltipTrigger>
-                          <TooltipPopup>归结会话</TooltipPopup>
+                          <TooltipPopup>标记为已处理</TooltipPopup>
                         </Tooltip>
                       ) : null}
                     </span>
@@ -3423,7 +3423,7 @@ export default function Sidebar() {
               toastManager.add(
                 stackedThreadToast({
                   type: "error",
-                  title: "归结会话失败",
+                  title: "标记为已处理失败",
                   description: error instanceof Error ? error.message : "发生错误。",
                 }),
               );
@@ -3475,7 +3475,7 @@ export default function Sidebar() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "取消归结会话失败",
+              title: "恢复为待处理失败",
               description: error instanceof Error ? error.message : "发生错误。",
             }),
           );
@@ -4147,7 +4147,7 @@ export default function Sidebar() {
           case "settle": {
             settlingThreadKeysRef.current.add(activeKey);
             const navigateAfterSettle = planForwardNavigation(activeKey);
-            const settled = await run(settleThread(threadRef), "归结会话失败").finally(() =>
+            const settled = await run(settleThread(threadRef), "标记为已处理失败").finally(() =>
               settlingThreadKeysRef.current.delete(activeKey),
             );
             if (
@@ -4166,7 +4166,7 @@ export default function Sidebar() {
           case "move-active":
             // The drag expresses unpin intent; button/menu confirmation is unchanged.
             if (plan.unpin && !(await run(unpinThread(threadRef), "取消固定会话失败"))) return;
-            if (plan.unsettle && !(await run(unsettleThread(threadRef), "取消归结会话失败")))
+            if (plan.unsettle && !(await run(unsettleThread(threadRef), "恢复为待处理失败")))
               return;
             if (plan.unsnooze && !(await run(unsnoozeThread(threadRef), "唤回会话失败"))) return;
             break;
@@ -4354,7 +4354,7 @@ export default function Sidebar() {
               : []),
             {
               id: "settle",
-              label: `Settle (${count})`,
+              label: `标记为已处理（${count}）`,
               disabled: settlingThreads.length === 0 || !canOperateThreads(settlingThreads),
             },
             ...(canSnoozeSelection
@@ -4778,7 +4778,7 @@ export default function Sidebar() {
               toastManager.add(
                 stackedThreadToast({
                   type: "error",
-                  title: "更新自动归结失败",
+                  title: "更新自动处理设置失败",
                   description: error instanceof Error ? error.message : "发生错误。",
                 }),
               );
@@ -5551,8 +5551,8 @@ export default function Sidebar() {
                                 )}
                                 label={
                                   settledShelfExpanded
-                                    ? "已归结"
-                                    : `已归结（${settledThreads.length}）`
+                                    ? "已处理"
+                                    : `已处理（${settledThreads.length}）`
                                 }
                                 dragging={from !== null}
                                 isDropTarget={dragTargetSection === "settled"}
@@ -5568,7 +5568,7 @@ export default function Sidebar() {
                               <SidebarSectionPlaceholder
                                 key="settled-placeholder"
                                 marker="settled-placeholder"
-                                label="已归结"
+                                label="已处理"
                                 showHint={
                                   from !== null &&
                                   (renderedSettledThreads.length === 0 ||

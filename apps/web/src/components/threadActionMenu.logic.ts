@@ -145,8 +145,8 @@ export function buildThreadActionMenuItems(
     ...(state.supports.settlement
       ? [
           state.isSettled
-            ? { id: "unsettle" as const, label: "取消归结会话", icon: "circle-check" }
-            : { id: "settle" as const, label: "归结会话", icon: "circle-check" },
+            ? { id: "unsettle" as const, label: "恢复为待处理", icon: "circle-check" }
+            : { id: "settle" as const, label: "标记为已处理", icon: "circle-check" },
         ]
       : []),
     ...(state.supports.snooze
@@ -199,7 +199,7 @@ export function buildThreadActionMenuItems(
       ? [
           {
             id: "auto-settle" as const,
-            label: "自动归结行为",
+            label: "自动标记为已处理",
             icon: "timer",
             children: [
               {

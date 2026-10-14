@@ -82,7 +82,7 @@ export class ThreadSettlementUnsupportedError extends Schema.TaggedError<ThreadS
   },
 ) {
   override get message(): string {
-    return "此环境的服务器尚不支持完结。请更新服务器以使用完结。";
+    return "此环境的服务器尚不支持将会话标记为已处理。请更新服务器以使用该功能。";
   }
 }
 
@@ -130,7 +130,7 @@ export class ThreadAutoSettleOptOutUnsupportedError extends Schema.TaggedError<T
   },
 ) {
   override get message(): string {
-    return "此环境的服务器尚不支持按会话关闭自动完结。请更新服务器以使用该功能。";
+    return "此环境的服务器尚不支持按会话关闭自动处理。请更新服务器以使用该功能。";
   }
 }
 
@@ -820,7 +820,7 @@ export function useThreadActions() {
           }
           return unsettled;
         },
-        failureTitle: "撤销完结失败",
+        failureTitle: "恢复为待处理失败",
       });
       return result;
     },

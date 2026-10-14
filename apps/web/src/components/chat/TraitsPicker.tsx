@@ -50,30 +50,45 @@ const SAVED_OPTION_LABELS: Readonly<Record<string, string>> = {
   variant: "推理",
 };
 
+const TRAIT_DISPLAY_LABELS: Readonly<Record<string, string>> = {
+  fast: "快速",
+  ultrafast: "极速",
+  standard: "标准",
+  normal: "标准",
+  low: "低",
+  medium: "中",
+  high: "高",
+  minimal: "最低",
+  "extra high": "极高",
+  "very high": "极高",
+  xhigh: "极高",
+  max: "最高",
+  ultra: "超高",
+  ultrathink: "深度思考（Ultrathink）",
+  ultracode: "多 Agent 编程（Ultracode）",
+  none: "无",
+  default: "默认",
+  auto: "自动",
+  enabled: "已启用",
+  disabled: "已禁用",
+  thinking: "思考",
+  reasoning: "推理强度",
+  effort: "思考强度",
+  "fast mode": "快速模式",
+  "reasoning effort": "推理强度",
+  "context window": "上下文窗口",
+};
+
 function traitDisplayLabel(label: string): string {
-  return (
-    (
-      {
-        Fast: "快速",
-        Ultrafast: "极速",
-        Standard: "标准",
-        Low: "低",
-        Medium: "中",
-        High: "高",
-        Minimal: "最低",
-        Max: "最高",
-        None: "无",
-        Default: "默认",
-        Auto: "自动",
-        Enabled: "已启用",
-        Disabled: "已禁用",
-        Thinking: "思考",
-        "Fast mode": "快速模式",
-        "Reasoning effort": "推理强度",
-        "Context window": "上下文窗口",
-      } as Readonly<Record<string, string>>
-    )[label] ?? label
-  );
+  return TRAIT_DISPLAY_LABELS[label.trim().toLowerCase()] ?? label;
+}
+
+const TRAIT_DISPLAY_DESCRIPTIONS: Readonly<Record<string, string>> = {
+  "xhigh effort plus multi-agent workflow orchestration": "极高思考强度，配合多 Agent 工作流编排",
+};
+
+function traitDisplayDescription(description: string): string {
+  return TRAIT_DISPLAY_DESCRIPTIONS[description.trim().toLowerCase()] ?? description;
 }
 
 function savedOptionLabel(id: string): string {
@@ -466,7 +481,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                       </span>
                       {option.description ? (
                         <span className="max-w-56 text-pretty text-muted-foreground/80 text-xs">
-                          {option.description}
+                          {traitDisplayDescription(option.description)}
                         </span>
                       ) : null}
                     </span>
